@@ -1,0 +1,322 @@
+# Documentation Rules
+
+## 文档结构约定
+```
+docs/
+├── README.md          # 项目总览
+├── SETUP.md          # 环境搭建指南
+├── API.md            # API 文档
+├── DEPLOYMENT.md     # 部署文档
+├── CONTRIBUTING.md   # 贡献指南
+├── CHANGELOG.md      # 变更日志
+├── architecture/     # 架构设计文档
+│   ├── system-design.md
+│   ├── database-schema.md
+│   └── api-design.md
+├── guides/           # 开发指南
+│   ├── frontend-guide.md
+│   ├── backend-guide.md
+│   └── testing-guide.md
+└── assets/           # 文档相关资源
+    ├── images/
+    └── diagrams/
+```
+
+## 文档写作规范
+
+### Markdown 格式规范
+- 使用清晰的标题层次 (H1-H6)
+- 代码块指定语言类型
+- 使用表格展示结构化数据
+- 添加目录导航 (TOC)
+- 使用相对链接引用其他文档
+
+### 内容组织原则
+- 开篇概述和目标读者
+- 循序渐进的说明步骤
+- 提供完整的示例代码
+- 包含常见问题解答
+- 定期更新维护
+
+## 项目文档模板
+
+### README.md 模板
+```markdown
+# Portfolio Website
+
+> 个人作品集网站，展示项目经验和技术能力
+
+## 🚀 快速开始
+
+### 环境要求
+- Node.js 18+
+- Java 17+
+- PostgreSQL 15+
+- Docker (可选)
+
+### 本地开发
+\`\`\`bash
+# 克隆项目
+git clone [repository-url]
+cd portfolio-website
+
+# 启动前端
+cd frontend
+npm install
+npm run dev
+
+# 启动后端
+cd backend
+mvn spring-boot:run
+\`\`\`
+
+## 📁 项目结构
+\`\`\`
+├── frontend/     # React 前端
+├── backend/      # Spring Boot 后端
+├── deployment/   # 部署配置
+└── docs/         # 项目文档
+\`\`\`
+
+## 🛠 技术栈
+- **前端**: React + TypeScript + Tailwind CSS
+- **后端**: Spring Boot + JPA + PostgreSQL
+- **部署**: Docker + Nginx
+
+## 📚 文档
+- [环境搭建](docs/SETUP.md)
+- [API 文档](docs/API.md)
+- [部署指南](docs/DEPLOYMENT.md)
+
+## 🤝 贡献
+请阅读 [贡献指南](docs/CONTRIBUTING.md)
+
+## 📄 许可证
+MIT License
+```
+
+### API.md 模板
+```markdown
+# API 文档
+
+## 基础信息
+- **Base URL**: `http://localhost:8080/api/v1`
+- **认证方式**: JWT Bearer Token
+- **响应格式**: JSON
+
+## 统一响应格式
+\`\`\`json
+{
+  "success": true,
+  "data": {},
+  "message": "操作成功",
+  "timestamp": "2024-01-01T00:00:00Z"
+}
+\`\`\`
+
+## API 端点
+
+### 用户管理
+
+#### 获取用户信息
+\`\`\`http
+GET /api/v1/users/{id}
+\`\`\`
+
+**参数说明**
+| 参数 | 类型 | 必需 | 说明 |
+|------|------|------|------|
+| id | Long | 是 | 用户ID |
+
+**响应示例**
+\`\`\`json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "张三",
+    "createdAt": "2024-01-01T00:00:00Z"
+  }
+}
+\`\`\`
+
+**错误码**
+| 错误码 | 说明 |
+|--------|------|
+| 404 | 用户不存在 |
+| 401 | 未授权 |
+```
+
+### SETUP.md 模板
+```markdown
+# 环境搭建指南
+
+## 开发环境要求
+
+### 前端环境
+- Node.js 18.x 或更高版本
+- npm 9.x 或更高版本
+- 现代浏览器 (Chrome, Firefox, Safari)
+
+### 后端环境
+- Java JDK 17
+- Maven 3.8+
+- PostgreSQL 15+
+- IDE: IntelliJ IDEA 或 VS Code
+
+## 详细安装步骤
+
+### 1. 安装 Node.js
+\`\`\`bash
+# 使用 nvm 安装 (推荐)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 18
+nvm use 18
+\`\`\`
+
+### 2. 安装 Java
+\`\`\`bash
+# macOS
+brew install openjdk@17
+
+# Ubuntu
+sudo apt update
+sudo apt install openjdk-17-jdk
+\`\`\`
+
+### 3. 安装 PostgreSQL
+\`\`\`bash
+# macOS
+brew install postgresql@15
+brew services start postgresql@15
+
+# Ubuntu
+sudo apt install postgresql postgresql-contrib
+\`\`\`
+
+### 4. 数据库初始化
+\`\`\`sql
+-- 创建数据库
+CREATE DATABASE portfolio;
+CREATE USER portfolio_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE portfolio TO portfolio_user;
+\`\`\`
+
+### 5. 环境变量配置
+复制环境变量模板并填写实际值：
+\`\`\`bash
+cp deployment/.env.example deployment/.env
+# 编辑 .env 文件，填写数据库密码等信息
+\`\`\`
+
+## 开发工具配置
+
+### VS Code 扩展推荐
+- ES7+ React/Redux/React-Native snippets
+- Tailwind CSS IntelliSense
+- TypeScript Importer
+- Prettier - Code formatter
+- ESLint
+
+### IntelliJ IDEA 插件推荐
+- Spring Boot
+- Lombok
+- Database Navigator
+- Git Integration
+
+## 验证安装
+\`\`\`bash
+# 检查版本
+node --version    # v18.x.x
+java --version    # openjdk 17.x.x
+mvn --version     # Apache Maven 3.8.x
+psql --version    # psql 15.x
+\`\`\`
+
+## 常见问题
+
+### Q: 前端启动失败
+A: 确保 Node.js 版本正确，删除 node_modules 重新安装
+
+### Q: 后端连接数据库失败
+A: 检查数据库服务是否启动，用户权限是否正确
+```
+
+## 代码文档规范
+
+### 注释规范
+```typescript
+/**
+ * 用户信息组件
+ * @param props - 组件属性
+ * @param props.userId - 用户ID
+ * @returns 用户信息JSX元素
+ * @example
+ * <UserProfile userId={1} />
+ */
+const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
+  // 组件实现
+};
+```
+
+### JavaDoc 规范
+```java
+/**
+ * 用户服务接口
+ * 
+ * @author Kyle Meng
+ * @version 1.0
+ * @since 2024-01-01
+ */
+public interface UserService {
+    
+    /**
+     * 根据用户ID获取用户信息
+     * 
+     * @param id 用户ID，不能为空
+     * @return 用户信息DTO
+     * @throws UserNotFoundException 当用户不存在时抛出
+     */
+    UserDTO findById(Long id);
+}
+```
+
+## 架构文档规范
+
+### 系统架构图
+- 使用 draw.io 或 Lucidchart
+- 包含所有系统组件
+- 标注数据流向
+- 说明技术选型理由
+
+### 数据库设计文档
+- ER 图设计
+- 表结构说明
+- 索引设计
+- 数据字典
+
+### API 设计文档
+- RESTful 设计原则
+- 请求/响应示例
+- 错误码定义
+- 版本控制策略
+
+## 文档维护流程
+
+### 更新频率
+- 每次功能迭代后更新
+- 重大架构变更时更新
+- 定期检查文档准确性
+
+### 审核流程
+- 开发者自查
+- 团队成员 Review
+- 技术负责人批准
+- 版本控制管理
+
+### 文档工具
+- Markdown 编辑器
+- 图表工具 (draw.io)
+- API 文档工具 (Swagger)
+- 版本控制 (Git) 

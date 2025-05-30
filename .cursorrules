@@ -1,0 +1,53 @@
+# Portfolio Website Project - Main Cursor Rules
+
+## 项目概述
+这是一个全栈 Portfolio Website 项目，包含：
+- 前端：React + TypeScript + Tailwind CSS
+- 后端：Java Spring Boot + Maven
+- 数据库：PostgreSQL
+- 部署：Docker + 云服务
+
+## 项目结构
+```
+├── frontend/          # React前端应用
+├── backend/           # Spring Boot后端应用  
+├── deployment/        # 部署配置文件
+└── docs/             # 项目文档
+```
+
+## 通用开发规范
+
+### 代码风格
+- 使用一致的缩进（前端2空格，后端4空格）
+- 遵循各语言的官方命名约定
+- 编写清晰的注释和文档
+
+### Git提交规范
+- feat: 新功能
+- fix: 修复bug
+- docs: 文档更新
+- style: 代码格式调整
+- refactor: 代码重构
+- test: 测试相关
+- chore: 构建过程或辅助工具变动
+
+### API设计原则
+- RESTful API设计
+- 统一的响应格式
+- 合适的HTTP状态码
+- API版本控制
+
+## 安全考虑
+- 环境变量管理
+- CORS配置
+- 数据验证
+- 错误处理
+
+## 性能优化
+- 前端代码分割和懒加载
+- 后端缓存策略
+- 数据库查询优化
+- 静态资源CDN
+
+---
+更具体的技术栈规范请参考各子目录的 .cursorrules 文件 
