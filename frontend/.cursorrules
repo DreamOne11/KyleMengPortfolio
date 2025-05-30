@@ -1,0 +1,122 @@
+# Frontend - React + TypeScript + Tailwind CSS Rules
+
+## 技术栈
+- React 18+
+- TypeScript
+- Tailwind CSS
+- Vite (构建工具)
+- ESLint + Prettier
+
+## 项目结构约定
+```
+src/
+├── components/        # 可复用组件
+│   ├── ui/           # 基础UI组件
+│   └── layout/       # 布局组件
+├── pages/            # 页面组件
+├── hooks/            # 自定义Hooks
+├── utils/            # 工具函数
+├── types/            # TypeScript类型定义
+├── services/         # API服务
+├── assets/           # 静态资源
+└── styles/           # 样式文件
+```
+
+## React 开发规范
+
+### 组件规范
+- 使用函数组件 + Hooks
+- 组件名使用 PascalCase
+- 文件名与组件名保持一致
+- 每个组件一个文件
+- 默认导出组件
+
+### TypeScript 规范
+- 严格模式开启
+- 为所有 props 定义接口
+- 避免使用 any 类型
+- 使用联合类型而非枚举（除非必要）
+- 泛型命名使用 T, K, V 等
+
+### Hooks 使用规范
+- 自定义Hooks以 use 开头
+- 使用 useCallback 优化函数传递
+- 使用 useMemo 优化计算密集操作
+- 合理使用 useEffect 依赖数组
+
+## Tailwind CSS 规范
+
+### 样式组织
+- 优先使用 Tailwind 原子类
+- 复杂样式使用 @apply 指令
+- 响应式设计遵循移动优先
+- 使用语义化的颜色变量
+
+### 类名顺序
+1. 布局 (display, position, flex, grid)
+2. 盒模型 (width, height, margin, padding)
+3. 背景和边框
+4. 字体和文本
+5. 变换和动画
+
+## 状态管理
+- 本地状态使用 useState
+- 复杂状态使用 useReducer
+- 全局状态考虑 Context API 或状态管理库
+- 服务器状态使用 React Query/SWR
+
+## 性能优化
+- 使用 React.memo 包装纯组件
+- 懒加载非关键组件
+- 图片优化和懒加载
+- 避免内联函数和对象
+
+## 错误处理
+- 使用 Error Boundaries
+- 表单验证使用专门库
+- API错误统一处理
+- 友好的错误提示
+
+## 测试策略
+- 组件单元测试
+- 集成测试关键流程
+- E2E测试核心功能
+- 测试覆盖率 > 80%
+
+## 代码示例模板
+
+### 组件模板
+```typescript
+interface ComponentProps {
+  // 定义props类型
+}
+
+const Component: React.FC<ComponentProps> = ({ }) => {
+  // 组件逻辑
+  
+  return (
+    <div className="">
+      {/* JSX内容 */}
+    </div>
+  );
+};
+
+export default Component;
+```
+
+### 自定义Hook模板
+```typescript
+interface UseHookReturn {
+  // 返回值类型
+}
+
+const useHook = (): UseHookReturn => {
+  // Hook逻辑
+  
+  return {
+    // 返回值
+  };
+};
+
+export default useHook;
+``` 
