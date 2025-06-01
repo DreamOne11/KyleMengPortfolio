@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
 import DesktopContainer from './components/DesktopContainer';
 import TopBar from './components/TopBar';
-import AppGrid from './components/AppGrid';
 import BottomDock from './components/BottomDock';
-import About from './components/About';
+import Screen from './components/Screen';
 
 function App() {
-  const [showAbout, setShowAbout] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState(0);
+
+  const handleScreenChange = (screen: number) => {
+    setCurrentScreen(screen);
+  };
 
   return (
     <DesktopContainer>
       <TopBar />
-      {showAbout ? <About onClose={() => setShowAbout(false)} /> : <AppGrid onAppClick={() => setShowAbout(true)} />}
-      <BottomDock />
+      <Screen 
+        currentScreen={currentScreen} 
+        onScreenChange={handleScreenChange}
+      />
+      <BottomDock 
+        currentScreen={currentScreen} 
+        onScreenChange={handleScreenChange}
+      />
     </DesktopContainer>
   );
 }
