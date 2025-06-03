@@ -6,6 +6,7 @@ import Screen from './components/Screen';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState(0);
+  const [isAnyWindowMaximized, setIsAnyWindowMaximized] = useState(false);
 
   const handleScreenChange = (screen: number) => {
     setCurrentScreen(screen);
@@ -17,10 +18,12 @@ function App() {
       <Screen 
         currentScreen={currentScreen} 
         onScreenChange={handleScreenChange}
+        onActiveMaximizedWindowsChange={setIsAnyWindowMaximized}
       />
       <BottomDock 
         currentScreen={currentScreen} 
         onScreenChange={handleScreenChange}
+        isHidden={isAnyWindowMaximized}
       />
     </DesktopContainer>
   );

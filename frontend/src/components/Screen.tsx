@@ -6,9 +6,10 @@ type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
   children?: React.ReactNode;
+  onActiveMaximizedWindowsChange?: (anyMaximized: boolean) => void;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children, onActiveMaximizedWindowsChange }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
@@ -113,6 +114,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
       folderName: string;
       sourcePosition: { x: number; y: number };
       zIndex: number;
+      isMaximized: boolean;
     }>>([]);
     
     // 文件夹配置 - 便于扩展和维护
@@ -167,7 +169,8 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
         id: folderId,
         folderName,
         sourcePosition: { x: centerX, y: centerY },
-        zIndex: maxZIndex + 1
+        zIndex: maxZIndex + 1,
+        isMaximized: false,
       }]);
     };
 
@@ -176,7 +179,10 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
     };
 
     const handleCloseFileManager = (folderId: string) => {
-      setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
+      const updatedFileManagers = openFileManagers.filter(fm => fm.id !== folderId);
+      setOpenFileManagers(updatedFileManagers);
+      const anyMaximized = updatedFileManagers.some(fm => fm.isMaximized);
+      onActiveMaximizedWindowsChange?.(anyMaximized);
     };
 
     const handleFileManagerFocus = (folderId: string) => {
@@ -247,6 +253,16 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
           onFocus={() => handleFileManagerFocus(fileManager.id)}
           windowOffset={{ x: index * 30, y: index * 30 }} // 为每个窗口添加偏移，避免完全重叠
           zIndex={fileManager.zIndex}
+          onMaximizeChange={(isMaximized) => {
+            setOpenFileManagers(prev => {
+              const updatedFms = prev.map(fm =>
+                fm.id === fileManager.id ? { ...fm, isMaximized } : fm
+              );
+              const anyMaximized = updatedFms.some(fm => fm.isMaximized);
+              onActiveMaximizedWindowsChange?.(anyMaximized);
+              return updatedFms;
+            });
+          }}
         />
       ))}
     </div>

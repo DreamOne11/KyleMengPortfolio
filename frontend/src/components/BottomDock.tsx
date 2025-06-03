@@ -3,9 +3,10 @@ import React from 'react';
 type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
+  isHidden?: boolean;
 };
 
-const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange }) => {
+const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }) => {
   const dockItems = [
     { id: 0, emoji: '👋', label: 'About Me' },
     { id: 1, emoji: '💼', label: 'My Work' },
@@ -14,7 +15,7 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange }) => {
   ];
 
   return (
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-6 py-3 rounded-2xl bg-white/30 backdrop-blur-md shadow-lg border border-white/20">
+    <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-6 py-3 rounded-2xl bg-white/30 backdrop-blur-md shadow-lg border border-white/20 ${isHidden ? 'hidden' : ''}`}>
       {dockItems.map((item) => (
         <button
           key={item.id}

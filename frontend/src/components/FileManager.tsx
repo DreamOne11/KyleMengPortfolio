@@ -11,9 +11,10 @@ type Props = {
   onFocus?: () => void; // 新增：窗口获得焦点时的回调
   windowOffset?: { x: number; y: number }; // 新增：窗口偏移量，避免多个窗口重叠
   zIndex?: number; // 新增：窗口层级
+  onMaximizeChange?: (isMaximized: boolean) => void;
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex }) => {
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onMaximizeChange }) => {
   // 使用useEffect来监听folderName变化并更新文件列表
   const [files, setFiles] = useState<FileItem[]>([]);
 
@@ -399,6 +400,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
         setWindowPosition(preMaximizeState.position);
         setPreMaximizeState(null);
         setIsMaximized(false);
+        onMaximizeChange?.(false);
       }
     } else {
       // 最大化窗口
@@ -412,6 +414,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       setWindowSize({ width: window.innerWidth, height: window.innerHeight }); // 这些值在最大化时会被CSS覆盖
       setWindowPosition({ x: 0, y: 0 }); // 这些值在最大化时会被CSS覆盖
       setIsMaximized(true);
+      onMaximizeChange?.(true);
     }
     
     // 窗口获得焦点
