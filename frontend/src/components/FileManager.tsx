@@ -531,7 +531,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           >
             {hoveredButton === 'close' && (
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none" className="absolute">
-                <path d="M1 1L7 7M7 1L1 7" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                <path d="M1 1L7 7M7 1L1 7" stroke="black" strokeWidth="1" strokeLinecap="round"/>
               </svg>
             )}
           </button>
@@ -543,7 +543,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           >
             {hoveredButton === 'minimize' && (
               <svg width="6" height="6" viewBox="0 0 6 6" fill="none" className="absolute">
-                <path d="M1 3H5" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                <path d="M1 3H5" stroke="black" strokeWidth="1" strokeLinecap="round"/>
               </svg>
             )}
           </button>
@@ -557,14 +557,14 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
             {hoveredButton === 'maximize' && (
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none" className="absolute">
                 {isMaximized ? (
-                  // 恢复图标：两个重叠的矩形
+                  // 恢复图标：两个矩形
                   <g>
-                    <rect x="1" y="1" width="4" height="4" stroke="white" strokeWidth="0.8" fill="none"/>
-                    <rect x="3" y="3" width="4" height="4" stroke="white" strokeWidth="0.8" fill="none"/>
+                    {/* 后面的矩形 */}
+                    <rect x="1" y="1" width="6" height="6" fill="none" stroke="black" strokeWidth="1"/>
                   </g>
                 ) : (
                   // 最大化图标：加号
-                  <path d="M4 1V7M1 4H7" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                  <path d="M4 1V7M1 4H7" stroke="black" strokeWidth="1" strokeLinecap="round"/>
                 )}
               </svg>
             )}
