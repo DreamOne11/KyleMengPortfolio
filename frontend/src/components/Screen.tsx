@@ -107,8 +107,27 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
   // About Me Screen Content
   const AboutMeContent = () => {
     const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-    const [openFileManager, setOpenFileManager] = useState<string | null>(null);
-    const [folderPosition, setFolderPosition] = useState<{ x: number; y: number } | null>(null);
+    // 修改为支持多个打开的文件管理器
+    const [openFileManagers, setOpenFileManagers] = useState<Array<{
+      id: string;
+      folderName: string;
+      sourcePosition: { x: number; y: number };
+      zIndex: number;
+    }>>([]);
+    
+    // 文件夹配置 - 便于扩展和维护
+    const folders = [
+      {
+        id: 'resume',
+        name: 'Resume',
+        color: 'blue' as const
+      },
+      {
+        id: 'contact',
+        name: 'Contact',
+        color: 'green' as const
+      }
+    ];
     
     const handleFolderClick = (folderId: string, e: React.MouseEvent) => {
       e.stopPropagation(); // 防止事件冒泡
@@ -118,6 +137,19 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
     const handleFolderDoubleClick = (folderId: string, action: () => void, e: React.MouseEvent) => {
       e.stopPropagation(); // 防止事件冒泡
       
+      // 检查该文件夹是否已经打开
+      const isAlreadyOpen = openFileManagers.some(fm => fm.id === folderId);
+      if (isAlreadyOpen) {
+        // 如果已经打开，将其置顶
+        setOpenFileManagers(prev => 
+          prev.map(fm => ({
+            ...fm,
+            zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+          }))
+        );
+        return;
+      }
+      
       // 获取文件夹图标的位置信息（更精确的中心点）
       const folderElement = e.currentTarget.querySelector('svg') || e.currentTarget;
       const rect = folderElement.getBoundingClientRect();
@@ -126,17 +158,35 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
       
       console.log('Folder position:', { x: centerX, y: centerY }); // 调试用
       
-      setFolderPosition({ x: centerX, y: centerY });
-      setOpenFileManager(folderId);
+      // 计算新窗口的z-index
+      const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
+      
+      // 添加新的文件管理器
+      const folderName = folders.find(f => f.id === folderId)?.name || folderId;
+      setOpenFileManagers(prev => [...prev, {
+        id: folderId,
+        folderName,
+        sourcePosition: { x: centerX, y: centerY },
+        zIndex: maxZIndex + 1
+      }]);
     };
 
     const handleBackgroundClick = () => {
       setSelectedFolder(null); // 点击空白区域取消选中
     };
 
-    const handleCloseFileManager = () => {
-      setOpenFileManager(null);
-      setFolderPosition(null);
+    const handleCloseFileManager = (folderId: string) => {
+      setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
+    };
+
+    const handleFileManagerFocus = (folderId: string) => {
+      // 将点击的窗口置顶
+      setOpenFileManagers(prev => 
+        prev.map(fm => ({
+          ...fm,
+          zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+        }))
+      );
     };
 
     return (
@@ -166,51 +216,39 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
         </div>
       </div>
       
-      {/* Resume and Contact Folders - positioned below ABOUT section */}
+      {/* Dynamic Folders - positioned below ABOUT section */}
       <div className="absolute left-8 flex gap-8" style={{ top: '20rem' }}>
-        {/* Resume Folder */}
-        <div 
-          className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
-          onClick={(e) => handleFolderClick('resume', e)}
-          onDoubleClick={(e) => handleFolderDoubleClick('resume', () => {}, e)}
-        >
-          {/* Custom SVG folder icon */}
-          <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${
-            selectedFolder === 'resume' ? 'bg-white/10' : ''
-          }`}>
-            <MacOSFolderIcon color="blue" />
+        {folders.map((folder) => (
+          <div 
+            key={folder.id}
+            className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
+            onClick={(e) => handleFolderClick(folder.id, e)}
+            onDoubleClick={(e) => handleFolderDoubleClick(folder.id, () => {}, e)}
+          >
+            <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${
+              selectedFolder === folder.id ? 'bg-white/10' : ''
+            }`}>
+              <MacOSFolderIcon color={folder.color} />
+            </div>
+            <h3 className={`font-semibold text-xs px-2 py-1 rounded ${
+              selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'
+            }`}>{folder.name}</h3>
           </div>
-          <h3 className={`font-semibold text-xs px-2 py-1 rounded ${
-            selectedFolder === 'resume' ? 'text-white bg-blue-500' : 'text-white'
-          }`}>Resume</h3>
-        </div>
-
-        {/* Contact Folder */}
-        <div 
-          className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
-          onClick={(e) => handleFolderClick('contact', e)}
-          onDoubleClick={(e) => handleFolderDoubleClick('contact', () => {}, e)}
-        >
-          {/* Custom SVG folder icon */}
-          <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${
-            selectedFolder === 'contact' ? 'bg-white/10' : ''
-          }`}>
-            <MacOSFolderIcon color="blue" />
-          </div>
-          <h3 className={`font-semibold text-xs px-2 py-1 rounded ${
-            selectedFolder === 'contact' ? 'text-white bg-blue-500' : 'text-white'
-          }`}>Contact</h3>
-        </div>
+        ))}
       </div>
       
-      {/* FileManager Modal */}
-      {openFileManager && (
+      {/* Multiple FileManager Modals */}
+      {openFileManagers.map((fileManager, index) => (
         <FileManager
-          folderName={openFileManager === 'resume' ? 'Resume' : 'Contact'}
-          onClose={handleCloseFileManager}
-          sourcePosition={folderPosition || undefined}
+          key={fileManager.id}
+          folderName={fileManager.folderName}
+          onClose={() => handleCloseFileManager(fileManager.id)}
+          sourcePosition={fileManager.sourcePosition}
+          onFocus={() => handleFileManagerFocus(fileManager.id)}
+          windowOffset={{ x: index * 30, y: index * 30 }} // 为每个窗口添加偏移，避免完全重叠
+          zIndex={fileManager.zIndex}
         />
-      )}
+      ))}
     </div>
   );
   };

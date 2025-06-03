@@ -1,14 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MacOSFolderIcon from './MacOSFolderIcon';
-
-type FileItem = {
-  id: string;
-  name: string;
-  type: 'folder' | 'file';
-  dateModified: string;
-  size: string;
-  kind: string;
-};
+import { FileItem, getFilesForFolder } from '../data/fileSystemData';
 
 type Props = {
   folderName: string;
@@ -16,41 +8,36 @@ type Props = {
   onBack?: () => void;
   sourcePosition?: { x: number; y: number }; // 文件夹的位置信息，用于动画起始点
   useRelativePositioning?: boolean; // 新增：是否使用相对定位
+  onFocus?: () => void; // 新增：窗口获得焦点时的回调
+  windowOffset?: { x: number; y: number }; // 新增：窗口偏移量，避免多个窗口重叠
+  zIndex?: number; // 新增：窗口层级
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning }) => {
-  const [files] = useState<FileItem[]>([
-    {
-      id: '1',
-      name: 'Resume.pdf',
-      type: 'file',
-      dateModified: 'May 30, 2024 at 11:13 PM',
-      size: '2.1 MB',
-      kind: 'Portable Document Format (PDF)'
-    },
-    {
-      id: '2',
-      name: 'Cover Letter.docx',
-      type: 'file',
-      dateModified: 'May 28, 2024 at 3:45 PM',
-      size: '45 KB',
-      kind: 'Microsoft Word Document'
-    },
-    {
-      id: '3',
-      name: 'Projects',
-      type: 'folder',
-      dateModified: 'May 25, 2024 at 9:20 AM',
-      size: '--',
-      kind: 'Folder'
-    }
-  ]);
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex }) => {
+  // 使用useEffect来监听folderName变化并更新文件列表
+  const [files, setFiles] = useState<FileItem[]>([]);
+
+  // 当folderName改变时，重新获取文件列表
+  useEffect(() => {
+    setFiles(getFilesForFolder(folderName));
+    setSelectedItems([]); // 清空选中状态
+  }, [folderName]);
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   
   // Window size and position state
   const [windowSize, setWindowSize] = useState({ width: 800, height: 600 });
-  const [windowPosition, setWindowPosition] = useState({ x: 0, y: 0 });
+  const [windowPosition, setWindowPosition] = useState({ 
+    x: (windowOffset?.x || 0), 
+    y: (windowOffset?.y || 0) 
+  });
+  
+  // 最大化相关状态
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [preMaximizeState, setPreMaximizeState] = useState<{
+    size: { width: number; height: number };
+    position: { x: number; y: number };
+  } | null>(null);
   
   // Button hover states
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
@@ -201,10 +188,20 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     e.preventDefault();
     e.stopPropagation();
     
-    isDragging.current = true;
-    setIsDraggingState(true); // 设置拖拽状态
+    // 窗口获得焦点
+    onFocus?.();
+    
+    // 如果窗口是最大化状态，禁用拖拽功能，符合macOS逻辑
+    if (isMaximized) {
+      return; // 直接返回，不执行任何拖拽逻辑
+    }
+    
+    // 正常窗口模式的拖拽逻辑
     startMouse.current = { x: e.clientX, y: e.clientY };
     startPosition.current = { ...windowPosition };
+    
+    isDragging.current = true;
+    setIsDraggingState(true); // 设置拖拽状态
     
     document.body.style.cursor = 'move';
     document.body.style.userSelect = 'none';
@@ -212,8 +209,14 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
 
   // Resize handling functions
   const handleResizeStart = (direction: string, e: React.MouseEvent) => {
+    // 最大化时禁用调整大小
+    if (isMaximized) return;
+    
     e.preventDefault();
     e.stopPropagation();
+    
+    // 窗口获得焦点
+    onFocus?.();
     
     isResizing.current = true;
     setIsResizingState(true); // 设置调整大小状态
@@ -255,7 +258,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     lastMoveTime.current = now;
 
     if (isDragging.current) {
-      // Handle window dragging (moving)
+      // Handle window dragging (moving) - 只在非最大化状态下会有拖拽
       const deltaX = e.clientX - startMouse.current.x;
       const deltaY = e.clientY - startMouse.current.y;
       
@@ -342,7 +345,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       setWindowSize({ width: newWidth, height: newHeight });
       setWindowPosition({ x: newX, y: newY });
     }
-  }, []);
+  }, []); // 移除isMaximized依赖，因为最大化时不会有拖拽状态
 
   // 优化的鼠标抬起处理函数
   const handleMouseUp = useCallback(() => {
@@ -379,19 +382,64 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // useCallback没有依赖，所以这里可以安全使用空数组
+  }, []); // 使用空依赖数组，因为事件处理函数是稳定的
+
+  // 处理窗口点击获得焦点
+  const handleWindowClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onFocus?.();
+  };
+
+  // 最大化/恢复窗口
+  const handleMaximize = () => {
+    if (isMaximized) {
+      // 恢复窗口
+      if (preMaximizeState) {
+        setWindowSize(preMaximizeState.size);
+        setWindowPosition(preMaximizeState.position);
+        setPreMaximizeState(null);
+        setIsMaximized(false);
+      }
+    } else {
+      // 最大化窗口
+      setPreMaximizeState({
+        size: { ...windowSize },
+        position: { ...windowPosition }
+      });
+      
+      // 最大化时直接填充整个Screen主容器
+      // 不需要计算父容器尺寸，直接设置为100%
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight }); // 这些值在最大化时会被CSS覆盖
+      setWindowPosition({ x: 0, y: 0 }); // 这些值在最大化时会被CSS覆盖
+      setIsMaximized(true);
+    }
+    
+    // 窗口获得焦点
+    onFocus?.();
+  };
 
   return (
     <div 
       ref={windowRef}
-      className={`${useRelativePositioning ? 'absolute' : 'fixed'} bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col z-50 ${
+      onClick={handleWindowClick}
+      className={`${useRelativePositioning ? 'absolute' : 'fixed'} bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col ${
         !isDraggingState && !isResizingState ? (
           isClosing 
             ? 'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]'
             : 'transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.2)]'
         ) : ''
-      }`}
-      style={{ 
+      } ${isMaximized ? 'fixed inset-0 rounded-none' : ''}`}
+      style={isMaximized ? {
+        // 最大化时的样式：填充整个Screen主容器
+        width: '100%',
+        height: '100%',
+        left: 0,
+        top: 0,
+        transform: 'none',
+        opacity: 1,
+        zIndex: 9999,
+      } : { 
+        // 正常窗口模式的样式
         width: windowSize.width, 
         height: windowSize.height,
         left: useRelativePositioning 
@@ -410,57 +458,62 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
         minHeight: 300,
         transformOrigin: 'center center', // 确保缩放从中心点开始
         willChange: 'transform, opacity', // 提示浏览器优化动画性能
+        zIndex: zIndex || 1000,
       }}
     >
-      {/* Resize handles */}
-      {/* Top edge */}
-      <div 
-        className="absolute top-0 left-2 right-2 h-2 cursor-ns-resize hover:bg-blue-200/30 z-10"
-        onMouseDown={(e) => handleResizeStart('top', e)}
-      />
-      
-      {/* Bottom edge */}
-      <div 
-        className="absolute bottom-0 left-2 right-2 h-2 cursor-ns-resize hover:bg-blue-200/30 z-10"
-        onMouseDown={(e) => handleResizeStart('bottom', e)}
-      />
-      
-      {/* Left edge */}
-      <div 
-        className="absolute top-2 bottom-2 left-0 w-2 cursor-ew-resize hover:bg-blue-200/30 z-10"
-        onMouseDown={(e) => handleResizeStart('left', e)}
-      />
-      
-      {/* Right edge */}
-      <div 
-        className="absolute top-2 bottom-2 right-0 w-2 cursor-ew-resize hover:bg-blue-200/30 z-10"
-        onMouseDown={(e) => handleResizeStart('right', e)}
-      />
-      
-      {/* Corner handles */}
-      {/* Top-left corner */}
-      <div 
-        className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize hover:bg-blue-200/50 z-20"
-        onMouseDown={(e) => handleResizeStart('top-left', e)}
-      />
-      
-      {/* Top-right corner */}
-      <div 
-        className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize hover:bg-blue-200/50 z-20"
-        onMouseDown={(e) => handleResizeStart('top-right', e)}
-      />
-      
-      {/* Bottom-left corner */}
-      <div 
-        className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize hover:bg-blue-200/50 z-20"
-        onMouseDown={(e) => handleResizeStart('bottom-left', e)}
-      />
-      
-      {/* Bottom-right corner */}
-      <div 
-        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize hover:bg-blue-200/50 z-20"
-        onMouseDown={(e) => handleResizeStart('bottom-right', e)}
-      />
+      {/* Resize handles - 最大化时隐藏 */}
+      {!isMaximized && (
+        <>
+          {/* Top edge */}
+          <div 
+            className="absolute top-0 left-2 right-2 h-2 cursor-ns-resize hover:bg-blue-200/30 z-10"
+            onMouseDown={(e) => handleResizeStart('top', e)}
+          />
+          
+          {/* Bottom edge */}
+          <div 
+            className="absolute bottom-0 left-2 right-2 h-2 cursor-ns-resize hover:bg-blue-200/30 z-10"
+            onMouseDown={(e) => handleResizeStart('bottom', e)}
+          />
+          
+          {/* Left edge */}
+          <div 
+            className="absolute top-2 bottom-2 left-0 w-2 cursor-ew-resize hover:bg-blue-200/30 z-10"
+            onMouseDown={(e) => handleResizeStart('left', e)}
+          />
+          
+          {/* Right edge */}
+          <div 
+            className="absolute top-2 bottom-2 right-0 w-2 cursor-ew-resize hover:bg-blue-200/30 z-10"
+            onMouseDown={(e) => handleResizeStart('right', e)}
+          />
+          
+          {/* Corner handles */}
+          {/* Top-left corner */}
+          <div 
+            className="absolute top-0 left-0 w-4 h-4 cursor-nw-resize hover:bg-blue-200/50 z-20"
+            onMouseDown={(e) => handleResizeStart('top-left', e)}
+          />
+          
+          {/* Top-right corner */}
+          <div 
+            className="absolute top-0 right-0 w-4 h-4 cursor-ne-resize hover:bg-blue-200/50 z-20"
+            onMouseDown={(e) => handleResizeStart('top-right', e)}
+          />
+          
+          {/* Bottom-left corner */}
+          <div 
+            className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize hover:bg-blue-200/50 z-20"
+            onMouseDown={(e) => handleResizeStart('bottom-left', e)}
+          />
+          
+          {/* Bottom-right corner */}
+          <div 
+            className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize hover:bg-blue-200/50 z-20"
+            onMouseDown={(e) => handleResizeStart('bottom-right', e)}
+          />
+        </>
+      )}
 
       {/* Title Bar - Draggable Area */}
       <div 
@@ -495,6 +548,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
             )}
           </button>
           <button 
+            onClick={handleMaximize}
             className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-600 transition-colors cursor-pointer relative flex items-center justify-center"
             onMouseDown={(e) => e.stopPropagation()}
             onMouseEnter={() => setHoveredButton('maximize')}
@@ -502,7 +556,16 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           >
             {hoveredButton === 'maximize' && (
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none" className="absolute">
-                <path d="M4 1V7M1 4H7" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                {isMaximized ? (
+                  // 恢复图标：两个重叠的矩形
+                  <g>
+                    <rect x="1" y="1" width="4" height="4" stroke="white" strokeWidth="0.8" fill="none"/>
+                    <rect x="3" y="3" width="4" height="4" stroke="white" strokeWidth="0.8" fill="none"/>
+                  </g>
+                ) : (
+                  // 最大化图标：加号
+                  <path d="M4 1V7M1 4H7" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                )}
               </svg>
             )}
           </button>
