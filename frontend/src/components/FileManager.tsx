@@ -425,13 +425,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     <div 
       ref={windowRef}
       onClick={handleWindowClick}
-      className={`${useRelativePositioning ? 'absolute' : 'fixed'} bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col ${
-        !isDraggingState && !isResizingState ? (
-          isClosing 
-            ? 'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]'
-            : 'transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.2)]'
-        ) : ''
-      } ${isMaximized ? 'fixed inset-0 rounded-none' : ''}`}
+      className={`${useRelativePositioning ? 'absolute' : 'fixed'} bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col ${isMaximized ? 'fixed inset-0 rounded-none' : ''}`}
       style={isMaximized ? {
         // 最大化时的样式：填充整个Screen主容器
         width: '100%',
