@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import FileManager from './FileManager';
+import EmailComposer from './EmailComposer';
 import MacOSFolderIcon from './MacOSFolderIcon';
 
 type Props = {
@@ -114,6 +115,12 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
       sourcePosition: { x: number; y: number };
       zIndex: number;
     }>>([]);
+
+    // 邮件发送框状态管理
+    const [openEmailComposers, setOpenEmailComposers] = useState<Array<{
+      id: string;
+      zIndex: number;
+    }>>([]);
     
     // 文件夹配置 - 便于扩展和维护
     const folders = [
@@ -189,6 +196,54 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
       );
     };
 
+    // 邮件发送框处理函数
+    const handleOpenEmailComposer = () => {
+      // 检查是否已经有邮件发送框打开
+      if (openEmailComposers.length > 0) {
+        // 如果已经打开，将其置顶
+        setOpenEmailComposers(prev => 
+          prev.map(ec => ({
+            ...ec,
+            zIndex: Math.max(...prev.map(e => e.zIndex)) + 1
+          }))
+        );
+        return;
+      }
+
+      // 计算新窗口的z-index
+      const allZIndices = [
+        ...openFileManagers.map(fm => fm.zIndex),
+        ...openEmailComposers.map(ec => ec.zIndex)
+      ];
+      const maxZIndex = allZIndices.length > 0 ? Math.max(...allZIndices) : 1000;
+
+      // 添加新的邮件发送框
+      setOpenEmailComposers(prev => [...prev, {
+        id: 'email-composer',
+        zIndex: maxZIndex + 1
+      }]);
+    };
+
+    const handleCloseEmailComposer = (composerId: string) => {
+      setOpenEmailComposers(prev => prev.filter(ec => ec.id !== composerId));
+    };
+
+    const handleEmailComposerFocus = (composerId: string) => {
+      // 将点击的窗口置顶
+      const allZIndices = [
+        ...openFileManagers.map(fm => fm.zIndex),
+        ...openEmailComposers.map(ec => ec.zIndex)
+      ];
+      const maxZIndex = Math.max(...allZIndices);
+
+      setOpenEmailComposers(prev => 
+        prev.map(ec => ({
+          ...ec,
+          zIndex: ec.id === composerId ? maxZIndex + 1 : ec.zIndex
+        }))
+      );
+    };
+
     return (
     <div className="relative w-full h-full" onClick={handleBackgroundClick}>
       {/* Kyle Logo */}
@@ -210,7 +265,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
         </h3>
         <div className="bg-[#2e394a] opacity-60 mb-6" style={{ height: '2px', width: '100%' }} />
         <div className="text-gray-800 leading-relaxed text-left" style={{ fontSize: '1.25rem', lineHeight: '1.75' }}>
-          <p className="mb-3">Hi, my name is Kyle Meng, based in Ottawa, Ontario, Canada.</p>
+          <p className="mb-3">Hi, my name is Kyle Meng, a new grad from University of Ottawa.</p>
           <p className="mb-3">An aspiring software engineer, also an amateur photographer.</p>
           <p className="mb-3">Passionate about web development, distributed systems, and photography.</p>
         </div>
@@ -247,6 +302,18 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
           onFocus={() => handleFileManagerFocus(fileManager.id)}
           windowOffset={{ x: index * 30, y: index * 30 }} // 为每个窗口添加偏移，避免完全重叠
           zIndex={fileManager.zIndex}
+          onOpenEmailComposer={handleOpenEmailComposer}
+        />
+      ))}
+
+      {/* Email Composer Modals */}
+      {openEmailComposers.map((emailComposer, index) => (
+        <EmailComposer
+          key={emailComposer.id}
+          onClose={() => handleCloseEmailComposer(emailComposer.id)}
+          onFocus={() => handleEmailComposerFocus(emailComposer.id)}
+          windowOffset={{ x: index * 40, y: index * 40 }}
+          zIndex={emailComposer.zIndex}
         />
       ))}
     </div>

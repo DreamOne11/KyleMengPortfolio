@@ -11,9 +11,10 @@ type Props = {
   onFocus?: () => void; // 新增：窗口获得焦点时的回调
   windowOffset?: { x: number; y: number }; // 新增：窗口偏移量，避免多个窗口重叠
   zIndex?: number; // 新增：窗口层级
+  onOpenEmailComposer?: () => void; // 新增：打开邮件发送框的回调
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex }) => {
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer }) => {
   // 使用useEffect来监听folderName变化并更新文件列表
   const [files, setFiles] = useState<FileItem[]>([]);
 
@@ -160,6 +161,8 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
   };
 
   const handleItemClick = (id: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // 防止事件冒泡到父容器
+    
     if (event.metaKey || event.ctrlKey) {
       // Multi-select with Cmd/Ctrl
       setSelectedItems(prev => 
@@ -179,7 +182,102 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       // Could open another FileManager instance
     } else {
       console.log(`Opening file: ${item.name}`);
+      
+      // 特殊处理Kyle的简历文件
+      if (item.name === 'Kyle_Meng_Resume.pdf') {
+        // 在新标签页中打开简历PDF
+        window.open('/resume.pdf', '_blank');
+        return;
+      }
+
+      // 处理社交媒体链接
+      switch (item.name) {
+        case 'Github':
+          window.open('https://github.com/DreamOne11', '_blank');
+          return;
+        case 'LinkedIn':
+          window.open('https://www.linkedin.com/in/xmeng11/', '_blank');
+          return;
+        case 'Instagram':
+          window.open('https://www.instagram.com/kylemeng78/', '_blank');
+          return;
+        case 'Email':
+          // Email可以触发邮件客户端或者显示邮件地址
+          if (onOpenEmailComposer) {
+            onOpenEmailComposer();
+          } else {
+            console.log('Email contact clicked');
+          }
+          return;
+        default:
+          break;
+      }
+      
+      // 其他文件的默认处理
       // Could open file viewer
+    }
+  };
+
+  // 处理空白区域点击，取消选中状态
+  const handleBlankAreaClick = (event: React.MouseEvent) => {
+    // 确保点击的是空白区域而不是文件项
+    if (event.target === event.currentTarget) {
+      setSelectedItems([]);
+    }
+  };
+
+  // 渲染文件图标
+  const renderFileIcon = (file: FileItem) => {
+    // 首先检查是否为文件夹
+    if (file.type === 'folder') {
+      return <MacOSFolderIcon size={20} />;
+    }
+
+    // 根据文件名渲染不同的社交媒体图标
+    switch (file.name) {
+      case 'Github':
+        return (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path fillRule="evenodd" clipRule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.341-3.369-1.341-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C17.137 18.163 20 14.418 20 10c0-5.523-4.477-10-10-10z" fill="#333"/>
+          </svg>
+        );
+      case 'LinkedIn':
+        return (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M17.5 0h-15C1.125 0 0 1.125 0 2.5v15C0 18.875 1.125 20 2.5 20h15c1.375 0 2.5-1.125 2.5-2.5v-15C20 1.125 18.875 0 17.5 0zM6.25 17.5H3.125V7.5H6.25v10zM4.688 6.25c-1.031 0-1.875-.844-1.875-1.875S3.656 2.5 4.688 2.5s1.875.844 1.875 1.875S5.719 6.25 4.688 6.25zM17.5 17.5h-3.125v-5c0-1.375-.625-2.188-1.875-2.188-1.5 0-2.5 1.125-2.5 2.5v4.688H6.875V7.5H10v1.25c.5-.938 1.5-1.563 3.125-1.563 2.5 0 4.375 1.875 4.375 4.688v6.125z" fill="#0077B5"/>
+          </svg>
+        );
+      case 'Instagram':
+        return (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 1.8c2.67 0 2.987.01 4.042.059 2.71.123 3.976 1.409 4.099 4.099.048 1.054.057 1.37.057 4.042 0 2.672-.01 2.988-.057 4.042-.123 2.687-1.387 3.975-4.1 4.099-1.054.048-1.37.058-4.041.058-2.67 0-2.987-.01-4.04-.058-2.718-.124-3.977-1.416-4.1-4.1-.048-1.054-.058-1.37-.058-4.041 0-2.67.01-2.986.058-4.04.124-2.69 1.387-3.977 4.1-4.1 1.054-.048 1.37-.059 4.04-.059L10 1.8zm0-1.8C7.284 0 6.944.012 5.877.06 2.246.227.227 2.242.061 5.877.012 6.944 0 7.284 0 10s.012 3.057.06 4.123c.167 3.632 2.182 5.65 5.817 5.817 1.067.048 1.407.06 4.123.06s3.057-.012 4.123-.06c3.629-.167 5.652-2.182 5.816-5.817.05-1.066.061-1.407.061-4.123s-.012-3.056-.06-4.122C19.773 2.249 17.76.228 14.124.061 13.057.012 12.716 0 10 0L10 0z" fill="url(#instagram-gradient)"/>
+            <path d="M10 4.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 8.468a3.333 3.333 0 100-6.666 3.333 3.333 0 000 6.666z" fill="url(#instagram-gradient)"/>
+            <circle cx="15.338" cy="4.662" r="1.2" fill="url(#instagram-gradient)"/>
+            <defs>
+              <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#405DE6"/>
+                <stop offset="25%" stopColor="#5851DB"/>
+                <stop offset="50%" stopColor="#833AB4"/>
+                <stop offset="75%" stopColor="#C13584"/>
+                <stop offset="100%" stopColor="#E1306C"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        );
+      case 'Email':
+        return (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M18 4H2C1.45 4 1 4.45 1 5v10c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1zM18 6L10 11L2 6h16z" fill="#EA4335"/>
+          </svg>
+        );
+      default:
+        // 默认文件图标
+        return (
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 3C3.44772 3 3 3.44772 3 4V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V7L13 3H4Z" fill="#E5E7EB"/>
+            <path d="M13 3V7H17" fill="none" stroke="#9CA3AF" strokeWidth="1"/>
+          </svg>
+        );
     }
   };
 
@@ -627,7 +725,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       </div>
 
       {/* File List */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto" onClick={handleBlankAreaClick}>
         {files.map((file) => (
           <div
             key={file.id}
@@ -639,14 +737,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           >
             <div className="flex-1 flex items-center px-4">
               <div className="w-6 h-6 mr-3 flex items-center justify-center">
-                {file.type === 'folder' ? (
-                  <MacOSFolderIcon size={20} />
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 3C3.44772 3 3 3.44772 3 4V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V7L13 3H4Z" fill="#E5E7EB"/>
-                    <path d="M13 3V7H17" fill="none" stroke="#9CA3AF" strokeWidth="1"/>
-                  </svg>
-                )}
+                {renderFileIcon(file)}
               </div>
               <span className="text-sm text-gray-800">{file.name}</span>
             </div>

@@ -28,81 +28,41 @@ export const folderContents: FolderData = {
       dateModified: 'May 28, 2024 at 3:45 PM',
       size: '45 KB',
       kind: 'Microsoft Word Document'
-    },
-    {
-      id: '3',
-      name: 'Portfolio_Summary.pdf',
-      type: 'file',
-      dateModified: 'June 1, 2024 at 2:30 PM',
-      size: '5.2 MB',
-      kind: 'Portable Document Format (PDF)'
-    },
-    {
-      id: '4',
-      name: 'References.docx',
-      type: 'file',
-      dateModified: 'May 15, 2024 at 4:20 PM',
-      size: '28 KB',
-      kind: 'Microsoft Word Document'
-    },
-    {
-      id: '5',
-      name: 'Certifications',
-      type: 'folder',
-      dateModified: 'June 10, 2024 at 9:15 AM',
-      size: '--',
-      kind: 'Folder'
     }
   ],
 
   contact: [
     {
       id: '1',
-      name: 'Kyle_Meng_BusinessCard.png',
+      name: 'Github',
       type: 'file',
-      dateModified: 'June 5, 2024 at 10:15 AM',
-      size: '245 KB',
-      kind: 'Portable Network Graphics (PNG)'
+      dateModified: 'Dec 15, 2024 at 10:15 AM',
+      size: '1 KB',
+      kind: 'Github Profile Link'
     },
     {
       id: '2',
-      name: 'LinkedIn_Profile.webloc',
+      name: 'LinkedIn',
       type: 'file',
-      dateModified: 'June 3, 2024 at 3:22 PM',
+      dateModified: 'Dec 15, 2024 at 10:16 AM',
       size: '1 KB',
-      kind: 'Web Internet Location'
+      kind: 'LinkedIn Profile Link'
     },
     {
       id: '3',
-      name: 'GitHub_Profile.webloc',
+      name: 'Instagram',
       type: 'file',
-      dateModified: 'June 3, 2024 at 3:25 PM',
+      dateModified: 'Dec 15, 2024 at 10:17 AM',
       size: '1 KB',
-      kind: 'Web Internet Location'
+      kind: 'Instagram Profile Link'
     },
     {
       id: '4',
-      name: 'Email_Template.txt',
+      name: 'Email',
       type: 'file',
-      dateModified: 'May 20, 2024 at 1:45 PM',
-      size: '2 KB',
-      kind: 'Plain Text Document'
-    },
-    {
-      id: '5',
-      name: 'Social_Media_Links',
-      type: 'folder',
-      dateModified: 'June 1, 2024 at 9:30 AM',
-      size: '--',
-      kind: 'Folder'
-    },
-    {
-      id: '6',
-      name: 'Contact_QR_Code.png',
-      type: 'file',
-      dateModified: 'June 8, 2024 at 4:12 PM',
-      size: '89 KB',
-      kind: 'Portable Network Graphics (PNG)'
+      dateModified: 'Dec 15, 2024 at 10:18 AM',
+      size: '1 KB',
+      kind: 'Email Contact'
     }
   ],
 
