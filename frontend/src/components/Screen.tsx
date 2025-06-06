@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import FileManager from './FileManager';
 import EmailComposer from './EmailComposer';
 import MacOSFolderIcon from './MacOSFolderIcon';
+import KyleChat from './KyleChat';
 
 type Props = {
   currentScreen: number;
@@ -245,97 +246,128 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
     };
 
     return (
-    <div className="relative w-full h-full" onClick={handleBackgroundClick}>
-      {/* Kyle Logo */}
-      <div className="absolute bottom-40 right-8 z-20">
-        <img 
-          src="/KyleLogo.png" 
-          alt="Kyle Logo" 
-          className="object-contain select-none max-w-none h-auto"
-          style={{ width: 'min(25vw, 400px)' }}
-          draggable="false"
-          onDragStart={(e) => e.preventDefault()}
-        />
+      <div className="relative w-full h-full" onClick={handleBackgroundClick}>
+        {/* Short Introduction - moved to top and aligned with logo */}
+        <div className="absolute top-8 left-8 right-8 z-10">
+          <h3 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4" style={{ fontSize: '2rem', letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
+            ABOUT
+          </h3>
+          <div className="bg-[#2e394a] opacity-60 mb-6" style={{ height: '2px', width: '100%' }} />
+          <div className="text-gray-800 leading-relaxed text-left" style={{ fontSize: '1.25rem', lineHeight: '1.75' }}>
+            <p className="mb-3">Hi, my name is Kyle Meng, a new grad from University of Ottawa.</p>
+            <p className="mb-3">An aspiring software engineer, also an amateur photographer.</p>
+            <p className="mb-3">Passionate about web development, distributed systems, and photography.</p>
+          </div>
+        </div>
+        {/* Dynamic Folders - positioned below ABOUT section */}
+        <div className="absolute left-8 flex gap-8" style={{ top: '20rem' }}>
+          {folders.map((folder) => (
+            <div 
+              key={folder.id}
+              className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
+              onClick={(e) => handleFolderClick(folder.id, e)}
+              onDoubleClick={(e) => handleFolderDoubleClick(folder.id, () => {}, e)}
+            >
+              <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${
+                selectedFolder === folder.id ? 'bg-white/10' : ''
+              }`}>
+                <MacOSFolderIcon color={folder.color} />
+              </div>
+              <h3 className={`font-semibold text-xs px-2 py-1 rounded ${
+                selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'
+              }`}>{folder.name}</h3>
+            </div>
+          ))}
+        </div>
+        {/* Multiple FileManager Modals */}
+        {openFileManagers.map((fileManager, index) => (
+          <FileManager
+            key={fileManager.id}
+            folderName={fileManager.folderName}
+            onClose={() => handleCloseFileManager(fileManager.id)}
+            sourcePosition={fileManager.sourcePosition}
+            onFocus={() => handleFileManagerFocus(fileManager.id)}
+            windowOffset={{ x: index * 30, y: index * 30 }} // 为每个窗口添加偏移，避免完全重叠
+            zIndex={fileManager.zIndex}
+            onOpenEmailComposer={handleOpenEmailComposer}
+          />
+        ))}
+        {/* Email Composer Modals */}
+        {openEmailComposers.map((emailComposer, index) => (
+          <EmailComposer
+            key={emailComposer.id}
+            onClose={() => handleCloseEmailComposer(emailComposer.id)}
+            onFocus={() => handleEmailComposerFocus(emailComposer.id)}
+            windowOffset={{ x: index * 40, y: index * 40 }}
+            zIndex={emailComposer.zIndex}
+          />
+        ))}
       </div>
-      
-      {/* Short Introduction - moved to top and aligned with logo */}
+    );
+  };
+
+  // Screen Content Components
+  const MyWorkContent = () => (
+    <div className="relative w-full h-full">
       <div className="absolute top-8 left-8 right-8 z-10">
         <h3 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4" style={{ fontSize: '2rem', letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
-          ABOUT
+          MY WORK
         </h3>
         <div className="bg-[#2e394a] opacity-60 mb-6" style={{ height: '2px', width: '100%' }} />
         <div className="text-gray-800 leading-relaxed text-left" style={{ fontSize: '1.25rem', lineHeight: '1.75' }}>
-          <p className="mb-3">Hi, my name is Kyle Meng, a new grad from University of Ottawa.</p>
-          <p className="mb-3">An aspiring software engineer, also an amateur photographer.</p>
-          <p className="mb-3">Passionate about web development, distributed systems, and photography.</p>
+          <p className="mb-3">Welcome to my professional journey.</p>
+          <p className="mb-3">Here you'll find my projects, experiences, and technical achievements.</p>
+          <p className="mb-3">Explore my work and see how I bring ideas to life through code.</p>
         </div>
       </div>
-      
-      {/* Dynamic Folders - positioned below ABOUT section */}
       <div className="absolute left-8 flex gap-8" style={{ top: '20rem' }}>
-        {folders.map((folder) => (
-          <div 
-            key={folder.id}
-            className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
-            onClick={(e) => handleFolderClick(folder.id, e)}
-            onDoubleClick={(e) => handleFolderDoubleClick(folder.id, () => {}, e)}
-          >
-            <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${
-              selectedFolder === folder.id ? 'bg-white/10' : ''
-            }`}>
-              <MacOSFolderIcon color={folder.color} />
-            </div>
-            <h3 className={`font-semibold text-xs px-2 py-1 rounded ${
-              selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'
-            }`}>{folder.name}</h3>
-          </div>
-        ))}
+        {/* Project folders will be added here */}
       </div>
-      
-      {/* Multiple FileManager Modals */}
-      {openFileManagers.map((fileManager, index) => (
-        <FileManager
-          key={fileManager.id}
-          folderName={fileManager.folderName}
-          onClose={() => handleCloseFileManager(fileManager.id)}
-          sourcePosition={fileManager.sourcePosition}
-          onFocus={() => handleFileManagerFocus(fileManager.id)}
-          windowOffset={{ x: index * 30, y: index * 30 }} // 为每个窗口添加偏移，避免完全重叠
-          zIndex={fileManager.zIndex}
-          onOpenEmailComposer={handleOpenEmailComposer}
-        />
-      ))}
-
-      {/* Email Composer Modals */}
-      {openEmailComposers.map((emailComposer, index) => (
-        <EmailComposer
-          key={emailComposer.id}
-          onClose={() => handleCloseEmailComposer(emailComposer.id)}
-          onFocus={() => handleEmailComposerFocus(emailComposer.id)}
-          windowOffset={{ x: index * 40, y: index * 40 }}
-          zIndex={emailComposer.zIndex}
-        />
-      ))}
     </div>
   );
-  };
 
-  // Generic Screen Content for other screens
-  const GenericScreenContent = ({ screen }: { screen: typeof screens[0] }) => (
-    <div className="text-center text-white max-w-2xl">
-      <div className="text-8xl mb-6 animate-bounce">{screen.emoji}</div>
-      <h1 className="text-5xl font-bold mb-6 tracking-tight">{screen.title}</h1>
-      <p className="text-2xl opacity-80 mb-12 leading-relaxed">{screen.subtitle}</p>
-      <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8">
-        <p className="text-white/90">
-          This section is coming soon! Stay tuned for exciting content.
-        </p>
+  const MyNoteContent = () => (
+    <div className="relative w-full h-full">
+      <div className="absolute top-8 left-8 right-8 z-10">
+        <h3 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4" style={{ fontSize: '2rem', letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
+          MY NOTE
+        </h3>
+        <div className="bg-[#2e394a] opacity-60 mb-6" style={{ height: '2px', width: '100%' }} />
+        <div className="text-gray-800 leading-relaxed text-left" style={{ fontSize: '1.25rem', lineHeight: '1.75' }}>
+          <p className="mb-3">A collection of my thoughts and learnings.</p>
+          <p className="mb-3">Technical insights, tutorials, and personal reflections.</p>
+          <p className="mb-3">Sharing knowledge and experiences in software development.</p>
+        </div>
+      </div>
+      <div className="absolute left-8 flex gap-8" style={{ top: '20rem' }}>
+        {/* Note folders will be added here */}
+      </div>
+    </div>
+  );
+
+  const PhotographyContent = () => (
+    <div className="relative w-full h-full">
+      <div className="absolute top-8 left-8 right-8 z-10">
+        <h3 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4" style={{ fontSize: '2rem', letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
+          PHOTOGRAPHY
+        </h3>
+        <div className="bg-[#2e394a] opacity-60 mb-6" style={{ height: '2px', width: '100%' }} />
+        <div className="text-gray-800 leading-relaxed text-left" style={{ fontSize: '1.25rem', lineHeight: '1.75' }}>
+          <p className="mb-3">Capturing moments through my lens.</p>
+          <p className="mb-3">A visual journey of landscapes, street photography, and more.</p>
+          <p className="mb-3">Exploring the world one frame at a time.</p>
+        </div>
+      </div>
+      <div className="absolute left-8 flex gap-8" style={{ top: '20rem' }}>
+        {/* Photography folders will be added here */}
       </div>
     </div>
   );
 
   return (
     <div className="relative w-full h-full overflow-hidden">
+      {/* Show KyleChat on all screens */}
+      <KyleChat />
       {/* Sliding Screens Container */}
       <div 
         className={`flex w-full h-full transition-transform duration-500 ease-in-out`}
@@ -352,11 +384,13 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            {index === 0 ? <AboutMeContent /> : <GenericScreenContent screen={screen} />}
+            {index === 0 ? <AboutMeContent /> : 
+             index === 1 ? <MyWorkContent /> :
+             index === 2 ? <MyNoteContent /> :
+             <PhotographyContent />}
           </div>
         ))}
       </div>
-      
       {children}
     </div>
   );

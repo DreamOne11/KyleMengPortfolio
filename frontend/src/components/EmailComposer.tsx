@@ -42,6 +42,8 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
   const startMouse = useRef({ x: 0, y: 0 });
   const startSize = useRef({ width: 0, height: 0 });
   const startPosition = useRef({ x: 0, y: 0 });
+  const animationFrameRef = useRef<number | null>(null);
+  const lastMoveTime = useRef<number>(0);
 
   // 打开动画
   useEffect(() => {
@@ -119,9 +121,13 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
     startMouse.current = { x: e.clientX, y: e.clientY };
     startPosition.current = { ...windowPosition };
     isDragging.current = true;
-    setIsDraggingState(true);
+    
+    // 立即设置样式，减少视觉延迟
     document.body.style.cursor = 'move';
     document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    
+    setIsDraggingState(true);
   };
 
   // Resize handling
@@ -159,7 +165,15 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
     }
   };
 
+  // 优化拖拽处理 - 添加节流和useCallback包装
   const handleMouseMove = useCallback((e: MouseEvent) => {
+    // 添加时间节流：限制更新频率到60fps
+    const now = Date.now();
+    if (now - lastMoveTime.current < 16) {
+      return;
+    }
+    lastMoveTime.current = now;
+
     if (isDragging.current) {
       const deltaX = e.clientX - startMouse.current.x;
       const deltaY = e.clientY - startMouse.current.y;
@@ -227,9 +241,15 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
       setWindowSize({ width: newWidth, height: newHeight });
       setWindowPosition({ x: newX, y: newY });
     }
-  }, []);
+  }, []); // 空依赖数组确保函数稳定
 
   const handleMouseUp = useCallback(() => {
+    // 清理动画帧
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    
     if (isDragging.current || isResizing.current) {
       isDragging.current = false;
       isResizing.current = false;
@@ -241,30 +261,33 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
     }
   }, []);
 
+  // 优化事件监听器的添加和移除 - 使用简化方式
   useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      handleMouseMove(e);
-    };
-    
-    const handleGlobalMouseUp = () => {
-      handleMouseUp();
-    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
 
-    if (isDraggingState || isResizingState) {
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      // 清理事件监听器
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
       
-      return () => {
-        document.removeEventListener('mousemove', handleGlobalMouseMove);
-        document.removeEventListener('mouseup', handleGlobalMouseUp);
-      };
-    }
-  }, [isDraggingState, isResizingState, handleMouseMove, handleMouseUp]);
+      // 清理动画帧
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 使用空依赖数组，因为事件处理函数是稳定的
 
   return (
     <div
       ref={windowRef}
-      className={`fixed bg-white border border-gray-300 shadow-2xl transition-all duration-300 ease-out ${
+      className={`fixed bg-white border border-gray-300 shadow-2xl ${
+        !isDraggingState && !isResizingState ? (
+          isClosing ? 'transition-all duration-300 ease-out' : 'transition-all duration-300 ease-out'
+        ) : ''
+      } ${
         isClosing ? 'scale-75 opacity-0' : isAnimated ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
       } rounded-lg overflow-hidden`}
       style={{

@@ -3,6 +3,7 @@ import DesktopContainer from './components/DesktopContainer';
 import TopBar from './components/TopBar';
 import BottomDock from './components/BottomDock';
 import Screen from './components/Screen';
+import ParticleBackground from './components/ParticleBackground/ParticleBackground';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState(0);
@@ -12,17 +13,20 @@ function App() {
   };
 
   return (
-    <DesktopContainer>
-      <TopBar />
-      <Screen 
-        currentScreen={currentScreen} 
-        onScreenChange={handleScreenChange}
-      />
-      <BottomDock 
-        currentScreen={currentScreen} 
-        onScreenChange={handleScreenChange}
-      />
-    </DesktopContainer>
+    <>
+      <ParticleBackground />
+      <DesktopContainer>
+        <TopBar />
+        <Screen 
+          currentScreen={currentScreen} 
+          onScreenChange={handleScreenChange}
+        />
+        <BottomDock 
+          currentScreen={currentScreen} 
+          onScreenChange={handleScreenChange}
+        />
+      </DesktopContainer>
+    </>
   );
 }
 
