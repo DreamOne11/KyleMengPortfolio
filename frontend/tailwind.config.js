@@ -1,19 +1,26 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
+    './index.html',                  // 如果用 Vite，别忘了加这一行
+    './src/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     extend: {
+      /* ① 你的自定义颜色保持不变 */
       colors: {
         primary: {
-          50: '#eff6ff',
+          50:  '#feffff',
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
-        }
-      }
+        },
+      },
+
+      /* ② 额外加入 spacing 扩展 */
+      spacing: {
+        '84': '21rem',   // 84 × 4px = 336px
+      },
     },
   },
   plugins: [],
-}
+};

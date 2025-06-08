@@ -17,3 +17,40 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+@layer utilities {
+  /* 40px 纸格背景 */
+  .bg-grid {
+    background-image: repeating-linear-gradient(
+        0deg, transparent 0 38px, rgba(0,0,0,.08) 38px 40px),
+      repeating-linear-gradient(
+        90deg, transparent 0 38px, rgba(0,0,0,.08) 38px 40px);
+    background-size: 40px 40px;
+  }
+
+  /* 键帽初始公共样式 */
+  .key {
+    @apply absolute w-28 select-none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+    will-change: transform, opacity;
+    transition: filter 0.15s ease;
+  }
+
+  /* 悬停时：抬到最前、附加轻微阴影 */
+    .key:hover {
+    z-index: 10;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,.25));
+  }
+
+  /* 目标网格（两行四列）*/
+  .key.to-grid:nth-child(1) {@apply top-0   left-0;}
+  .key.to-grid:nth-child(2) {@apply top-0   left-28;}
+  .key.to-grid:nth-child(3) {@apply top-0   left-56;}
+  .key.to-grid:nth-child(4) {@apply top-0 left-80;}
+  .key.to-grid:nth-child(5) {@apply top-32 left-0;}
+  .key.to-grid:nth-child(6) {@apply top-32 left-28;}
+  .key.to-grid:nth-child(7) {@apply top-32 left-56;}
+  .key.to-grid:nth-child(8) {@apply top-32 left-84;}
+}

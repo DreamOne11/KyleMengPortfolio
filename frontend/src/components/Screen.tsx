@@ -3,18 +3,38 @@ import FileManager from './FileManager';
 import EmailComposer from './EmailComposer';
 import MacOSFolderIcon from './MacOSFolderIcon';
 import KyleChat from './KyleChat';
+import KeyboardLogoStacked from './KeyboardLogoStacked';
 
 type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
-  children?: React.ReactNode;
+  onAnyFileManagerMaximizedChange?: (isMax: boolean) => void;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // 顶层管理所有文件管理器和邮件窗口
+  const [openFileManagers, setOpenFileManagers] = useState<Array<{
+    id: string;
+    folderName: string;
+    sourcePosition: { x: number; y: number };
+    zIndex: number;
+    isMaximized?: boolean;
+  }>>([]);
+  const [openEmailComposers, setOpenEmailComposers] = useState<Array<{
+    id: string;
+    zIndex: number;
+  }>>([]);
+
+  // 最大化状态计算和通知
+  const isAnyFileManagerMaximized = openFileManagers.some(fm => fm.isMaximized);
+  React.useEffect(() => {
+    onAnyFileManagerMaximizedChange?.(isAnyFileManagerMaximized);
+  }, [isAnyFileManagerMaximized, onAnyFileManagerMaximizedChange]);
 
   const screens = [
     { id: 0, title: 'About Me', subtitle: 'Get to know me better', emoji: '👋' },
@@ -109,142 +129,42 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
   // About Me Screen Content
   const AboutMeContent = () => {
     const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-    // 修改为支持多个打开的文件管理器
-    const [openFileManagers, setOpenFileManagers] = useState<Array<{
-      id: string;
-      folderName: string;
-      sourcePosition: { x: number; y: number };
-      zIndex: number;
-    }>>([]);
-
-    // 邮件发送框状态管理
-    const [openEmailComposers, setOpenEmailComposers] = useState<Array<{
-      id: string;
-      zIndex: number;
-    }>>([]);
-    
-    // 文件夹配置 - 便于扩展和维护
+    // 文件夹配置
     const folders = [
-      {
-        id: 'resume',
-        name: 'Resume',
-        color: 'blue' as const
-      },
-      {
-        id: 'contact',
-        name: 'Contact',
-        color: 'green' as const
-      }
+      { id: 'resume', name: 'Resume', color: 'blue' as const },
+      { id: 'contact', name: 'Contact', color: 'green' as const }
     ];
-    
     const handleFolderClick = (folderId: string, e: React.MouseEvent) => {
-      e.stopPropagation(); // 防止事件冒泡
+      e.stopPropagation();
       setSelectedFolder(folderId);
     };
-    
     const handleFolderDoubleClick = (folderId: string, action: () => void, e: React.MouseEvent) => {
-      e.stopPropagation(); // 防止事件冒泡
-      
+      e.stopPropagation();
       // 检查该文件夹是否已经打开
       const isAlreadyOpen = openFileManagers.some(fm => fm.id === folderId);
       if (isAlreadyOpen) {
-        // 如果已经打开，将其置顶
-        setOpenFileManagers(prev => 
-          prev.map(fm => ({
-            ...fm,
-            zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
-          }))
-        );
+        setOpenFileManagers(prev => prev.map(fm => ({
+          ...fm,
+          zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+        })));
         return;
       }
-      
-      // 获取文件夹图标的位置信息（更精确的中心点）
+      // 获取文件夹图标的位置信息
       const folderElement = e.currentTarget.querySelector('svg') || e.currentTarget;
       const rect = folderElement.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      
-      console.log('Folder position:', { x: centerX, y: centerY }); // 调试用
-      
-      // 计算新窗口的z-index
       const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
-      
-      // 添加新的文件管理器
       const folderName = folders.find(f => f.id === folderId)?.name || folderId;
       setOpenFileManagers(prev => [...prev, {
         id: folderId,
         folderName,
         sourcePosition: { x: centerX, y: centerY },
-        zIndex: maxZIndex + 1
+        zIndex: maxZIndex + 1,
+        isMaximized: false
       }]);
     };
-
-    const handleBackgroundClick = () => {
-      setSelectedFolder(null); // 点击空白区域取消选中
-    };
-
-    const handleCloseFileManager = (folderId: string) => {
-      setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
-    };
-
-    const handleFileManagerFocus = (folderId: string) => {
-      // 将点击的窗口置顶
-      setOpenFileManagers(prev => 
-        prev.map(fm => ({
-          ...fm,
-          zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
-        }))
-      );
-    };
-
-    // 邮件发送框处理函数
-    const handleOpenEmailComposer = () => {
-      // 检查是否已经有邮件发送框打开
-      if (openEmailComposers.length > 0) {
-        // 如果已经打开，将其置顶
-        setOpenEmailComposers(prev => 
-          prev.map(ec => ({
-            ...ec,
-            zIndex: Math.max(...prev.map(e => e.zIndex)) + 1
-          }))
-        );
-        return;
-      }
-
-      // 计算新窗口的z-index
-      const allZIndices = [
-        ...openFileManagers.map(fm => fm.zIndex),
-        ...openEmailComposers.map(ec => ec.zIndex)
-      ];
-      const maxZIndex = allZIndices.length > 0 ? Math.max(...allZIndices) : 1000;
-
-      // 添加新的邮件发送框
-      setOpenEmailComposers(prev => [...prev, {
-        id: 'email-composer',
-        zIndex: maxZIndex + 1
-      }]);
-    };
-
-    const handleCloseEmailComposer = (composerId: string) => {
-      setOpenEmailComposers(prev => prev.filter(ec => ec.id !== composerId));
-    };
-
-    const handleEmailComposerFocus = (composerId: string) => {
-      // 将点击的窗口置顶
-      const allZIndices = [
-        ...openFileManagers.map(fm => fm.zIndex),
-        ...openEmailComposers.map(ec => ec.zIndex)
-      ];
-      const maxZIndex = Math.max(...allZIndices);
-
-      setOpenEmailComposers(prev => 
-        prev.map(ec => ({
-          ...ec,
-          zIndex: ec.id === composerId ? maxZIndex + 1 : ec.zIndex
-        }))
-      );
-    };
-
+    const handleBackgroundClick = () => setSelectedFolder(null);
     return (
       <div className="relative w-full h-full" onClick={handleBackgroundClick}>
         {/* Short Introduction - moved to top and aligned with logo */}
@@ -257,51 +177,26 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
             <p className="mb-3">Hi, my name is Kyle Meng, a new grad from University of Ottawa.</p>
             <p className="mb-3">An aspiring software engineer, also an amateur photographer.</p>
             <p className="mb-3">Passionate about web development, distributed systems, and photography.</p>
+            <p className="mb-3">Check the folders below to learn more about me.</p>
           </div>
         </div>
-        {/* Dynamic Folders - positioned below ABOUT section */}
+        {/* Dynamic Folders */}
         <div className="absolute left-8 flex gap-8" style={{ top: '20rem' }}>
           {folders.map((folder) => (
-            <div 
-              key={folder.id}
-              className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
+            <div key={folder.id} className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
               onClick={(e) => handleFolderClick(folder.id, e)}
-              onDoubleClick={(e) => handleFolderDoubleClick(folder.id, () => {}, e)}
-            >
-              <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${
-                selectedFolder === folder.id ? 'bg-white/10' : ''
-              }`}>
+              onDoubleClick={(e) => handleFolderDoubleClick(folder.id, () => {}, e)}>
+              <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
                 <MacOSFolderIcon color={folder.color} />
               </div>
-              <h3 className={`font-semibold text-xs px-2 py-1 rounded ${
-                selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'
-              }`}>{folder.name}</h3>
+              <h3 className={`font-semibold text-xs px-2 py-1 rounded ${selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'}`}>{folder.name}</h3>
             </div>
           ))}
         </div>
-        {/* Multiple FileManager Modals */}
-        {openFileManagers.map((fileManager, index) => (
-          <FileManager
-            key={fileManager.id}
-            folderName={fileManager.folderName}
-            onClose={() => handleCloseFileManager(fileManager.id)}
-            sourcePosition={fileManager.sourcePosition}
-            onFocus={() => handleFileManagerFocus(fileManager.id)}
-            windowOffset={{ x: index * 30, y: index * 30 }} // 为每个窗口添加偏移，避免完全重叠
-            zIndex={fileManager.zIndex}
-            onOpenEmailComposer={handleOpenEmailComposer}
-          />
-        ))}
-        {/* Email Composer Modals */}
-        {openEmailComposers.map((emailComposer, index) => (
-          <EmailComposer
-            key={emailComposer.id}
-            onClose={() => handleCloseEmailComposer(emailComposer.id)}
-            onFocus={() => handleEmailComposerFocus(emailComposer.id)}
-            windowOffset={{ x: index * 40, y: index * 40 }}
-            zIndex={emailComposer.zIndex}
-          />
-        ))}
+        {/* 键帽 Logo ——固定红框位置，可根据需要微调 right/top/w/h */}
+        <div className="absolute right-[135px] top-[280px] w-[450px] h-[220px]">
+          <KeyboardLogoStacked />
+        </div>
       </div>
     );
   };
@@ -364,6 +259,49 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
     </div>
   );
 
+  // 邮件发送框处理函数
+  const handleOpenEmailComposer = () => {
+    if (openEmailComposers.length > 0) {
+      setOpenEmailComposers(prev => prev.map(ec => ({
+        ...ec,
+        zIndex: Math.max(...prev.map(e => e.zIndex)) + 1
+      })));
+      return;
+    }
+    const allZIndices = [
+      ...openFileManagers.map(fm => fm.zIndex),
+      ...openEmailComposers.map(ec => ec.zIndex)
+    ];
+    const maxZIndex = allZIndices.length > 0 ? Math.max(...allZIndices) : 1000;
+    setOpenEmailComposers(prev => [...prev, {
+      id: 'email-composer',
+      zIndex: maxZIndex + 1
+    }]);
+  };
+  const handleCloseFileManager = (folderId: string) => {
+    setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
+  };
+  const handleFileManagerFocus = (folderId: string) => {
+    setOpenFileManagers(prev => prev.map(fm => ({
+      ...fm,
+      zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+    })));
+  };
+  const handleCloseEmailComposer = (composerId: string) => {
+    setOpenEmailComposers(prev => prev.filter(ec => ec.id !== composerId));
+  };
+  const handleEmailComposerFocus = (composerId: string) => {
+    const allZIndices = [
+      ...openFileManagers.map(fm => fm.zIndex),
+      ...openEmailComposers.map(ec => ec.zIndex)
+    ];
+    const maxZIndex = Math.max(...allZIndices);
+    setOpenEmailComposers(prev => prev.map(ec => ({
+      ...ec,
+      zIndex: ec.id === composerId ? maxZIndex + 1 : ec.zIndex
+    })));
+  };
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Show KyleChat on all screens */}
@@ -391,7 +329,34 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, children }) =>
           </div>
         ))}
       </div>
-      {children}
+      {/* FileManager Modals 顶层渲染 */}
+      {openFileManagers.map((fileManager, index) => (
+        <FileManager
+          key={fileManager.id}
+          folderName={fileManager.folderName}
+          onClose={() => handleCloseFileManager(fileManager.id)}
+          sourcePosition={fileManager.sourcePosition}
+          onFocus={() => handleFileManagerFocus(fileManager.id)}
+          windowOffset={{ x: index * 30, y: index * 30 }}
+          zIndex={fileManager.zIndex}
+          onOpenEmailComposer={handleOpenEmailComposer}
+          onMaximizeChange={(isMax) => {
+            setOpenFileManagers(prev => prev.map(fm =>
+              fm.id === fileManager.id ? { ...fm, isMaximized: isMax } : fm
+            ));
+          }}
+        />
+      ))}
+      {/* EmailComposer Modals 顶层渲染 */}
+      {openEmailComposers.map((emailComposer, index) => (
+        <EmailComposer
+          key={emailComposer.id}
+          onClose={() => handleCloseEmailComposer(emailComposer.id)}
+          onFocus={() => handleEmailComposerFocus(emailComposer.id)}
+          windowOffset={{ x: index * 40, y: index * 40 }}
+          zIndex={emailComposer.zIndex}
+        />
+      ))}
     </div>
   );
 };

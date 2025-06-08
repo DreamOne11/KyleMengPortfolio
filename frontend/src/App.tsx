@@ -7,6 +7,7 @@ import ParticleBackground from './components/ParticleBackground/ParticleBackgrou
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState(0);
+  const [isAnyFileManagerMaximized, setIsAnyFileManagerMaximized] = useState(false);
 
   const handleScreenChange = (screen: number) => {
     setCurrentScreen(screen);
@@ -20,10 +21,12 @@ function App() {
         <Screen 
           currentScreen={currentScreen} 
           onScreenChange={handleScreenChange}
+          onAnyFileManagerMaximizedChange={setIsAnyFileManagerMaximized}
         />
         <BottomDock 
           currentScreen={currentScreen} 
           onScreenChange={handleScreenChange}
+          isHidden={isAnyFileManagerMaximized}
         />
       </DesktopContainer>
     </>

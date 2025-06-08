@@ -12,9 +12,10 @@ type Props = {
   windowOffset?: { x: number; y: number }; // 新增：窗口偏移量，避免多个窗口重叠
   zIndex?: number; // 新增：窗口层级
   onOpenEmailComposer?: () => void; // 新增：打开邮件发送框的回调
+  onMaximizeChange?: (isMax: boolean) => void; // 新增
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer }) => {
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange }) => {
   // 使用useEffect来监听folderName变化并更新文件列表
   const [files, setFiles] = useState<FileItem[]>([]);
 
@@ -491,28 +492,23 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
   // 最大化/恢复窗口
   const handleMaximize = () => {
     if (isMaximized) {
-      // 恢复窗口
       if (preMaximizeState) {
         setWindowSize(preMaximizeState.size);
         setWindowPosition(preMaximizeState.position);
         setPreMaximizeState(null);
         setIsMaximized(false);
+        onMaximizeChange?.(false); // 通知还原
       }
     } else {
-      // 最大化窗口
       setPreMaximizeState({
         size: { ...windowSize },
         position: { ...windowPosition }
       });
-      
-      // 最大化时直接填充整个Screen主容器
-      // 不需要计算父容器尺寸，直接设置为100%
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight }); // 这些值在最大化时会被CSS覆盖
-      setWindowPosition({ x: 0, y: 0 }); // 这些值在最大化时会被CSS覆盖
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      setWindowPosition({ x: 0, y: 0 });
       setIsMaximized(true);
+      onMaximizeChange?.(true); // 通知最大化
     }
-    
-    // 窗口获得焦点
     onFocus?.();
   };
 
@@ -520,15 +516,14 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     <div 
       ref={windowRef}
       onClick={handleWindowClick}
-      className={`${useRelativePositioning ? 'absolute' : 'fixed'} bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col ${
+      className={`${isMaximized ? 'absolute inset-0 rounded-none' : (useRelativePositioning ? 'absolute' : 'fixed')} bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col ${
         !isDraggingState && !isResizingState ? (
           isClosing 
             ? 'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]'
             : 'transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.2)]'
         ) : ''
-      } ${isMaximized ? 'fixed inset-0 rounded-none' : ''}`}
+      }`}
       style={isMaximized ? {
-        // 最大化时的样式：填充整个Screen主容器
         width: '100%',
         height: '100%',
         left: 0,
@@ -537,7 +532,6 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
         opacity: 1,
         zIndex: 9999,
       } : { 
-        // 正常窗口模式的样式
         width: windowSize.width, 
         height: windowSize.height,
         left: useRelativePositioning 
