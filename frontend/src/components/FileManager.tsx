@@ -13,9 +13,12 @@ type Props = {
   zIndex?: number; // 新增：窗口层级
   onOpenEmailComposer?: () => void; // 新增：打开邮件发送框的回调
   onMaximizeChange?: (isMax: boolean) => void; // 新增
+  customFiles?: any[];
+  onProjectDoubleClick?: (project: any) => void;
+  isActive?: boolean; // 新增：是否处于活动状态
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange }) => {
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange, customFiles, onProjectDoubleClick, isActive = false }) => {
   // 使用useEffect来监听folderName变化并更新文件列表
   const [files, setFiles] = useState<FileItem[]>([]);
 
@@ -530,7 +533,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
         top: 0,
         transform: 'none',
         opacity: 1,
-        zIndex: 9999,
+        zIndex: isActive ? 1000 : 900,
       } : { 
         width: windowSize.width, 
         height: windowSize.height,
@@ -541,16 +544,16 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           ? `calc(50% + ${windowPosition.y}px)` 
           : `calc(50% + ${windowPosition.y}px)`,
         transform: !isAnimated && !isClosing
-          ? `translate(-50%, -50%) translate(${animationStartPosition.x}px, ${animationStartPosition.y}px) scale(0.01)` // 初始状态：偏移到文件夹位置，极小尺寸
+          ? `translate(-50%, -50%) translate(${animationStartPosition.x}px, ${animationStartPosition.y}px) scale(0.01)`
           : isClosing 
-            ? `translate(-50%, -50%) translate(${animationStartPosition.x}px, ${animationStartPosition.y}px) scale(0.01)` // 关闭状态：偏移到文件夹位置，极小尺寸  
-            : 'translate(-50%, -50%) scale(1)', // 动画完成：在屏幕中心，正常尺寸
-        opacity: !isPositionReady ? 0 : (!isAnimated && !isClosing ? 0.1 : isClosing ? 0.1 : 1), // 优化透明度变化
+            ? `translate(-50%, -50%) translate(${animationStartPosition.x}px, ${animationStartPosition.y}px) scale(0.01)`
+            : 'translate(-50%, -50%) scale(1)',
+        opacity: !isPositionReady ? 0 : (!isAnimated && !isClosing ? 0.1 : isClosing ? 0.1 : 1),
         minWidth: 400,
         minHeight: 300,
-        transformOrigin: 'center center', // 确保缩放从中心点开始
-        willChange: 'transform, opacity', // 提示浏览器优化动画性能
-        zIndex: zIndex || 1000,
+        transformOrigin: 'center center',
+        willChange: 'transform, opacity',
+        zIndex: isActive ? 1000 : 900,
       }}
     >
       {/* Resize handles - 最大化时隐藏 */}
@@ -718,28 +721,47 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
         <div className="w-48 px-4">Kind</div>
       </div>
 
-      {/* File List */}
-      <div className="flex-1 overflow-auto" onClick={handleBlankAreaClick}>
-        {files.map((file) => (
-          <div
-            key={file.id}
-            className={`h-12 flex items-center border-b border-gray-100 hover:bg-blue-50 cursor-pointer ${
-              selectedItems.includes(file.id) ? 'bg-blue-100' : ''
-            }`}
-            onClick={(e) => handleItemClick(file.id, e)}
-            onDoubleClick={() => handleItemDoubleClick(file)}
-          >
-            <div className="flex-1 flex items-center px-4">
-              <div className="w-6 h-6 mr-3 flex items-center justify-center">
-                {renderFileIcon(file)}
+      {/* 文件列表区域，flex-1 保证 status bar 在底部 */}
+      <div className="flex-1 overflow-auto">
+        {customFiles ? (
+          <div className="flex flex-col divide-y divide-gray-100">
+            {customFiles.map((item, idx) => (
+              <div
+                key={item.id || idx}
+                className="flex items-center text-sm hover:bg-blue-50 transition cursor-pointer"
+                onDoubleClick={() => onProjectDoubleClick && onProjectDoubleClick(item)}
+              >
+                <div className="flex-1 px-4 py-2 font-medium text-gray-800">{item.name}</div>
+                <div className="w-48 px-4 text-gray-500">{item.date || '-'}</div>
+                <div className="w-24 px-4 text-gray-500">-</div>
+                <div className="w-48 px-4 text-gray-500">{item.kind || '-'}</div>
               </div>
-              <span className="text-sm text-gray-800">{file.name}</span>
-            </div>
-            <div className="w-48 px-4 text-sm text-gray-600">{file.dateModified}</div>
-            <div className="w-24 px-4 text-sm text-gray-600">{file.size}</div>
-            <div className="w-48 px-4 text-sm text-gray-600">{file.kind}</div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div onClick={handleBlankAreaClick}>
+            {files.map((file) => (
+              <div
+                key={file.id}
+                className={`h-12 flex items-center border-b border-gray-100 hover:bg-blue-50 cursor-pointer ${
+                  selectedItems.includes(file.id) ? 'bg-blue-100' : ''
+                }`}
+                onClick={(e) => handleItemClick(file.id, e)}
+                onDoubleClick={() => handleItemDoubleClick(file)}
+              >
+                <div className="flex-1 flex items-center px-4">
+                  <div className="w-6 h-6 mr-3 flex items-center justify-center">
+                    {renderFileIcon(file)}
+                  </div>
+                  <span className="text-sm text-gray-800">{file.name}</span>
+                </div>
+                <div className="w-48 px-4 text-sm text-gray-600">{file.dateModified}</div>
+                <div className="w-24 px-4 text-sm text-gray-600">{file.size}</div>
+                <div className="w-48 px-4 text-sm text-gray-600">{file.kind}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Status Bar - Draggable Area */}
@@ -764,7 +786,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           <span>{folderName}</span>
         </div>
         <div className="ml-auto">
-          {files.length} items, 2.1 GB available
+          {(customFiles ? customFiles.length : files.length)} items, 2.1 GB available
         </div>
       </div>
     </div>
