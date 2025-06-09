@@ -194,7 +194,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
           ))}
         </div>
         {/* 键帽 Logo ——固定红框位置，可根据需要微调 right/top/w/h */}
-        <div className="absolute right-[135px] top-[280px] w-[450px] h-[220px]">
+        <div className="absolute right-[-395px] top-[260px] w-[900px] h-[440px]">
           <KeyboardLogoStacked />
         </div>
       </div>
