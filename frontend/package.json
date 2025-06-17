@@ -32,7 +32,8 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint:css": "stylelint \"src/**/*.css\""
   },
   "eslintConfig": {
     "extends": [
@@ -54,9 +55,15 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "@stagewise-plugins/react": "^0.4.7",
+    "@stagewise/toolbar-react": "^0.4.7",
     "@types/three": "^0.177.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.4",
+    "stylelint": "^16.20.0",
+    "stylelint-config-standard": "^38.0.0",
+    "stylelint-config-tailwindcss": "^1.0.0",
+    "stylelint-scss": "^6.12.1",
     "tailwindcss": "^3.4.17"
   }
 }

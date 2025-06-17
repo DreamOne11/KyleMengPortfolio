@@ -20,6 +20,16 @@ module.exports = {
       spacing: {
         '84': '21rem',   // 84 × 4px = 336px
       },
+
+      /* ③ 添加自定义断点 */
+      screens: {
+        'xs': '320px',
+        'sm': '480px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1440px',
+        '2xl': '1920px',
+      },
     },
   },
   plugins: [],

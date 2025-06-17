@@ -1,26 +1,23 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "target": "ES2020",                          // Modern target for performance and compatibility
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],    // Match modern APIs (instead of esnext which may be unstable)
+    "module": "Node16",                          // Best for CRACO/Webpack bundlers
+    "moduleResolution": "Node16",                // Resolves modern packages correctly
+    
+    "jsx": "react-jsx",                          // Required for React 17+
+    "allowJs": true,                             // Allows JS alongside TS
+    "skipLibCheck": true,                        // Faster builds, avoids checking node_modules
+    "esModuleInterop": true,                     // Interop with CommonJS modules
+    "allowSyntheticDefaultImports": true,        // Allows default import from non-ES modules
+    "resolveJsonModule": true,                   // Allows importing `.json` files
+    "isolatedModules": true,                     // Needed for Babel / ts-loader
+
+    "strict": true,                              // Enables all strict type checks
+    "forceConsistentCasingInFileNames": true,    // Avoids case-sensitivity bugs (especially on macOS vs Linux)
+    "noFallthroughCasesInSwitch": true,          // Prevents logic bugs in switch blocks
+
+    "noEmit": true                               // No output files; CRACO handles build
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

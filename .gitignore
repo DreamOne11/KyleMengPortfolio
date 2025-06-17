@@ -2,10 +2,13 @@
 node_modules/
 frontend/node_modules/
 backend/node_modules/
+/.pnp
+.pnp.js
 
 # Production builds
 frontend/build/
 backend/target/
+/dist/
 
 # Environment variables
 .env
@@ -20,18 +23,16 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Testing
+/coverage
+*.lcov
+.nyc_output
+
 # Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
 
 # IDE files
 .vscode/
@@ -39,6 +40,13 @@ coverage/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+.apt_generated
 
 # OS generated files
 .DS_Store
@@ -52,6 +60,10 @@ Thumbs.db
 # Maven
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 # Java
 *.class
@@ -65,4 +77,10 @@ backend/.mvn/wrapper/maven-wrapper.jar
 
 # Database
 *.db
-*.sqlite 
+*.sqlite
+
+# Style linting
+.stylelintrc.json
+.stylelintignore
+.stylelintcache
+.eslintcache 
