@@ -83,4 +83,10 @@ backend/.mvn/wrapper/maven-wrapper.jar
 .stylelintrc.json
 .stylelintignore
 .stylelintcache
-.eslintcache 
+.eslintcache
+
+# Cursor rules
+.cursor/
+.cursor/rules/
+.cursor/rules/*.mdc
+.cursorrules 
