@@ -66,7 +66,7 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
     if (isMobileDevice && !isMaximized) {
       handleMaximize();
     }
-  }, [isMobileDevice]);
+  }, [isMobileDevice, isMaximized,]);
 
   // 打开动画
   useEffect(() => {
@@ -291,6 +291,7 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    const timeoutId = tapTimeoutRef.current;
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -298,8 +299,8 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, [handleMouseMove, handleMouseUp]);

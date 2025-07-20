@@ -72,7 +72,7 @@ const MyWorkScreen: React.FC<MyWorkScreenProps> = ({ onAllProjectsFolderDoubleCl
     } else if (responsive.isTablet) {
       return { folder: '14.5rem', cards: '21rem' };
     } else {
-      return { folder: '15.5rem', cards: '22rem' };
+      return { folder: '16.5rem', cards: '24rem' };
     }
   };
   
@@ -119,7 +119,7 @@ const MyWorkScreen: React.FC<MyWorkScreenProps> = ({ onAllProjectsFolderDoubleCl
       </div>
       
       <div 
-        className={`absolute ${responsive.isMobile ? 'left-0 right-0 px-4' : 'left-8'} ${getCardsLayout()}`} 
+        className={`absolute ${responsive.isMobile ? 'left-0 right-0 px-4' : 'left-1/2 transform -translate-x-1/2'} ${getCardsLayout()}`} 
         style={{ top: topPositions.cards }}
       >
         {/* Project Showcase 1 */}
@@ -152,12 +152,12 @@ const MyWorkScreen: React.FC<MyWorkScreenProps> = ({ onAllProjectsFolderDoubleCl
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.344-3.369-1.344-.454-1.157-1.11-1.465-1.11-1.465-.908-.62.069-.608.069-.608 1.003.07 1.531 1.034 1.531 1.034.892 1.532 2.341 1.09 2.91.834.092-.648.35-1.09.636-1.34-2.22-.254-4.555-1.113-4.555-4.951 0-1.093.39-1.986 1.029-2.685-.103-.254-.446-1.272.098-2.651 0 0 .84-.27 2.75 1.027A9.564 9.564 0 0112 6.844c.85.004 1.705.116 2.504.34 1.909-1.297 2.747-1.027 2.747-1.027.546 1.38.203 2.397.1 2.651.64.7 1.028 1.592 1.028 2.685 0 3.847-2.339 4.695-4.566 4.945.359.31.678.922.678 1.857 0 1.34-.012 2.422-.012 2.75 0 .267.18.577.688.48C19.137 20.203 22 16.448 22 12.021 22 6.484 17.523 2 12 2Z"/></svg>
             </a>
           </div>
-          <div className="description text-sm mb-2" style={{color:'#333'}}>基于Java的分布式全文搜索引擎，支持高效网页抓取、索引与多条件检索。</div>
+          <div className="description text-sm mb-2" style={{color:'#333'}}>A campus search engine base on Java, support efficient web page crawling, indexing and  webpage search.</div>
           <div className="flex flex-wrap gap-2 mt-2">
             <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>Java</span>
-            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>Python</span>
-            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>CSS</span>
-            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>分布式</span>
+            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>Hadoop</span>
+            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>HBase</span>
+            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>Selenium</span>
           </div>
         </div>
 
@@ -170,12 +170,12 @@ const MyWorkScreen: React.FC<MyWorkScreenProps> = ({ onAllProjectsFolderDoubleCl
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.344-3.369-1.344-.454-1.157-1.11-1.465-1.11-1.465-.908-.62.069-.608.069-.608 1.003.07 1.531 1.034 1.531 1.034.892 1.532 2.341 1.09 2.91.834.092-.648.35-1.09.636-1.34-2.22-.254-4.555-1.113-4.555-4.951 0-1.093.39-1.986 1.029-2.685-.103-.254-.446-1.272.098-2.651 0 0 .84-.27 2.75 1.027A9.564 9.564 0 0112 6.844c.85.004 1.705.116 2.504.34 1.909-1.297 2.747-1.027 2.747-1.027.546 1.38.203 2.397.1 2.651.64.7 1.028 1.592 1.028 2.685 0 3.847-2.339 4.695-4.566 4.945.359.31.678.922.678 1.857 0 1.34-.012 2.422-.012 2.75 0 .267.18.577.688.48C19.137 20.203 22 16.448 22 12.021 22 6.484 17.523 2 12 2Z"/></svg>
             </a>
           </div>
-          <div className="description text-sm mb-2" style={{color:'#333'}}>基于Java的思维导图与团队协作平台，支持多人实时编辑、任务分配与进度追踪。</div>
+          <div className="description text-sm mb-2" style={{color:'#333'}}>A creative investment website to help you find brainstorming creative ideas.</div>
           <div className="flex flex-wrap gap-2 mt-2">
             <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>Java</span>
-            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>JavaScript</span>
-            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>CSS</span>
-            <span className={responsive.isMobile ? "hidden" : "label text-xs font-semibold px-2 py-1"} style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>团队协作</span>
+            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>SpringBoot</span>
+            <span className="label text-xs font-semibold px-2 py-1" style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>Wechat Mini Program</span>
+            <span className={responsive.isMobile ? "hidden" : "label text-xs font-semibold px-2 py-1"} style={{color:'#1A1A1A',background:'rgba(255,255,255,0.1)',borderRadius:'6px',textShadow:'0 1px 4px rgba(0,0,0,0.18)'}}>MySQL</span>
           </div>
         </div>
       </div>

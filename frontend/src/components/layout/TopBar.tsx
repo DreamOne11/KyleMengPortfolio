@@ -4,7 +4,7 @@ import { useResponsive } from '../../utils/responsive';
 const TopBar: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState('🌤️');
-  const responsive = useResponsive();
+  
 
   // 更新时间
   useEffect(() => {

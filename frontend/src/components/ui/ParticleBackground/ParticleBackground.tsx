@@ -11,10 +11,7 @@ interface CustomShaderMaterial extends THREE.ShaderMaterial {
     };
 }
 
-// 添加 Navigator 接口扩展，以支持 deviceMemory 属性
-interface NavigatorWithMemory extends Navigator {
-    deviceMemory?: number;
-}
+
 
 // // 性能检测函数
 // const detectPerformance = (): 'high' | 'medium' | 'low' => {

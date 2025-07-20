@@ -608,7 +608,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     if (isMobileDevice && !isMaximized) {
       handleMaximize();
     }
-  }, [isMobileDevice]);
+  }, [isMobileDevice, isMaximized, handleMaximize]);
 
   // 添加项目触摸事件处理函数
   const handleProjectTouchEnd = (project: any, e: React.TouchEvent) => {

@@ -69,11 +69,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     }
   }, []);
 
-  // 防止双击缩放的处理函数
-  const handleDoubleTap = (e: React.TouchEvent) => {
-    e.preventDefault();
-    return false;
-  };
+  
 
   const screens = [
     { id: 0, title: 'About Me', subtitle: 'Get to know me better', emoji: '👋' },
