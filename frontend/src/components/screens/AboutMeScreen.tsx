@@ -33,15 +33,16 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick }) =>
   
   
   return (
-    <div className="relative w-full h-full" onClick={handleBackgroundClick}>
+    <div className="relative w-full h-full overflow-hidden" onClick={handleBackgroundClick}>
       {/* Short Introduction - moved to top and aligned with logo */}
       <div className="absolute top-8 left-8 right-8 z-10">
         <h3 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4" style={{ fontSize: '2rem', letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
-          ABOUT
+          ABOUT ME
         </h3>
+        <div className="bg-[#2e394a] opacity-60 mb-6" style={{ height: '2px', width: '100%' }} />
       </div>
       {/* Dynamic Folders */}
-        <div className={`absolute left-8 flex gap-4 md:gap-4`} style={{ top: responsive.isMobile ? '10rem' : '5rem' }}>
+        <div className={`absolute left-8 flex gap-4 md:gap-4`} style={{ top: responsive.isMobile ? '10rem' : '6rem' }}>
           {folders.map((folder) => (
             <div key={folder.id} className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
               onClick={(e) => handleFolderClick(folder.id, e)}
@@ -60,18 +61,6 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick }) =>
         fontSize: responsive.isMobile ? '0.9rem' : '1.1rem',
         lineHeight: '1.6'
       }}>
-        <div className="flex flex-col">
-          <span>Based in Ottawa</span>
-          <span>Software Developer</span>
-          <span>Amateur Photographer</span>
-          <span>I think web design</span>
-          <span>can be more </span>
-          <span>diverse and inspiring.</span>
-          <span>I am pursuing</span>
-          <span>new expressions</span>
-          <span>through experiments</span>
-          <span>and thoughts.</span>
-        </div>
       </div>
       
       {/* Second vertical text - bottom right corner */}
@@ -79,19 +68,6 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick }) =>
         fontSize: responsive.isMobile ? '0.9rem' : '1.1rem',
         lineHeight: '1.6'
       }}>
-        <div className="flex flex-col items-end">
-          <span>Photography and Web</span>
-          <span>design are both</span>
-          <span>aesthetically pleasing</span>
-          <span>the composition of</span>
-          <span>a photograph is</span>
-          <span>as important as</span>
-          <span>the layout of</span>
-          <span>a web page providing</span>
-          <span>a stunning visual</span>
-          <span>experience and</span>
-          <span>interaction.</span>
-        </div>
       </div>
       
       {/* 键帽 Logo - 居中显示 */}

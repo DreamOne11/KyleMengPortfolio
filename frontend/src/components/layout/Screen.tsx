@@ -280,7 +280,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
         {screens.map((screen, index) => (
           <div
             key={screen.id}
-            className={`min-w-full h-full flex items-center justify-center ${responsive.isMobile ? 'p-0' : responsive.isTablet ? 'p-2' : 'p-8'} cursor-grab active:cursor-grabbing select-none touch-none`}
+            className={`min-w-full h-full flex items-center justify-center ${responsive.isMobile ? 'p-0' : responsive.isTablet ? 'p-2' : 'p-8'} cursor-grab active:cursor-grabbing select-none touch-none overflow-hidden`}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}

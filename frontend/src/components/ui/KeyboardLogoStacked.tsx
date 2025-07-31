@@ -84,203 +84,426 @@ export default function KeyboardLogoStacked() {
 
   /* ⑥ 装载持续动画 */
   useEffect(() => {
-    // 清除旧动画
-    animationsRef.current.forEach(a => a.kill());
-    animationsRef.current = [];
-
-    /* </> 左右开合动画 */
-    if (leftBracketRef.current && slashRef.current && rightBracketRef.current) {
-      const openCloseAnimation = gsap.timeline({
-        repeat: -1,
-        yoyo: true,
-        duration: 1.5,
-        ease: 'sine.inOut',
+    // 添加延迟确保所有ref都已就绪
+    const initAnimations = () => {
+      // 清除旧动画
+      animationsRef.current.forEach(a => {
+        if (a && typeof a.kill === 'function') {
+          a.kill();
+        }
       });
-      
-      openCloseAnimation
-        .to(leftBracketRef.current, {
-          x: -6,
-          scaleX: 1.2,
-        }, 0)
-        .to(rightBracketRef.current, {
-          x: 6,
-          scaleX: 1.2,
-        }, 0)
-        .to(slashRef.current, {
-          scaleX: 1.15,
-        }, 0);
-      
-      animationsRef.current.push(openCloseAnimation);
-    }
+      animationsRef.current = [];
 
-    /* 光标三角形巡游 */
-    if (cursorRef.current) {
-      const keySize = responsive.isMobile ? 32 : responsive.isTablet ? 40 : 56;
-      const triangleCenters = ['M', 'L', 'G'].map(l => {
-        const k = standardKeyLayout.find(i => i.letter === l)!;
-        return { x: k.x + keySize, y: k.y + keySize };
-      });
-
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
-      [...triangleCenters, triangleCenters[0]].forEach(({ x, y }, idx) => {
-        tl.to(
-          cursorRef.current!,
-          {
-            left: x + CURSOR_OFFSET.dx,
-            top: y + CURSOR_OFFSET.dy,
-            duration: 0.8,
-            ease: 'power2.inOut',
-          },
-          idx === 0 ? 0 : '>'
-        );
-      });
-      animationsRef.current.push(tl);
-    }
-
-    /* 指针轻浮 */
-    if (floatRef.current) {
-      const floatAnim = gsap.to(floatRef.current, {
-        y: -5,
-        duration: 1.5,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      });
-      animationsRef.current.push(floatAnim);
-    }
-
-    /* 星星相互浮动效果 */
-    if (starLargeRef.current) {
-      const starLargeFloat = gsap.to(starLargeRef.current, {
-        y: -8,
-        duration: 1.8,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      });
-      animationsRef.current.push(starLargeFloat);
-    }
-
-    if (starSmallRef.current) {
-      const starSmallFloat = gsap.to(starSmallRef.current, {
-        y: -6,
-        duration: 2.2,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-        delay: 0.5, // 相位差
-      });
-      animationsRef.current.push(starSmallFloat);
-    }
-
-    /* mail 摇摆动画 */
-    if (mailRef.current) {
-      const mailSway = gsap.to(mailRef.current, {
-        rotation: 5,
-        duration: 2.5,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      });
-      animationsRef.current.push(mailSway);
-    }
-
-    /* pencil x轴左右移动动画 */
-    if (pencilRef.current) {
-      const pencilMove = gsap.to(pencilRef.current, {
-        x: 6,
-        duration: 2.8,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-        delay: 0.8, // 与mail不同步
-      });
-      animationsRef.current.push(pencilMove);
-    }
-
-    /* note x轴左右移动动画 */
-    if (noteRef.current) {
-      const noteMove = gsap.to(noteRef.current, {
-        x: -4,
-        duration: 3.2,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-        delay: 0.5,
-      });
-      animationsRef.current.push(noteMove);
-    }
-
-    /* chat bubble 上下左右浮动动画 */
-    if (chatBubbleRef.current) {
-      const chatBubbleFloat = gsap.timeline({ repeat: -1 });
-      chatBubbleFloat
-        .to(chatBubbleRef.current, {
-          x: 3,
-          y: -4,
-          duration: 2,
+      /* </> 左右开合动画 */
+      if (leftBracketRef.current && slashRef.current && rightBracketRef.current) {
+        const openCloseAnimation = gsap.timeline({
+          repeat: -1,
+          yoyo: true,
+          duration: 1.5,
           ease: 'sine.inOut',
-        })
-        .to(chatBubbleRef.current, {
-          x: -2,
-          y: 3,
-          duration: 2.5,
+        });
+        
+        openCloseAnimation
+          .to(leftBracketRef.current, {
+            x: -6,
+            scaleX: 1.2,
+          }, 0)
+          .to(rightBracketRef.current, {
+            x: 6,
+            scaleX: 1.2,
+          }, 0)
+          .to(slashRef.current, {
+            scaleX: 1.15,
+          }, 0);
+        
+        animationsRef.current.push(openCloseAnimation);
+      }
+
+      /* 光标三角形巡游 */
+      if (cursorRef.current) {
+        const keySize = responsive.isMobile ? 32 : responsive.isTablet ? 40 : 56;
+        const triangleCenters = ['M', 'L', 'G'].map(l => {
+          const k = standardKeyLayout.find(i => i.letter === l)!;
+          return { x: k.x + keySize, y: k.y + keySize };
+        });
+
+        const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
+        [...triangleCenters, triangleCenters[0]].forEach(({ x, y }, idx) => {
+          tl.to(
+            cursorRef.current!,
+            {
+              left: x + CURSOR_OFFSET.dx,
+              top: y + CURSOR_OFFSET.dy,
+              duration: 0.8,
+              ease: 'power2.inOut',
+            },
+            idx === 0 ? 0 : '>'
+          );
+        });
+        animationsRef.current.push(tl);
+      }
+
+      /* 指针轻浮 */
+      if (floatRef.current) {
+        const floatAnim = gsap.to(floatRef.current, {
+          y: -5,
+          duration: 1.5,
           ease: 'sine.inOut',
-        })
-        .to(chatBubbleRef.current, {
-          x: 2,
-          y: -2,
+          yoyo: true,
+          repeat: -1,
+        });
+        animationsRef.current.push(floatAnim);
+      }
+
+      /* 星星相互浮动效果 */
+      if (starLargeRef.current) {
+        const starLargeFloat = gsap.to(starLargeRef.current, {
+          y: -8,
           duration: 1.8,
           ease: 'sine.inOut',
-        })
-        .to(chatBubbleRef.current, {
-          x: 0,
-          y: 0,
+          yoyo: true,
+          repeat: -1,
+        });
+        animationsRef.current.push(starLargeFloat);
+      }
+
+      if (starSmallRef.current) {
+        const starSmallFloat = gsap.to(starSmallRef.current, {
+          y: -6,
           duration: 2.2,
           ease: 'sine.inOut',
-                 });
-       animationsRef.current.push(chatBubbleFloat);
-     }
+          yoyo: true,
+          repeat: -1,
+          delay: 0.5, // 相位差
+        });
+        animationsRef.current.push(starSmallFloat);
+      }
 
-    /* 三个句号从左到右有序跳动动画 */
-    if (period1Ref.current) {
-      const period1Jump = gsap.to(period1Ref.current, {
-        y: -8,
-        duration: 0.6,
-        ease: 'power2.inOut',
-        yoyo: true,
-        repeat: -1,
-      });
-      animationsRef.current.push(period1Jump);
-    }
+      /* mail 摇摆动画 */
+      if (mailRef.current) {
+        const mailSway = gsap.to(mailRef.current, {
+          rotation: 5,
+          duration: 2.5,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+        });
+        animationsRef.current.push(mailSway);
+      }
 
-    if (period2Ref.current) {
-      const period2Jump = gsap.to(period2Ref.current, {
-        y: -8,
-        duration: 0.6,
-        ease: 'power2.inOut',
-        yoyo: true,
-        repeat: -1,
-        delay: 0.2, // 延迟0.2秒
-      });
-      animationsRef.current.push(period2Jump);
-    }
+      /* pencil x轴左右移动动画 */
+      if (pencilRef.current) {
+        const pencilMove = gsap.to(pencilRef.current, {
+          x: 6,
+          duration: 2.8,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: 0.8, // 与mail不同步
+        });
+        animationsRef.current.push(pencilMove);
+      }
 
-    if (period3Ref.current) {
-      const period3Jump = gsap.to(period3Ref.current, {
-        y: -8,
-        duration: 0.6,
-        ease: 'power2.inOut',
-        yoyo: true,
-        repeat: -1,
-        delay: 0.4, // 延迟0.4秒
-      });
-      animationsRef.current.push(period3Jump);
-    }
+      /* note x轴左右移动动画 */
+      if (noteRef.current) {
+        const noteMove = gsap.to(noteRef.current, {
+          x: -4,
+          duration: 3.2,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: 0.5,
+        });
+        animationsRef.current.push(noteMove);
+      }
+
+      /* chat bubble 上下左右浮动动画 */
+      if (chatBubbleRef.current) {
+        const chatBubbleFloat = gsap.timeline({ repeat: -1 });
+        chatBubbleFloat
+          .to(chatBubbleRef.current, {
+            x: 3,
+            y: -4,
+            duration: 2,
+            ease: 'sine.inOut',
+          })
+          .to(chatBubbleRef.current, {
+            x: -2,
+            y: 3,
+            duration: 2.5,
+            ease: 'sine.inOut',
+          })
+          .to(chatBubbleRef.current, {
+            x: 2,
+            y: -2,
+            duration: 1.8,
+            ease: 'sine.inOut',
+          })
+          .to(chatBubbleRef.current, {
+            x: 0,
+            y: 0,
+            duration: 2.2,
+            ease: 'sine.inOut',
+          });
+        animationsRef.current.push(chatBubbleFloat);
+      }
+
+      /* 三个句号从左到右有序跳动动画 */
+      if (period1Ref.current) {
+        const period1Jump = gsap.to(period1Ref.current, {
+          y: -8,
+          duration: 0.6,
+          ease: 'power2.inOut',
+          yoyo: true,
+          repeat: -1,
+        });
+        animationsRef.current.push(period1Jump);
+      }
+
+      if (period2Ref.current) {
+        const period2Jump = gsap.to(period2Ref.current, {
+          y: -8,
+          duration: 0.6,
+          ease: 'power2.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: 0.2, // 延迟0.2秒
+        });
+        animationsRef.current.push(period2Jump);
+      }
+
+      if (period3Ref.current) {
+        const period3Jump = gsap.to(period3Ref.current, {
+          y: -8,
+          duration: 0.6,
+          ease: 'power2.inOut',
+          yoyo: true,
+          repeat: -1,
+          delay: 0.4, // 延迟0.4秒
+        });
+        animationsRef.current.push(period3Jump);
+      }
+    };
+
+    // 添加延迟以确保DOM完全就绪
+    const timeoutId = setTimeout(initAnimations, 100);
 
     return () => {
-      animationsRef.current.forEach(a => a.kill());
+      clearTimeout(timeoutId);
+      animationsRef.current.forEach(a => {
+        if (a && typeof a.kill === 'function') {
+          a.kill();
+        }
+      });
     };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 添加单独的响应式处理useEffect
+  useEffect(() => {
+    // 当响应式状态改变时，重新初始化动画
+    const reinitializeAnimations = () => {
+      // 先清除现有动画
+      animationsRef.current.forEach(a => {
+        if (a && typeof a.kill === 'function') {
+          a.kill();
+        }
+      });
+      animationsRef.current = [];
+
+      // 延迟重新创建动画，确保布局完成
+      setTimeout(() => {
+        // 重新触发动画初始化（通过调用第一个useEffect中的逻辑）
+        const initAnimations = () => {
+          /* </> 左右开合动画 */
+          if (leftBracketRef.current && slashRef.current && rightBracketRef.current) {
+            const openCloseAnimation = gsap.timeline({
+              repeat: -1,
+              yoyo: true,
+              duration: 1.5,
+              ease: 'sine.inOut',
+            });
+            
+            openCloseAnimation
+              .to(leftBracketRef.current, {
+                x: -6,
+                scaleX: 1.2,
+              }, 0)
+              .to(rightBracketRef.current, {
+                x: 6,
+                scaleX: 1.2,
+              }, 0)
+              .to(slashRef.current, {
+                scaleX: 1.15,
+              }, 0);
+            
+            animationsRef.current.push(openCloseAnimation);
+          }
+
+          /* 光标三角形巡游 */
+          if (cursorRef.current) {
+            const keySize = responsive.isMobile ? 32 : responsive.isTablet ? 40 : 56;
+            const triangleCenters = ['M', 'L', 'G'].map(l => {
+              const k = standardKeyLayout.find(i => i.letter === l)!;
+              return { x: k.x + keySize, y: k.y + keySize };
+            });
+
+            const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
+            [...triangleCenters, triangleCenters[0]].forEach(({ x, y }, idx) => {
+              tl.to(
+                cursorRef.current!,
+                {
+                  left: x + CURSOR_OFFSET.dx,
+                  top: y + CURSOR_OFFSET.dy,
+                  duration: 0.8,
+                  ease: 'power2.inOut',
+                },
+                idx === 0 ? 0 : '>'
+              );
+            });
+            animationsRef.current.push(tl);
+          }
+
+          /* 其他动画保持不变... */
+          if (floatRef.current) {
+            const floatAnim = gsap.to(floatRef.current, {
+              y: -5,
+              duration: 1.5,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+            });
+            animationsRef.current.push(floatAnim);
+          }
+
+          if (starLargeRef.current) {
+            const starLargeFloat = gsap.to(starLargeRef.current, {
+              y: -8,
+              duration: 1.8,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+            });
+            animationsRef.current.push(starLargeFloat);
+          }
+
+          if (starSmallRef.current) {
+            const starSmallFloat = gsap.to(starSmallRef.current, {
+              y: -6,
+              duration: 2.2,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+              delay: 0.5,
+            });
+            animationsRef.current.push(starSmallFloat);
+          }
+
+          if (mailRef.current) {
+            const mailSway = gsap.to(mailRef.current, {
+              rotation: 5,
+              duration: 2.5,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+            });
+            animationsRef.current.push(mailSway);
+          }
+
+          if (pencilRef.current) {
+            const pencilMove = gsap.to(pencilRef.current, {
+              x: 6,
+              duration: 2.8,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+              delay: 0.8,
+            });
+            animationsRef.current.push(pencilMove);
+          }
+
+          if (noteRef.current) {
+            const noteMove = gsap.to(noteRef.current, {
+              x: -4,
+              duration: 3.2,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+              delay: 0.5,
+            });
+            animationsRef.current.push(noteMove);
+          }
+
+          if (chatBubbleRef.current) {
+            const chatBubbleFloat = gsap.timeline({ repeat: -1 });
+            chatBubbleFloat
+              .to(chatBubbleRef.current, {
+                x: 3,
+                y: -4,
+                duration: 2,
+                ease: 'sine.inOut',
+              })
+              .to(chatBubbleRef.current, {
+                x: -2,
+                y: 3,
+                duration: 2.5,
+                ease: 'sine.inOut',
+              })
+              .to(chatBubbleRef.current, {
+                x: 2,
+                y: -2,
+                duration: 1.8,
+                ease: 'sine.inOut',
+              })
+              .to(chatBubbleRef.current, {
+                x: 0,
+                y: 0,
+                duration: 2.2,
+                ease: 'sine.inOut',
+              });
+            animationsRef.current.push(chatBubbleFloat);
+          }
+
+          if (period1Ref.current) {
+            const period1Jump = gsap.to(period1Ref.current, {
+              y: -8,
+              duration: 0.6,
+              ease: 'power2.inOut',
+              yoyo: true,
+              repeat: -1,
+            });
+            animationsRef.current.push(period1Jump);
+          }
+
+          if (period2Ref.current) {
+            const period2Jump = gsap.to(period2Ref.current, {
+              y: -8,
+              duration: 0.6,
+              ease: 'power2.inOut',
+              yoyo: true,
+              repeat: -1,
+              delay: 0.2,
+            });
+            animationsRef.current.push(period2Jump);
+          }
+
+          if (period3Ref.current) {
+            const period3Jump = gsap.to(period3Ref.current, {
+              y: -8,
+              duration: 0.6,
+              ease: 'power2.inOut',
+              yoyo: true,
+              repeat: -1,
+              delay: 0.4,
+            });
+            animationsRef.current.push(period3Jump);
+          }
+        };
+        
+        initAnimations();
+      }, 200);
+    };
+
+    reinitializeAnimations();
   }, [responsive.isMobile, responsive.isTablet]);
 
   /* ⑦ 获取元素位置 */
@@ -388,7 +611,7 @@ export default function KeyboardLogoStacked() {
   return (
     <div className={`relative ${getContainerSize()} select-none flex items-center justify-center mx-auto`}>
       {/* 键帽 */}
-      {standardKeyLayout.map(({ letter, x, y, r, z }, index) => (
+      {standardKeyLayout.map(({ letter, x, y, r, z }) => (
         <img
           key={`${letter}-${x}-${y}`}
           src={`/img/keys/key-${letter.toLowerCase()}.png`}
