@@ -17,12 +17,12 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
   ];
 
   return (
-    <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 px-4 md:px-8 py-2 md:py-4 rounded-[16px] md:rounded-[32px] bg-white/20 backdrop-blur-xl shadow-2xl border border-white/20">
+    <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 px-3 md:px-6 py-1.5 md:py-3 rounded-[12px] md:rounded-[24px] bg-white/20 backdrop-blur-xl shadow-2xl border border-white/20">
       {dockItems.map((item, idx) => (
         <React.Fragment key={item.id}>
           <button
             onClick={() => onScreenChange(item.id)}
-            className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center rounded-xl md:rounded-2xl transition-all duration-200 bg-white/30 text-white text-lg sm:text-xl md:text-2xl shadow-md backdrop-blur-md border border-white/20
+            className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center rounded-lg md:rounded-xl transition-all duration-200 bg-white/30 text-white text-base sm:text-lg md:text-xl shadow-md backdrop-blur-md border border-white/20
               ${currentScreen === item.id ? 'bg-white/50 ring-2 ring-white/60 shadow-xl scale-110' : 'hover:bg-white/40 hover:scale-105'}
             `}
             title={item.label}
