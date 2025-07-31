@@ -10,7 +10,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentScreen, setCurrentScreen] = useState(0);
   const [isAnyFileManagerMaximized, setIsAnyFileManagerMaximized] = useState(false);
-  const [StagewiseComponent, setStagewiseComponent] = useState<React.ComponentType<any> | null>(null);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
+
 
   const handleScreenChange = (screen: number) => {
     setCurrentScreen(screen);
@@ -20,29 +21,6 @@ function App() {
     setIsLoading(false);
   };
 
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      Promise.all([
-        import('@stagewise/toolbar-react'),
-        import('@stagewise-plugins/react')
-      ]).then(([toolbarModule, pluginsModule]) => {
-        const { StagewiseToolbar } = toolbarModule;
-        const { ReactPlugin } = pluginsModule;
-        
-        const WrappedStagewise = () => (
-          <StagewiseToolbar 
-            config={{
-              plugins: [ReactPlugin]
-            }}
-          />
-        );
-        
-        setStagewiseComponent(() => WrappedStagewise);
-      }).catch(err => {
-        console.error('Failed to load Stagewise:', err);
-      });
-    }
-  }, []);
 
   if (isLoading) {
     return <LoadingScreen onComplete={handleLoadingComplete} />;
@@ -57,14 +35,14 @@ function App() {
           currentScreen={currentScreen} 
           onScreenChange={handleScreenChange}
           onAnyFileManagerMaximizedChange={setIsAnyFileManagerMaximized}
+          onChatExpandedChange={setIsChatExpanded}
         />
         <BottomDock 
           currentScreen={currentScreen} 
           onScreenChange={handleScreenChange}
-          isHidden={isAnyFileManagerMaximized}
+          isHidden={isAnyFileManagerMaximized || isChatExpanded}
         />
       </DesktopContainer>
-      {StagewiseComponent && <StagewiseComponent />}
     </div>
   );
 }

@@ -28,7 +28,7 @@ const MyNoteScreen: React.FC = () => {
   
   return (
     <div className="relative w-full h-full overflow-hidden">
-      <div className={`absolute top-8 ${responsive.isMobile ? 'left-4 right-4' : 'left-8 right-8'} z-10`}>
+      <div className={`absolute ${responsive.isMobile ? 'top-24 left-4 right-4' : 'top-8 left-8 right-8'} z-10`}>
         <h3 
           className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4" 
           style={{ 

@@ -121,10 +121,11 @@ export default function KeyboardLogoStacked() {
 
       /* 光标三角形巡游 */
       if (cursorRef.current) {
-        const keySize = responsive.isMobile ? 32 : responsive.isTablet ? 40 : 56;
+        const currentKeySize = responsive.isMobile ? 43 : 56; // 根据设备使用相应的键帽大小
+        const currentLayout = responsive.isMobile ? getMobileKeyLayout() : standardKeyLayout;
         const triangleCenters = ['M', 'L', 'G'].map(l => {
-          const k = standardKeyLayout.find(i => i.letter === l)!;
-          return { x: k.x + keySize, y: k.y + keySize };
+          const k = currentLayout.find(i => i.letter === l)!;
+          return { x: k.x + currentKeySize, y: k.y + currentKeySize };
         });
 
         const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
@@ -341,10 +342,11 @@ export default function KeyboardLogoStacked() {
 
           /* 光标三角形巡游 */
           if (cursorRef.current) {
-            const keySize = responsive.isMobile ? 32 : responsive.isTablet ? 40 : 56;
+            const currentKeySize = responsive.isMobile ? 43 : 56; // 根据设备使用相应的键帽大小
+            const currentLayout = responsive.isMobile ? getMobileKeyLayout() : standardKeyLayout;
             const triangleCenters = ['M', 'L', 'G'].map(l => {
-              const k = standardKeyLayout.find(i => i.letter === l)!;
-              return { x: k.x + keySize, y: k.y + keySize };
+              const k = currentLayout.find(i => i.letter === l)!;
+              return { x: k.x + currentKeySize, y: k.y + currentKeySize };
             });
 
             const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
@@ -506,112 +508,106 @@ export default function KeyboardLogoStacked() {
     reinitializeAnimations();
   }, [responsive.isMobile, responsive.isTablet]);
 
-  /* ⑦ 获取元素位置 */
+  /* ⑦ 获取元素位置 - 根据设备类型返回合适位置 */
   const getPosition = (type: 'div' | 'note' | 'float' | 'mail' | 'pencil' | 'star-large' | 'star-small' | 'chat-bubble' | 'period-1' | 'period-2' | 'period-3') => {
     if (responsive.isMobile) {
-      if (type === 'div') return { left: 90, top: -12 };
-      if (type === 'note') return { left: 40, top: -80 };
-      if (type === 'float') return { left: 165, top: 10 };
-      if (type === 'mail') return { left: 200, top: -35 };
-      if (type === 'pencil') return { left: 240, top: 120 };
-      if (type === 'star-large') return { left: -15, top: -25 };
-      if (type === 'star-small') return { left: -28, top: -12 };
-      if (type === 'chat-bubble') return { left: 65, top: 165 };
-      if (type === 'period-1') return { left: 70, top: 150 };
-      if (type === 'period-2') return { left: 78, top: 150 };
-      return { left: 86, top: 150 }; // period-3
+      // 移动端使用缩放后的位置配置（约为桌面端的 76% 比例）
+      if (type === 'div') return { left: 103, top: -15 }; // 136 * 0.76 ≈ 103
+      if (type === 'note') return { left: 91, top: -30 }; // 120 * 0.76 ≈ 91
+      if (type === 'float') return { left: 243, top: 57 }; // 320 * 0.76 ≈ 243
+      if (type === 'mail') return { left: 228, top: -30 }; // 300 * 0.76 ≈ 228
+      if (type === 'pencil') return { left: 190, top: 194 }; // 250 * 0.76 ≈ 190
+      if (type === 'star-large') return { left: -15, top: -27 }; // -20 * 0.76 ≈ -15
+      if (type === 'star-small') return { left: 27, top: -42 }; // 35 * 0.76 ≈ 27
+      if (type === 'chat-bubble') return { left: -8, top: 198 }; // -10 * 0.76 ≈ -8, 260 * 0.76 ≈ 198
+      if (type === 'period-1') return { left: 11, top: 213 }; // 15 * 0.76 ≈ 11, 280 * 0.76 ≈ 213
+      if (type === 'period-2') return { left: 27, top: 213 }; // 35 * 0.76 ≈ 27
+      return { left: 42, top: 213 }; // 55 * 0.76 ≈ 42, period-3
+    } else {
+      // 桌面端使用原有的位置配置
+      if (type === 'div') return { left: 136, top: -20 };
+      if (type === 'note') return { left: 120, top: -40 };
+      if (type === 'float') return { left: 320, top: 75 };
+      if (type === 'mail') return { left: 300, top: -40 };
+      if (type === 'pencil') return { left: 250, top: 255 };
+      if (type === 'star-large') return { left: -20, top: -35 };
+      if (type === 'star-small') return { left: 35, top: -55 };
+      if (type === 'chat-bubble') return { left: -10, top: 260 };
+      if (type === 'period-1') return { left: 15, top: 280 };
+      if (type === 'period-2') return { left: 35, top: 280 };
+      return { left: 55, top: 280 }; // period-3
     }
-    if (responsive.isTablet) {
-      if (type === 'div') return { left: 110, top: -15 };
-      if (type === 'note') return { left: 50, top: -95 };
-      if (type === 'float') return { left: 240, top: 15 };
-      if (type === 'mail') return { left: 255, top: -40 };
-      if (type === 'pencil') return { left: 320, top: 180 };
-      if (type === 'star-large') return { left: -18, top: -30 };
-      if (type === 'star-small') return { left: -32, top: -15 };
-      if (type === 'chat-bubble') return { left: 68, top: 185 };
-      if (type === 'period-1') return { left: 73, top: 170 };
-      if (type === 'period-2') return { left: 82, top: 170 };
-      return { left: 91, top: 170 }; // period-3
-    }
-    if (type === 'div') return { left: 136, top: -20 };
-    if (type === 'note') return { left: 120, top: -40 };
-    if (type === 'float') return { left: 320, top: 75 };
-    if (type === 'mail') return { left: 300, top: -40 };
-    if (type === 'pencil') return { left: 250, top: 255 };
-    if (type === 'star-large') return { left: -20, top: -35 };
-    if (type === 'star-small') return { left: 35, top: -55 };
-    if (type === 'chat-bubble') return { left: -10, top: 260 };
-    if (type === 'period-1') return { left: 15, top: 280 };
-    if (type === 'period-2') return { left: 35, top: 280 };
-    return { left: 55, top: 280 }; // period-3
   };
 
-  /* ⑧ 获取元素尺寸 */
+  /* ⑧ 获取元素尺寸 - 根据设备类型返回合适尺寸 */
   const getSize = (type: 'key' | 'div' | 'note' | 'cursor' | 'float' | 'mail' | 'pencil' | 'star-large' | 'star-small' | 'chat-bubble' | 'period-1' | 'period-2' | 'period-3') => {
     if (responsive.isMobile) {
-      if (type === 'key') return 'w-16';
-      if (type === 'div') return 'w-10';
-      if (type === 'note') return 'w-32';
-      if (type === 'float') return 'w-8';
-      if (type === 'cursor') return 'w-10';
-      if (type === 'mail') return 'w-12';
-      if (type === 'pencil') return 'w-12';
-      if (type === 'star-large') return 'w-10';
-      if (type === 'star-small') return 'w-8';
-      if (type === 'chat-bubble') return 'w-14';
-      if (type === 'period-1') return 'w-2';
-      if (type === 'period-2') return 'w-2';
-      return 'w-2'; // period-3
-    }
-    if (responsive.isTablet) {
-      if (type === 'key') return 'w-28';
-      if (type === 'div') return 'w-16';
-      if (type === 'note') return 'w-32';
-      if (type === 'float') return 'w-10';
-      if (type === 'cursor') return 'w-12';
-      if (type === 'mail') return 'w-14';
-      if (type === 'pencil') return 'w-14';
-      if (type === 'star-large') return 'w-12';
-      if (type === 'star-small') return 'w-10';
-      if (type === 'chat-bubble') return 'w-16';
+      // 移动端使用较小的尺寸配置（约为桌面端的 76% 比例）
+      if (type === 'key') return 'w-[85px]'; // 约 21.25 * 4 = 85px
+      if (type === 'div') return 'w-9'; // 约 w-12 * 0.76 = w-9
+      if (type === 'note') return 'w-[85px]';
+      if (type === 'float') return 'w-[60px]'; // w-20 * 0.76 ≈ w-15
+      if (type === 'cursor') return 'w-9';
+      if (type === 'mail') return 'w-[60px]';
+      if (type === 'pencil') return 'w-[120px]'; // w-40 * 0.76 ≈ w-30
+      if (type === 'star-large') return 'w-12'; // w-16 * 0.76 ≈ w-12
+      if (type === 'star-small') return 'w-6'; // w-8 * 0.76 ≈ w-6
+      if (type === 'chat-bubble') return 'w-[120px]';
       if (type === 'period-1') return 'w-3';
       if (type === 'period-2') return 'w-3';
       return 'w-3'; // period-3
+    } else {
+      // 桌面端使用原有的尺寸配置
+      if (type === 'key') return 'w-28';
+      if (type === 'div') return 'w-12';
+      if (type === 'note') return 'w-28';
+      if (type === 'float') return 'w-20';
+      if (type === 'cursor') return 'w-12';
+      if (type === 'mail') return 'w-20';
+      if (type === 'pencil') return 'w-40';
+      if (type === 'star-large') return 'w-16';
+      if (type === 'star-small') return 'w-8';
+      if (type === 'chat-bubble') return 'w-40';
+      if (type === 'period-1') return 'w-4';
+      if (type === 'period-2') return 'w-4';
+      return 'w-4'; // period-3
     }
-    if (type === 'key') return 'w-28';
-    if (type === 'div') return 'w-12';
-    if (type === 'note') return 'w-28';
-    if (type === 'float') return 'w-20';
-    if (type === 'cursor') return 'w-12';
-    if (type === 'mail') return 'w-20';
-    if (type === 'pencil') return 'w-40';
-    if (type === 'star-large') return 'w-16';
-    if (type === 'star-small') return 'w-8';
-    if (type === 'chat-bubble') return 'w-40';
-    if (type === 'period-1') return 'w-4';
-    if (type === 'period-2') return 'w-4';
-    return 'w-4'; // period-3
   };
 
-  /* ⑨ 获取容器尺寸 */
+  /* ⑨ 获取容器尺寸 - 根据设备类型返回合适尺寸 */
   const getContainerSize = () => {
-    if (responsive.isMobile) return 'w-[200px] h-[120px]';
-    if (responsive.isTablet) return 'w-[280px] h-[170px]';
+    // 移动端使用较小的容器尺寸
+    if (responsive.isMobile) {
+      return 'w-[290px] h-[235px]';
+    }
+    // 桌面端使用原有的容器尺寸
     return 'w-[440px] h-[260px]';
   };
 
-  /* 渲染 */
-  const keySize = responsive.isMobile ? 32 : responsive.isTablet ? 40 : 56;
+  /* 渲染 - 根据设备类型使用合适的键帽大小 */
+  const keySize = responsive.isMobile ? 43 : 56; // 移动端使用较小的键帽大小 (56 * 0.76 ≈ 43)
+  const scaleFactor = responsive.isMobile ? 0.76 : 1; // 移动端缩放因子
+  
+  // 移动端键帽布局生成函数
+  const getMobileKeyLayout = React.useCallback(() => {
+    return standardKeyLayout.map(key => ({
+      ...key,
+      x: Math.round(key.x * scaleFactor),
+      y: Math.round(key.y * scaleFactor)
+    }));
+  }, [scaleFactor]);
+  
+  const keyLayout = responsive.isMobile ? getMobileKeyLayout() : standardKeyLayout;
+  
   const initialCursorPos = {
-    left: standardKeyLayout.find(k => k.letter === 'M')!.x + keySize + CURSOR_OFFSET.dx,
-    top: standardKeyLayout.find(k => k.letter === 'M')!.y + keySize + CURSOR_OFFSET.dy
+    left: keyLayout.find(k => k.letter === 'M')!.x + keySize + CURSOR_OFFSET.dx,
+    top: keyLayout.find(k => k.letter === 'M')!.y + keySize + CURSOR_OFFSET.dy
   };
 
   return (
     <div className={`relative ${getContainerSize()} select-none flex items-center justify-center mx-auto`}>
       {/* 键帽 */}
-      {standardKeyLayout.map(({ letter, x, y, r, z }) => (
+      {keyLayout.map(({ letter, x, y, r, z }) => (
         <img
           key={`${letter}-${x}-${y}`}
           src={`/img/keys/key-${letter.toLowerCase()}.png`}
@@ -634,8 +630,8 @@ export default function KeyboardLogoStacked() {
         }}
       >
         <svg
-          width={responsive.isMobile ? 50 : responsive.isTablet ? 70 : 70}
-          height={responsive.isMobile ? 32 : responsive.isTablet ? 45 : 45}
+          width={responsive.isMobile ? 53 : 70}
+          height={responsive.isMobile ? 34 : 45}
           viewBox="0 0 80 50"
           className="pointer-events-none"
           style={{ overflow: 'visible' }}
@@ -674,17 +670,15 @@ export default function KeyboardLogoStacked() {
         </svg>
       </div>
       
-      {/* 笔记图标 - 在移动设备上隐藏以节省空间 */}
-      {!responsive.isMobile && (
-        <img
-          ref={noteRef}
-          src="/img/icon/div_bg.png"
-          alt="note-bg"
-          draggable={false}
-          className={`absolute ${getSize('note')}`}
-          style={{ ...getPosition('note'), zIndex: 0 }}
-        />
-      )}
+      {/* 笔记图标 */}
+      <img
+        ref={noteRef}
+        src="/img/icon/div_bg.png"
+        alt="note-bg"
+        draggable={false}
+        className={`absolute ${getSize('note')}`}
+        style={{ ...getPosition('note'), zIndex: 0 }}
+      />
       
       {/* 指针图标 */}
       <img

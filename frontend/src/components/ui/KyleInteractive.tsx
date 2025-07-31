@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Kyle3DModel from '../models/Kyle3DModel';
+import { useResponsive } from '../../utils/responsive';
 
-const KyleChat: React.FC = () => {
+type KyleInteractiveProps = {
+  onChatExpandedChange?: (isExpanded: boolean) => void;
+};
+
+const KyleInteractive: React.FC<KyleInteractiveProps> = ({ onChatExpandedChange }) => {
+  const responsive = useResponsive();
+  
   // 3D聊天机器人状态管理
   const [isChatExpanded, setIsChatExpanded] = useState(false);
   const [currentBubbleText, setCurrentBubbleText] = useState(0);
+  
+
   const [chatMessages, setChatMessages] = useState<Array<{
     type: 'bot' | 'user';
     content: string;
@@ -78,10 +87,19 @@ const KyleChat: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [isChatExpanded, bubbleTexts.length]);
+
+
   
   // 处理3D模型双击
   const handle3DModelDoubleClick = () => {
-    setIsChatExpanded(!isChatExpanded);
+    const newExpandedState = !isChatExpanded;
+    setIsChatExpanded(newExpandedState);
+    
+    // 通知父组件聊天状态变化
+    if (onChatExpandedChange) {
+      onChatExpandedChange(newExpandedState && responsive.isMobile);
+    }
+    
     if (!isChatExpanded) {
       setChatMessages([
         { type: 'bot', content: "Hi!" },
@@ -89,6 +107,18 @@ const KyleChat: React.FC = () => {
         { type: 'bot', content: "How can I help you today?" }
       ]);
     }
+  };
+
+  // 处理移动端触摸事件（简化为单击触发）
+  const handleTouch = (e: React.MouseEvent) => {
+    if (!responsive.isMobile) return;
+    
+    // 阻止事件冒泡，避免触发其他元素的事件
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // 移动端直接触发聊天展开
+    handle3DModelDoubleClick();
   };
   
   // 处理预设问题点击
@@ -140,53 +170,138 @@ const KyleChat: React.FC = () => {
     return presetQuestions.filter(q => !askedQuestions.includes(q));
   };
 
+  // 响应式布局配置
+  const getLayoutConfig = () => {
+    if (responsive.isMobile) {
+      return {
+        container: "relative w-full flex items-center justify-center gap-4 h-32",
+        modelContainer: "w-28 h-28 flex-shrink-0 cursor-pointer",
+        chatContainer: "flex-1 max-w-[200px]",
+        chatWidth: "w-full"
+      };
+    } else {
+      return {
+        container: "relative w-44 h-44 lg:w-48 lg:h-48 xl:w-52 xl:h-52",
+        modelContainer: "w-full h-full cursor-pointer transform -translate-y-4",
+        chatContainer: "absolute z-30 top-16 -left-56",
+        chatWidth: "w-64"
+      };
+    }
+  };
+
+  const layout = getLayoutConfig();
+
+  // 移动端全屏聊天模式
+  if (responsive.isMobile && isChatExpanded) {
+    return (
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-purple-400 via-blue-500 to-teal-400">
+        {/* 全屏聊天界面 */}
+        <div className="flex flex-col h-full">
+          {/* Chat Header */}
+          <div className="bg-teal-600/90 backdrop-blur-sm text-gray-800 p-4 border-b border-white/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-white/20">
+                  <img 
+                    src="/kyle-avatar.png" 
+                    alt="Kyle Avatar" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-semibold text-white">Kyle Bot</p>
+                  <p className="text-xs text-white">Ask me a question</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  setIsChatExpanded(false);
+                  if (onChatExpandedChange) {
+                    onChatExpandedChange(false);
+                  }
+                }}
+                className="text-white hover:text-gray-800 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100/50"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          
+          {/* Chat Content */}
+          <div 
+            ref={chatContainerRef}
+            className="flex-1 bg-white/80 backdrop-blur-sm p-4 overflow-y-auto"
+          >
+            {/* All Messages in one continuous flow */}
+            <div className="space-y-3">
+              {chatMessages.map((message, index) => (
+                <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-xs p-3 rounded-2xl text-sm shadow-sm backdrop-blur-sm ${
+                    message.type === 'user' 
+                      ? 'bg-blue-500/90 text-white rounded-br-md border border-blue-400/20' 
+                      : 'bg-white/80 text-gray-800 rounded-bl-md border border-white/40'
+                  }`}>
+                    {message.content}
+                  </div>
+                </div>
+              ))}
+              
+              {/* Quick Questions - only show if there are available questions */}
+              {getAvailableQuestions().length > 0 && (
+                <div className="mt-4 space-y-2">
+                  {getAvailableQuestions().map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePresetQuestion(question)}
+                      className="w-full text-center font-bold p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-full text-sm text-gray-800 transition-all border border-gray-300/60 hover:border-gray-400/80 shadow-sm"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      {/* 3D Model - positioned in top right corner */}
+    <div className={layout.container}>
+      {/* 3D Model */}
       <div 
-        className="absolute z-20 cursor-pointer"
-        style={{
-          right: 'min(1rem, 2vw)',
-          top: 'calc(-5vh)',
-          width: 'min(8rem, 10vw)',
-          height: 'min(8rem, 10vw)',
-          minWidth: '192px',
-          minHeight: '192px'
-        }}
-        onDoubleClick={handle3DModelDoubleClick}
-        title="Double-click to chat with me!"
+        className={layout.modelContainer}
+        onDoubleClick={!responsive.isMobile ? handle3DModelDoubleClick : undefined}
+        onClick={responsive.isMobile ? handleTouch : undefined}
+        title={responsive.isMobile ? "Tap to chat with me!" : "Double-click to chat with me!"}
+        style={{ touchAction: 'manipulation' }}
       >
         <Kyle3DModel />
       </div>
       
-      {/* Speech Bubble / Chat Interface */}
-      <div 
-        className="absolute z-30"
-        style={{
-          right: 'min(10rem, 15vw)',
-          top: 'min(2rem, 3vh)',
-          maxWidth: '350px',
-          minWidth: '280px'
-        }}
-      >
-        <div className={`relative bg-white/10 backdrop-blur-md shadow-xl transition-all duration-500 ${
-          isChatExpanded 
-            ? 'rounded-3xl max-h-[600px] overflow-hidden' 
-            : 'rounded-2xl max-h-16'
-        }`}>
+      {/* Chat Interface - 移动端未展开时显示简单气泡，桌面端显示完整聊天 */}
+      {(!responsive.isMobile || !isChatExpanded) && (
+        <div className={`${layout.chatContainer} ${layout.chatWidth}`}>
+          <div className={`relative bg-white/10 backdrop-blur-md shadow-xl transition-all duration-500 ${
+            isChatExpanded 
+              ? 'rounded-3xl max-h-[600px] overflow-hidden' 
+              : 'rounded-2xl max-h-16'
+          }`}>
           {!isChatExpanded ? (
             // Simple bubble mode
             <div className="px-4 py-3 bg-white/20 backdrop-blur-sm rounded-2xl relative">
               <p className="text-gray-800 text-sm font-medium transition-all duration-300">
                 {bubbleTexts[currentBubbleText]}
               </p>
-              {/* Simple mode arrow */}
+              {/* Speech bubble arrow */}
               <div 
-                className="absolute top-3 -right-2"
+                className={`absolute ${responsive.isMobile ? 'top-1/2 transform -translate-y-1/2 -left-2' : 'top-1/2 transform -translate-y-1/2 -right-2'}`}
                 style={{
                   width: 0,
                   height: 0,
-                  borderLeft: '8px solid rgba(255, 255, 255, 0.2)',
+                  borderLeft: responsive.isMobile ? 'none' : '8px solid rgba(255, 255, 255, 0.2)',
+                  borderRight: responsive.isMobile ? '8px solid rgba(255, 255, 255, 0.2)' : 'none',
                   borderTop: '6px solid transparent',
                   borderBottom: '6px solid transparent',
                   filter: 'drop-shadow(2px 0 4px rgba(0,0,0,0.1))'
@@ -263,11 +378,12 @@ const KyleChat: React.FC = () => {
               
               {/* Expanded mode arrow */}
               <div 
-                className="absolute top-4 -right-3"
+                className={`absolute ${responsive.isMobile ? 'top-8 -left-3' : 'top-8 -right-3'}`}
                 style={{
                   width: 0,
                   height: 0,
-                  borderLeft: '12px solid rgba(255, 255, 255, 0.1)',
+                  borderLeft: responsive.isMobile ? 'none' : '12px solid rgba(255, 255, 255, 0.1)',
+                  borderRight: responsive.isMobile ? '12px solid rgba(255, 255, 255, 0.1)' : 'none',
                   borderTop: '8px solid transparent',
                   borderBottom: '8px solid transparent',
                   filter: 'drop-shadow(2px 0 4px rgba(0,0,0,0.1))'
@@ -276,9 +392,10 @@ const KyleChat: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
-    </>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default KyleChat; 
+export default KyleInteractive;

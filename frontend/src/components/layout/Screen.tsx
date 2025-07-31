@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import FileManager from '../windows/FileManager';
 import EmailComposer from '../windows/EmailComposer';
-import KyleChat from '../windows/KyleChat';
+
 import ProjectDetailWindow from '../windows/ProjectDetailWindow';
 import { useResponsive } from '../../utils/responsive';
 
@@ -15,9 +15,10 @@ type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
   onAnyFileManagerMaximizedChange?: (isMax: boolean) => void;
+  onChatExpandedChange?: (isExpanded: boolean) => void;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
@@ -269,9 +270,6 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {/* Show KyleChat on all screens */}
-      <KyleChat />
-      
       {/* Sliding Screens Container */}
       <div 
         className={`flex w-full h-full transition-transform ${responsive.isMobile ? 'duration-300' : 'duration-500'} ease-in-out`}
@@ -291,7 +289,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             onMouseUp={handleMouseUp}
           >
             {index === 0 ? (
-              <AboutMeScreen onFolderDoubleClick={handleFolderDoubleClick} />
+              <AboutMeScreen onFolderDoubleClick={handleFolderDoubleClick} onChatExpandedChange={onChatExpandedChange} />
             ) : index === 1 ? (
               <MyWorkScreen onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick} />
             ) : index === 2 ? (
