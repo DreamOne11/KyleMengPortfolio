@@ -639,7 +639,11 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       }
       
       tapTimeoutRef.current = setTimeout(() => {
-        // 单击操作 - 这里可以添加项目单击的逻辑
+        // 单击操作 - 移动端单击直接打开项目
+        console.log('Single tap detected on mobile for project:', project.name);
+        if (onProjectDoubleClick) {
+          onProjectDoubleClick(project);
+        }
         tapTimeoutRef.current = null;
       }, DOUBLE_TAP_DELAY);
     }
@@ -863,12 +867,21 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
               <div
                 key={item.id || idx}
                 className="flex items-center text-xs md:text-sm hover:bg-blue-50 transition cursor-pointer"
-                onDoubleClick={() => onProjectDoubleClick && onProjectDoubleClick(item)}
+                onClick={(e) => {
+                  // 桌面端的单击选择逻辑可以在这里添加
+                  // 移动端使用 onTouchEnd 处理
+                }}
+                onDoubleClick={(e) => {
+                  // 桌面端双击打开项目
+                  if (!responsive.isMobile) {
+                    onProjectDoubleClick && onProjectDoubleClick(item);
+                  }
+                }}
                 onTouchEnd={(e) => handleProjectTouchEnd(item, e)}
               >
                 <div className="flex-1 px-2 md:px-4 py-2 font-medium text-gray-800">{item.name}</div>
                 <div className="w-24 md:w-48 px-2 md:px-4 text-gray-500 hidden sm:block">{item.date || '-'}</div>
-                <div className="w-16 md:w-24 px-2 md:px-4 text-gray-500 hidden md:block">-</div>
+                <div className="w-16 md:w-24 px-2 md:px-4 text-gray-500 hidden md:block">{item.size || '-'}</div>
                 <div className="w-24 md:w-48 px-2 md:px-4 text-gray-500 hidden lg:block">{item.kind || '-'}</div>
               </div>
             ))}

@@ -40,11 +40,66 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
   }>>([]);
 
   const allProjects = [
-    { id: 'portfolio', name: 'Portfolio', date: '2024-06-09', kind: 'Web', desc: 'Personal Portfolio Website for showing my ideas and creations.' },
-    { id: 'searchengine', name: 'Compus Network Search Engine', date: '2024-05-01', kind: 'Java', desc: '基于Java的分布式全文搜索引擎，支持高效网页抓取、索引与多条件检索。' },
-    { id: 'ithink', name: 'iThink Ideas Investment Platform', date: '2023-12-15', kind: 'Java', desc: '基于Java的思维导图与团队协作平台，支持多人实时编辑、任务分配与进度追踪。' },
-    { id: 'blank1', name: 'Blank Project 1', date: '', kind: '', desc: '' },
-    { id: 'blank2', name: 'Blank Project 2', date: '', kind: '', desc: '' },
+    { 
+      id: 'portfolio', 
+      name: 'Portfolio', 
+      date: '2025-06-09', 
+      size: 'Personal', 
+      kind: 'React, TypeScript', 
+      desc: 'Personal Portfolio Website for showing my ideas and creations.',
+      detailedDesc: 'A desktop-inspired personal portfolio website built with React and TypeScript, featuring a unique macOS-style interface with 3D elements, particle backgrounds, and responsive design. The site simulates an operating system experience with window management, file system navigation, and interactive components.',
+      screenshot: '/img/projects/portfolio.png',
+      techStack: ['React', 'TypeScript', 'Three.js', 'Tailwind CSS', 'GSAP', 'CRACO'],
+      links: {
+        website: 'https://kylemeng.dev',
+        github: 'https://github.com/DreamOne11/KyleMengPortfolio'
+      }
+    },
+    { 
+      id: 'suogogo', 
+      name: 'Suogogo Platform', 
+      date: '2025-07-01', 
+      size: 'Team', 
+      kind: 'React, TypeScript', 
+      desc: 'Suogogo is a shipping platform for cross-board logistics.',
+      detailedDesc: 'A comprehensive cross-border logistics platform that connects shippers and carriers globally. Features real-time tracking, automated pricing, route optimization, and multi-language support. Built with modern web technologies to handle high-volume international shipping operations.',
+      screenshot: '/img/projects/suogogo.png',
+      techStack: ['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'PostgreSQL', 'Redis'],
+      links: {
+        website: 'https://www.suogogo.com',
+        github: null
+      }
+    },
+    { 
+      id: 'searchengine', 
+      name: 'Campus Network Search Engine', 
+      date: '2021-06-01', 
+      size: 'Personal', 
+      kind: 'Java, Hadoop', 
+      desc: 'A distributed full-text search engine based on Java, supporting efficient web page crawling, indexing, and multi-condition retrieval.',
+      detailedDesc: 'A distributed search engine designed for campus networks, featuring intelligent web crawling, inverted indexing, and advanced query processing. Implemented with Hadoop ecosystem for scalable data processing and HBase for efficient data storage. Supports Boolean queries, phrase matching, and relevance ranking.',
+      screenshot: '/img/projects/searchEngine.png',
+      techStack: ['Java', 'Hadoop', 'HBase', 'Selenium', 'Lucene', 'Spring Boot'],
+      links: {
+        website: null,
+        github: 'https://github.com/DreamOne11/SearchEngine'
+      }
+    },
+    { 
+      id: 'ithink', 
+      name: 'iThink Ideas Investment Platform', 
+      date: '2020-12-15', 
+      size: 'Team', 
+      kind: 'Java, Spring Boot', 
+      desc: 'A platform for idea investment and collaboration.',
+      detailedDesc: 'A comprehensive idea investment and collaboration platform that connects innovators with investors. Features idea submission, evaluation workflows, funding mechanisms, and project management tools. Includes both web platform and WeChat Mini Program for mobile access.',
+      screenshot: '/img/projects/iThink.png',
+      techStack: ['Java', 'Spring Boot', 'MySQL', 'WeChat Mini Program', 'Vue.js', 'MyBatis'],
+      links: {
+        website: null,
+        github: 'https://github.com/Chocolate-Prince-and-Six-Dwarfs/iThink/'
+      }
+    },
   ];
 
   // 在 Screen 组件顶部添加 projectDetailWindows 状态

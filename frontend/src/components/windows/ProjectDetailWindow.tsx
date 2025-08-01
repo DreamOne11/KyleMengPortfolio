@@ -7,7 +7,13 @@ type Props = {
     date?: string;
     kind?: string;
     desc?: string;
+    detailedDesc?: string;
+    screenshot?: string;
     techStack?: string[];
+    links?: {
+      website?: string | null;
+      github?: string | null;
+    };
   };
   onClose: () => void;
   onFocus?: () => void;
@@ -447,17 +453,90 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
       </div>
       {/* 内容区 */}
       <div className="flex-1 p-3 md:p-6 overflow-auto">
-        <div className="mb-1 md:mb-2 text-xs md:text-sm text-gray-500 flex flex-wrap gap-1">
-          <span>{project.date}</span>
-          <span className="hidden xs:inline">&nbsp;|&nbsp;</span>
-          <span>{project.kind}</span>
+        {/* 项目基本信息 */}
+        <div className="mb-3 md:mb-4">
+          <div className="mb-1 md:mb-2 text-xs md:text-sm text-gray-500 flex flex-wrap gap-1">
+            <span>{project.date}</span>
+            <span className="hidden xs:inline">&nbsp;|&nbsp;</span>
+            <span>{project.kind}</span>
+          </div>
+          <div className="mb-3 md:mb-4 text-sm md:text-base text-gray-700 leading-relaxed">
+            {project.detailedDesc || project.desc || 'No description yet.'}
+          </div>
         </div>
-        <div className="mb-3 md:mb-4 text-sm md:text-base text-gray-700">{project.desc || 'No description yet.'}</div>
+
+        {/* 项目截图 */}
+        {project.screenshot && (
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-sm md:text-base font-semibold text-gray-800 mb-2">Project Screenshot</h3>
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+              <img 
+                src={project.screenshot} 
+                alt={`${project.name} screenshot`}
+                className="w-full h-auto object-cover"
+                style={{ maxHeight: responsive.isMobile ? '200px' : '300px' }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<div class="flex items-center justify-center h-32 text-gray-400 text-sm">Screenshot not available</div>';
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 技术栈标签 */}
         {project.techStack && project.techStack.length > 0 && (
-          <div className="flex flex-wrap gap-1 md:gap-2 mt-2">
-            {project.techStack.map((tech, idx) => (
-              <span key={idx} className="bg-blue-100 text-blue-700 text-xs font-semibold px-1.5 py-0.5 md:px-2 md:py-1 rounded">{tech}</span>
-            ))}
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-sm md:text-base font-semibold text-gray-800 mb-2">Tech Stack</h3>
+            <div className="flex flex-wrap gap-1.5 md:gap-2">
+              {project.techStack.map((tech, idx) => (
+                <span 
+                  key={idx} 
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-medium px-2.5 py-1 md:px-3 md:py-1.5 rounded-full shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 项目链接 */}
+        {project.links && (project.links.website || project.links.github) && (
+          <div className="mb-4 md:mb-6">
+            <h3 className="text-sm md:text-base font-semibold text-gray-800 mb-2">Links</h3>
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              {project.links.website && (
+                <a 
+                  href={project.links.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors shadow-sm hover:shadow-md"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                  </svg>
+                  Visit Website
+                </a>
+              )}
+              {project.links.github && (
+                <a 
+                  href={project.links.github} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors shadow-sm hover:shadow-md"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.344-3.369-1.344-.454-1.157-1.11-1.465-1.11-1.465-.908-.62.069-.608.069-.608 1.003.07 1.531 1.034 1.531 1.034.892 1.532 2.341 1.09 2.91.834.092-.648.35-1.09.636-1.34-2.22-.254-4.555-1.113-4.555-4.951 0-1.093.39-1.986 1.029-2.685-.103-.254-.446-1.272.098-2.651 0 0 .84-.27 2.75 1.027A9.564 9.564 0 0112 6.844c.85.004 1.705.116 2.504.34 1.909-1.297 2.747-1.027 2.747-1.027.546 1.38.203 2.397.1 2.651.64.7 1.028 1.592 1.028 2.685 0 3.847-2.339 4.695-4.566 4.945.359.31.678.922.678 1.857 0 1.34-.012 2.422-.012 2.75 0 .267.18.577.688.48C19.137 20.203 22 16.448 22 12.021 22 6.484 17.523 2 12 2Z" fill="currentColor"/>
+                  </svg>
+                  View on GitHub
+                </a>
+              )}
+            </div>
           </div>
         )}
       </div>
