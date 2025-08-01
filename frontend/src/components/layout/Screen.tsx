@@ -51,7 +51,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
       screenshot: '/img/projects/portfolio.png',
       techStack: ['React', 'TypeScript', 'Three.js', 'Tailwind CSS', 'GSAP', 'CRACO'],
       links: {
-        website: 'https://kylemeng.dev',
+        website: 'https://www.kylemeng.com',
         github: 'https://github.com/DreamOne11/KyleMengPortfolio'
       }
     },

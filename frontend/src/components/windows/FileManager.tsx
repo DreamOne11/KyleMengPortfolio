@@ -261,51 +261,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     }
   };
 
-  // 添加触摸事件处理函数，解决移动端双击问题
-  const lastTapTimeRef = useRef<number>(0);
-  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleItemTouchEnd = (item: FileItem, e: React.TouchEvent) => {
-    e.preventDefault();
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300; // 双击间隔时间（毫秒）
-    
-    if (now - lastTapTimeRef.current < DOUBLE_TAP_DELAY) {
-      // 双击检测到，清除可能的单击超时
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-        tapTimeoutRef.current = null;
-      }
-      
-      // 执行双击操作
-      console.log('Double tap detected on mobile for:', item.name);
-      handleItemDoubleClick(item);
-      lastTapTimeRef.current = 0; // 重置，避免三击被检测为另一次双击
-    } else {
-      // 第一次点击，设置超时以检测是否为双击
-      lastTapTimeRef.current = now;
-      
-      // 设置单击操作的延迟执行
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-      
-      tapTimeoutRef.current = setTimeout(() => {
-        // 单击操作
-        handleItemClick(item.id, e as any);
-        tapTimeoutRef.current = null;
-      }, DOUBLE_TAP_DELAY);
-    }
-  };
-
-  // 组件卸载时清理
-  useEffect(() => {
-    return () => {
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-    };
-  }, []);
+  // 移动端现在使用onClick事件处理，不再需要复杂的触摸事件处理
 
   // 处理空白区域点击，取消选中状态
   const handleBlankAreaClick = (event: React.MouseEvent) => {
@@ -611,43 +567,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
   }, [isMobileDevice, isMaximized, handleMaximize]);
 
   // 添加项目触摸事件处理函数
-  const handleProjectTouchEnd = (project: any, e: React.TouchEvent) => {
-    e.preventDefault();
-    const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300; // 双击间隔时间（毫秒）
-    
-    if (now - lastTapTimeRef.current < DOUBLE_TAP_DELAY) {
-      // 双击检测到，清除可能的单击超时
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-        tapTimeoutRef.current = null;
-      }
-      
-      // 执行双击操作
-      console.log('Double tap detected on mobile for project:', project.name);
-      if (onProjectDoubleClick) {
-        onProjectDoubleClick(project);
-      }
-      lastTapTimeRef.current = 0; // 重置，避免三击被检测为另一次双击
-    } else {
-      // 第一次点击，设置超时以检测是否为双击
-      lastTapTimeRef.current = now;
-      
-      // 设置单击操作的延迟执行
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-      
-      tapTimeoutRef.current = setTimeout(() => {
-        // 单击操作 - 移动端单击直接打开项目
-        console.log('Single tap detected on mobile for project:', project.name);
-        if (onProjectDoubleClick) {
-          onProjectDoubleClick(project);
-        }
-        tapTimeoutRef.current = null;
-      }, DOUBLE_TAP_DELAY);
-    }
-  };
+  // handleProjectTouchEnd 已移除，现在使用onClick处理移动端交互
 
   return (
     <div 
@@ -868,8 +788,11 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
                 key={item.id || idx}
                 className="flex items-center text-xs md:text-sm hover:bg-blue-50 transition cursor-pointer"
                 onClick={(e) => {
-                  // 桌面端的单击选择逻辑可以在这里添加
-                  // 移动端使用 onTouchEnd 处理
+                  // 移动端单击直接打开项目
+                  if (responsive.isMobile) {
+                    e.preventDefault();
+                    onProjectDoubleClick && onProjectDoubleClick(item);
+                  }
                 }}
                 onDoubleClick={(e) => {
                   // 桌面端双击打开项目
@@ -877,7 +800,6 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
                     onProjectDoubleClick && onProjectDoubleClick(item);
                   }
                 }}
-                onTouchEnd={(e) => handleProjectTouchEnd(item, e)}
               >
                 <div className="flex-1 px-2 md:px-4 py-2 font-medium text-gray-800">{item.name}</div>
                 <div className="w-24 md:w-48 px-2 md:px-4 text-gray-500 hidden sm:block">{item.date || '-'}</div>
@@ -894,9 +816,22 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
                 className={`h-10 md:h-12 flex items-center border-b border-gray-100 hover:bg-blue-50 cursor-pointer ${
                   selectedItems.includes(file.id) ? 'bg-blue-100' : ''
                 }`}
-                onClick={(e) => handleItemClick(file.id, e)}
-                onDoubleClick={() => handleItemDoubleClick(file)}
-                onTouchEnd={(e) => handleItemTouchEnd(file, e)}
+                onClick={(e) => {
+                  // 移动端单击直接打开文件，桌面端单击选择文件
+                  if (responsive.isMobile) {
+                    e.preventDefault();
+                    handleItemDoubleClick(file);
+                  } else {
+                    handleItemClick(file.id, e);
+                  }
+                }}
+                onDoubleClick={() => {
+                  // 桌面端双击打开文件
+                  if (!responsive.isMobile) {
+                    handleItemDoubleClick(file);
+                  }
+                }}
+                // onTouchEnd={(e) => handleItemTouchEnd(file, e)} // 移除，使用onClick处理移动端交互
               >
                 <div className="flex-1 flex items-center px-2 md:px-4">
                   <div className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 flex items-center justify-center">
