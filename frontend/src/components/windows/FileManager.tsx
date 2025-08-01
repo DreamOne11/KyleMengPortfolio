@@ -581,7 +581,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
   const isMobileDevice = responsive.isMobile;
 
   // 最大化/恢复窗口
-  const handleMaximize = () => {
+  const handleMaximize = React.useCallback(() => {
     if (isMaximized) {
       if (preMaximizeState) {
         setWindowSize(preMaximizeState.size);
@@ -601,7 +601,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       onMaximizeChange?.(true); // 通知最大化
     }
     onFocus?.();
-  };
+  }, [isMaximized, preMaximizeState, windowSize, windowPosition, onMaximizeChange, onFocus]);
 
   // 在移动设备上自动最大化窗口
   useEffect(() => {

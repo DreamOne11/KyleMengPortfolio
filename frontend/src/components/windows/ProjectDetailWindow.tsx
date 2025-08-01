@@ -67,21 +67,6 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
     position: { x: number; y: number };
   } | null>(null);
 
-  // 在移动设备上自动最大化窗口
-  useEffect(() => {
-    if (isMobileDevice && !isMaximized) {
-      handleMaximize();
-    }
-  }, [isMobileDevice, isMaximized,]);
-
-  // 打开动画
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsAnimated(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
   // 关闭动画处理
   const handleClose = () => {
     setIsClosing(true);
@@ -91,7 +76,7 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
   };
 
   // 最大化/恢复窗口
-  const handleMaximize = () => {
+  const handleMaximize = React.useCallback(() => {
     if (isMaximized) {
       if (preMaximizeState) {
         setWindowSize(preMaximizeState.size);
@@ -111,7 +96,22 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
       onMaximizeChange?.(true); // 通知最大化
     }
     onFocus?.();
-  };
+  }, [isMaximized, preMaximizeState, windowSize, windowPosition, onMaximizeChange, onFocus]);
+
+  // 在移动设备上自动最大化窗口
+  useEffect(() => {
+    if (isMobileDevice && !isMaximized) {
+      handleMaximize();
+    }
+  }, [isMobileDevice, isMaximized, handleMaximize]);
+
+  // 打开动画
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnimated(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   // 触摸事件处理 - 窗口拖动
   const handleTouchStart = (e: React.TouchEvent) => {

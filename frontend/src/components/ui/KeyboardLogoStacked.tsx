@@ -82,6 +82,20 @@ export default function KeyboardLogoStacked() {
     }
   };
 
+  // 移动端缩放因子
+  const scaleFactor = responsive.isMobile ? 0.76 : 1;
+  
+  // 移动端键帽布局生成函数
+  const getMobileKeyLayout = React.useCallback(() => {
+    return standardKeyLayout.map(key => ({
+      ...key,
+      x: Math.round(key.x * scaleFactor),
+      y: Math.round(key.y * scaleFactor)
+    }));
+  }, [scaleFactor]);
+  
+  const keyLayout = responsive.isMobile ? getMobileKeyLayout() : standardKeyLayout;
+
   /* ⑥ 装载持续动画 */
   useEffect(() => {
     // 添加延迟确保所有ref都已就绪
@@ -506,7 +520,7 @@ export default function KeyboardLogoStacked() {
     };
 
     reinitializeAnimations();
-  }, [responsive.isMobile, responsive.isTablet]);
+  }, [responsive.isMobile, responsive.isTablet, getMobileKeyLayout]);
 
   /* ⑦ 获取元素位置 - 根据设备类型返回合适位置 */
   const getPosition = (type: 'div' | 'note' | 'float' | 'mail' | 'pencil' | 'star-large' | 'star-small' | 'chat-bubble' | 'period-1' | 'period-2' | 'period-3') => {
@@ -586,18 +600,6 @@ export default function KeyboardLogoStacked() {
 
   /* 渲染 - 根据设备类型使用合适的键帽大小 */
   const keySize = responsive.isMobile ? 43 : 56; // 移动端使用较小的键帽大小 (56 * 0.76 ≈ 43)
-  const scaleFactor = responsive.isMobile ? 0.76 : 1; // 移动端缩放因子
-  
-  // 移动端键帽布局生成函数
-  const getMobileKeyLayout = React.useCallback(() => {
-    return standardKeyLayout.map(key => ({
-      ...key,
-      x: Math.round(key.x * scaleFactor),
-      y: Math.round(key.y * scaleFactor)
-    }));
-  }, [scaleFactor]);
-  
-  const keyLayout = responsive.isMobile ? getMobileKeyLayout() : standardKeyLayout;
   
   const initialCursorPos = {
     left: keyLayout.find(k => k.letter === 'M')!.x + keySize + CURSOR_OFFSET.dx,

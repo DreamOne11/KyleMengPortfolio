@@ -54,16 +54,8 @@ const MyWorkScreen: React.FC<MyWorkScreenProps> = ({ onAllProjectsFolderDoubleCl
     }
   };
   
-  // 根据屏幕尺寸调整项目卡片布局
-  const getCardsLayout = () => {
-    if (responsive.isMobile) {
-      return 'flex flex-col items-center gap-6';
-    } else if (responsive.isTablet) {
-      return 'flex flex-wrap gap-6';
-    } else {
-      return 'flex gap-8';
-    }
-  };
+  // 移除未使用的 getCardsLayout 函数
+  // 项目卡片布局已在具体的 JSX 中直接定义
   
   // 根据屏幕尺寸调整顶部位置
   const getTopPosition = () => {
