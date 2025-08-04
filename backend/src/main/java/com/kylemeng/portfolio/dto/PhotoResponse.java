@@ -13,14 +13,9 @@ public class PhotoResponse {
     private String description;
     private String filePath;
     private String thumbnailPath;
-    private String metadata;
     private LocalDateTime takenAt;
     private String location;
-    private String cameraInfo;
-    private Long fileSize;
-    private String dimensions;
-    private Integer sortOrder;
-    private Boolean isFeatured;
+    private Long likesCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -36,14 +31,9 @@ public class PhotoResponse {
         this.description = photo.getDescription();
         this.filePath = photo.getFilePath();
         this.thumbnailPath = photo.getThumbnailPath();
-        this.metadata = photo.getMetadata();
         this.takenAt = photo.getTakenAt();
         this.location = photo.getLocation();
-        this.cameraInfo = photo.getCameraInfo();
-        this.fileSize = photo.getFileSize();
-        this.dimensions = photo.getDimensions();
-        this.sortOrder = photo.getSortOrder();
-        this.isFeatured = photo.getIsFeatured();
+        this.likesCount = photo.getLikesCount();
         this.createdAt = photo.getCreatedAt();
         this.updatedAt = photo.getUpdatedAt();
     }
@@ -105,14 +95,6 @@ public class PhotoResponse {
         this.thumbnailPath = thumbnailPath;
     }
     
-    public String getMetadata() {
-        return metadata;
-    }
-    
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
-    
     public LocalDateTime getTakenAt() {
         return takenAt;
     }
@@ -129,44 +111,12 @@ public class PhotoResponse {
         this.location = location;
     }
     
-    public String getCameraInfo() {
-        return cameraInfo;
+    public Long getLikesCount() {
+        return likesCount;
     }
     
-    public void setCameraInfo(String cameraInfo) {
-        this.cameraInfo = cameraInfo;
-    }
-    
-    public Long getFileSize() {
-        return fileSize;
-    }
-    
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
-    }
-    
-    public String getDimensions() {
-        return dimensions;
-    }
-    
-    public void setDimensions(String dimensions) {
-        this.dimensions = dimensions;
-    }
-    
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-    
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-    
-    public Boolean getIsFeatured() {
-        return isFeatured;
-    }
-    
-    public void setIsFeatured(Boolean isFeatured) {
-        this.isFeatured = isFeatured;
+    public void setLikesCount(Long likesCount) {
+        this.likesCount = likesCount;
     }
     
     public LocalDateTime getCreatedAt() {

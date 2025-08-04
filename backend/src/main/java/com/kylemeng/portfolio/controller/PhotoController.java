@@ -119,13 +119,81 @@ public class PhotoController {
     }
     
     /**
-     * GET /api/photos/featured
-     * Get featured photos
+     * GET /api/photos/popular
+     * Get photos ordered by likes count
      */
-    @GetMapping("/photos/featured")
-    public ResponseEntity<List<PhotoResponse>> getFeaturedPhotos() {
+    @GetMapping("/photos/popular")
+    public ResponseEntity<List<PhotoResponse>> getPopularPhotos() {
         try {
-            List<Photo> photos = photoService.getFeaturedPhotos();
+            List<Photo> photos = photoService.getPhotosByLikes();
+            List<PhotoResponse> response = photos.stream()
+                    .map(PhotoResponse::new)
+                    .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * GET /api/photos/top
+     * Get top photos by likes count
+     */
+    @GetMapping("/photos/top")
+    public ResponseEntity<List<PhotoResponse>> getTopPhotos() {
+        try {
+            List<Photo> photos = photoService.getTopPhotosByLikes();
+            List<PhotoResponse> response = photos.stream()
+                    .map(PhotoResponse::new)
+                    .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * POST /api/photos/{id}/like
+     * Increment likes count for a photo
+     */
+    @PostMapping("/photos/{id}/like")
+    public ResponseEntity<PhotoResponse> likePhoto(@PathVariable Long id) {
+        try {
+            Photo photo = photoService.incrementLikes(id);
+            return ResponseEntity.ok(new PhotoResponse(photo));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * POST /api/photos/{id}/unlike
+     * Decrement likes count for a photo
+     */
+    @PostMapping("/photos/{id}/unlike")
+    public ResponseEntity<PhotoResponse> unlikePhoto(@PathVariable Long id) {
+        try {
+            Photo photo = photoService.decrementLikes(id);
+            return ResponseEntity.ok(new PhotoResponse(photo));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * GET /api/photos/category/{categoryId}/popular
+     * Get photos by category ordered by likes count
+     */
+    @GetMapping("/photos/category/{categoryId}/popular")
+    public ResponseEntity<List<PhotoResponse>> getPopularPhotosByCategory(@PathVariable Long categoryId) {
+        try {
+            List<Photo> photos = photoService.getPhotosByCategoryOrderByLikes(categoryId);
             List<PhotoResponse> response = photos.stream()
                     .map(PhotoResponse::new)
                     .collect(Collectors.toList());

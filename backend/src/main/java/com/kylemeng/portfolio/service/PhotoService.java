@@ -96,7 +96,7 @@ public class PhotoService {
      */
     @Transactional(readOnly = true)
     public List<Photo> getPhotosByCategoryId(Long categoryId) {
-        return photoRepository.findByCategoryIdOrderBySortOrderAscCreatedAtDesc(categoryId);
+        return photoRepository.findByCategoryIdOrderByCreatedAtDesc(categoryId);
     }
     
     /**
@@ -104,15 +104,33 @@ public class PhotoService {
      */
     @Transactional(readOnly = true)
     public Page<Photo> getPhotosByCategoryId(Long categoryId, Pageable pageable) {
-        return photoRepository.findByCategoryIdOrderBySortOrderAscCreatedAtDesc(categoryId, pageable);
+        return photoRepository.findByCategoryIdOrderByCreatedAtDesc(categoryId, pageable);
     }
     
     /**
-     * Get featured photos
+     * Get photos ordered by likes count
      */
     @Transactional(readOnly = true)
-    public List<Photo> getFeaturedPhotos() {
-        return photoRepository.findByIsFeaturedTrueOrderBySortOrderAscCreatedAtDesc();
+    public List<Photo> getPhotosByLikes() {
+        return photoRepository.findAllByOrderByLikesCountDesc();
+    }
+    
+    /**
+     * Get photos by category ordered by likes count
+     */
+    @Transactional(readOnly = true)
+    public List<Photo> getPhotosByCategoryOrderByLikes(Long categoryId) {
+        Optional<PhotoCategory> category = photoCategoryRepository.findById(categoryId);
+        return category.map(photoRepository::findByCategoryOrderByLikesCountDesc)
+                      .orElse(List.of());
+    }
+    
+    /**
+     * Get top photos by likes
+     */
+    @Transactional(readOnly = true)
+    public List<Photo> getTopPhotosByLikes() {
+        return photoRepository.findTop10ByOrderByLikesCountDesc();
     }
     
     /**
@@ -169,10 +187,31 @@ public class PhotoService {
     }
     
     /**
-     * Get photos by camera info
+     * Increment likes count for a photo
      */
-    @Transactional(readOnly = true)
-    public List<Photo> getPhotosByCameraInfo(String cameraInfo) {
-        return photoRepository.findByCameraInfoContainingIgnoreCaseOrderByCreatedAtDesc(cameraInfo);
+    public Photo incrementLikes(Long photoId) {
+        Optional<Photo> photoOpt = photoRepository.findById(photoId);
+        if (photoOpt.isPresent()) {
+            Photo photo = photoOpt.get();
+            photo.setLikesCount(photo.getLikesCount() + 1);
+            return photoRepository.save(photo);
+        }
+        throw new RuntimeException("Photo not found with id: " + photoId);
+    }
+    
+    /**
+     * Decrement likes count for a photo
+     */
+    public Photo decrementLikes(Long photoId) {
+        Optional<Photo> photoOpt = photoRepository.findById(photoId);
+        if (photoOpt.isPresent()) {
+            Photo photo = photoOpt.get();
+            Long currentLikes = photo.getLikesCount();
+            if (currentLikes > 0) {
+                photo.setLikesCount(currentLikes - 1);
+                return photoRepository.save(photo);
+            }
+        }
+        throw new RuntimeException("Photo not found with id: " + photoId);
     }
 }

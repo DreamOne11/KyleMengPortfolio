@@ -42,14 +42,12 @@ public class DataInitializer implements CommandLineRunner {
         
         // Create default photo categories
         PhotoCategory[] categories = {
-            createCategory("nature", "Nature Photography", 
-                "Beautiful landscapes, wildlife, and natural scenes", "#10B981", 1),
-            createCategory("street", "Street Photography", 
-                "Urban life, people, and candid moments", "#6B7280", 2),
-            createCategory("portrait", "Portrait Photography", 
-                "People portraits and character studies", "#EC4899", 3),
-            createCategory("travel", "Travel Photography", 
-                "Adventures and places around the world", "#3B82F6", 4)
+            createCategory("portrait", "Portrait", 
+                "Portrait photography capturing human essence and character", "#EC4899", 1),
+            createCategory("landscape", "Landscape", 
+                "Natural scenery and environmental landscape photography", "#10B981", 2),
+            createCategory("humanist", "Humanist", 
+                "Documentary photography showcasing human life and culture", "#3B82F6", 3)
         };
         
         for (PhotoCategory category : categories) {
@@ -85,60 +83,100 @@ public class DataInitializer implements CommandLineRunner {
         String categoryName = category.getName().toLowerCase();
         
         switch (categoryName) {
-            case "nature":
-                createPhoto(category, "Mountain Sunrise", 
-                    "Golden hour over the mountain peaks", 
-                    "/images/photography/nature/mountain-sunrise.jpg",
-                    "/images/photography/nature/thumbs/mountain-sunrise-thumb.jpg",
-                    "Rocky Mountains, Colorado", "Canon EOS R5", true, 1);
-                
-                createPhoto(category, "Forest Stream", 
-                    "Peaceful stream flowing through autumn forest", 
-                    "/images/photography/nature/forest-stream.jpg",
-                    "/images/photography/nature/thumbs/forest-stream-thumb.jpg",
-                    "Pacific Northwest", "Nikon D850", false, 2);
-                break;
-                
-            case "street":
-                createPhoto(category, "City Rush", 
-                    "People rushing through the busy intersection", 
-                    "/images/photography/street/city-rush.jpg",
-                    "/images/photography/street/thumbs/city-rush-thumb.jpg",
-                    "New York City", "Fujifilm X-T4", true, 1);
-                
-                createPhoto(category, "Coffee Shop Moments", 
-                    "Candid scene from a local coffee shop", 
-                    "/images/photography/street/coffee-shop.jpg",
-                    "/images/photography/street/thumbs/coffee-shop-thumb.jpg",
-                    "San Francisco", "Leica Q2", false, 2);
-                break;
-                
             case "portrait":
-                createPhoto(category, "Artist at Work", 
-                    "Portrait of a painter in her studio", 
-                    "/images/photography/portrait/artist-work.jpg",
-                    "/images/photography/portrait/thumbs/artist-work-thumb.jpg",
-                    "Studio, Brooklyn", "Canon 5D Mark IV", true, 1);
+                createPhoto(category, "Portrait Study 1", 
+                    "Professional portrait capturing natural expression", 
+                    "/images/photography/portrait/DSC_4661.jpg",
+                    "/images/photography/portrait/DSC_4661.jpg",
+                    "Studio Session", 25L);
                 
-                createPhoto(category, "Young Entrepreneur", 
-                    "Professional headshot for business profile", 
-                    "/images/photography/portrait/entrepreneur.jpg",
-                    "/images/photography/portrait/thumbs/entrepreneur-thumb.jpg",
-                    "Silicon Valley", "Sony A7R IV", false, 2);
+                createPhoto(category, "Portrait Study 2", 
+                    "Character portrait with dramatic lighting", 
+                    "/images/photography/portrait/DSC_4679.jpg",
+                    "/images/photography/portrait/DSC_4679.jpg",
+                    "Portrait Studio", 18L);
+                
+                createPhoto(category, "Portrait Study 3", 
+                    "Environmental portrait in natural setting", 
+                    "/images/photography/portrait/DSC_4769.jpg",
+                    "/images/photography/portrait/DSC_4769.jpg",
+                    "Outdoor Location", 32L);
+                
+                createPhoto(category, "Portrait Study 4", 
+                    "Classic portrait with soft lighting", 
+                    "/images/photography/portrait/DSC_4872.jpg",
+                    "/images/photography/portrait/DSC_4872.jpg",
+                    "Studio Session", 41L);
+                
+                createPhoto(category, "Portrait Study 5", 
+                    "Contemporary portrait with modern aesthetic", 
+                    "/images/photography/portrait/DSC_4873.jpg",
+                    "/images/photography/portrait/DSC_4873.jpg",
+                    "Portrait Studio", 29L);
                 break;
                 
-            case "travel":
-                createPhoto(category, "Ancient Temple", 
-                    "Sunrise over ancient temple complex", 
-                    "/images/photography/travel/ancient-temple.jpg",
-                    "/images/photography/travel/thumbs/ancient-temple-thumb.jpg",
-                    "Angkor Wat, Cambodia", "Canon EOS R6", true, 1);
+            case "landscape":
+                createPhoto(category, "Mountain Vista", 
+                    "Breathtaking mountain landscape at golden hour", 
+                    "/images/photography/landscape/DSC_1093.jpg",
+                    "/images/photography/landscape/DSC_1093.jpg",
+                    "Mountain Range", 67L);
                 
-                createPhoto(category, "Market Vendors", 
-                    "Colorful spices at traditional market", 
-                    "/images/photography/travel/market-vendors.jpg",
-                    "/images/photography/travel/thumbs/market-vendors-thumb.jpg",
-                    "Marrakech, Morocco", "Fujifilm X-Pro3", false, 2);
+                createPhoto(category, "Serene Waters", 
+                    "Peaceful lake reflection with mountain backdrop", 
+                    "/images/photography/landscape/DSC_1174.jpg",
+                    "/images/photography/landscape/DSC_1174.jpg",
+                    "Alpine Lake", 54L);
+                
+                createPhoto(category, "Natural Beauty", 
+                    "Stunning natural landscape with dramatic sky", 
+                    "/images/photography/landscape/DSC_1180.jpg",
+                    "/images/photography/landscape/DSC_1180.jpg",
+                    "Nature Reserve", 43L);
+                
+                createPhoto(category, "Wilderness Scene", 
+                    "Untouched wilderness capturing nature's essence", 
+                    "/images/photography/landscape/DSC_1190.jpg",
+                    "/images/photography/landscape/DSC_1190.jpg",
+                    "National Park", 38L);
+                
+                createPhoto(category, "Scenic Overlook", 
+                    "Panoramic view from scenic mountain overlook", 
+                    "/images/photography/landscape/DSC_1195.jpg",
+                    "/images/photography/landscape/DSC_1195.jpg",
+                    "Scenic Viewpoint", 52L);
+                break;
+                
+            case "humanist":
+                createPhoto(category, "Human Connection", 
+                    "Authentic moment capturing human emotion", 
+                    "/images/photography/humanist/DSC_3590.jpg",
+                    "/images/photography/humanist/DSC_3590.jpg",
+                    "Urban Setting", 73L);
+                
+                createPhoto(category, "Daily Life", 
+                    "Candid documentation of everyday moments", 
+                    "/images/photography/humanist/DSC_3592.jpg",
+                    "/images/photography/humanist/DSC_3592.jpg",
+                    "City Streets", 61L);
+                
+                createPhoto(category, "Cultural Expression", 
+                    "Cultural moment showcasing human diversity", 
+                    "/images/photography/humanist/DSC_3595.jpg",
+                    "/images/photography/humanist/DSC_3595.jpg",
+                    "Cultural District", 45L);
+                
+                createPhoto(category, "Social Documentary", 
+                    "Documentary style capturing social interaction", 
+                    "/images/photography/humanist/DSC_3597.jpg",
+                    "/images/photography/humanist/DSC_3597.jpg",
+                    "Public Space", 59L);
+                
+                createPhoto(category, "Life Stories", 
+                    "Storytelling through humanistic photography", 
+                    "/images/photography/humanist/DSC_3642.jpg",
+                    "/images/photography/humanist/DSC_3642.jpg",
+                    "Community Center", 48L);
                 break;
                 
             default:
@@ -157,8 +195,7 @@ public class DataInitializer implements CommandLineRunner {
     }
     
     private void createPhoto(PhotoCategory category, String title, String description, 
-                           String filePath, String thumbnailPath, String location, 
-                           String cameraInfo, boolean isFeatured, int sortOrder) {
+                           String filePath, String thumbnailPath, String location, Long likesCount) {
         try {
             Photo photo = new Photo();
             photo.setCategory(category);
@@ -167,18 +204,12 @@ public class DataInitializer implements CommandLineRunner {
             photo.setFilePath(filePath);
             photo.setThumbnailPath(thumbnailPath);
             photo.setLocation(location);
-            photo.setCameraInfo(cameraInfo);
-            photo.setIsFeatured(isFeatured);
-            photo.setSortOrder(sortOrder);
+            photo.setLikesCount(likesCount);
             photo.setTakenAt(LocalDateTime.now().minusDays((long) (Math.random() * 365)));
-            photo.setDimensions("1920x1080");
-            photo.setFileSize((long) (Math.random() * 5000000 + 1000000)); // Random size between 1MB-6MB
-            
-            // Sample metadata as JSON
-            photo.setMetadata("{\"aperture\":\"f/2.8\",\"shutterSpeed\":\"1/125\",\"iso\":800,\"focalLength\":\"85mm\"}");
             
             Photo saved = photoService.createPhoto(photo);
-            logger.info("Created sample photo: {} for category: {}", saved.getTitle(), category.getDisplayName());
+            logger.info("Created sample photo: {} for category: {} with {} likes", 
+                       saved.getTitle(), category.getDisplayName(), likesCount);
         } catch (Exception e) {
             logger.error("Failed to create sample photo: {} for category: {}", title, category.getDisplayName(), e);
         }

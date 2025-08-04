@@ -33,6 +33,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     zIndex: number;
     isMaximized?: boolean;
     customFiles?: any[];
+    photoCategoryId?: number;
   }>>([]);
   const [openEmailComposers, setOpenEmailComposers] = useState<Array<{
     id: string;
@@ -276,6 +277,35 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     }]);
   };
 
+  // 处理照片点击事件的函数
+  const handlePhotoClick = (photo: any) => {
+    // TODO: 实现照片详情显示功能
+    // 这里可以打开一个照片详情窗口或者模态框
+    console.log('Photo clicked:', photo);
+    
+    // 示例：创建一个照片查看器窗口
+    const photoViewerId = `photo-viewer-${photo.id}`;
+    const isAlreadyOpen = openFileManagers.some(fm => fm.id === photoViewerId);
+    if (isAlreadyOpen) {
+      setOpenFileManagers(prev => prev.map(fm => ({
+        ...fm,
+        zIndex: fm.id === photoViewerId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+      })));
+      return;
+    }
+    
+    const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
+    setOpenFileManagers(prev => [...prev, {
+      id: photoViewerId,
+      folderName: `Photo: ${photo.title}`,
+      sourcePosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+      zIndex: maxZIndex + 1,
+      isMaximized: false,
+      customFiles: [photo], // Single photo for viewing
+      photoCategoryId: photo.categoryId
+    }]);
+  };
+
   // 邮件发送框处理函数
   const handleOpenEmailComposer = () => {
     if (openEmailComposers.length > 0) {
@@ -350,7 +380,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             ) : index === 2 ? (
               <MyNoteScreen />
             ) : (
-              <PhotographyScreen />
+              <PhotographyScreen onPhotoClick={handlePhotoClick} />
             )}
           </div>
         ))}
@@ -373,6 +403,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             ));
           }}
           customFiles={fileManager.customFiles}
+          photoCategoryId={fileManager.photoCategoryId}
           onProjectDoubleClick={(project: any) => {
             setProjectDetailWindows(prev => {
               // 若已存在同 id 的弹窗，则聚焦（提升 zIndex）

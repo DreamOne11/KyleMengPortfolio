@@ -15,34 +15,39 @@ import java.util.List;
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
     
     /**
-     * Find photos by category ordered by sort order and creation date
+     * Find photos by category ordered by creation date
      */
-    List<Photo> findByCategoryOrderBySortOrderAscCreatedAtDesc(PhotoCategory category);
+    List<Photo> findByCategoryOrderByCreatedAtDesc(PhotoCategory category);
     
     /**
-     * Find photos by category ID ordered by sort order and creation date
+     * Find photos by category ID ordered by creation date
      */
-    List<Photo> findByCategoryIdOrderBySortOrderAscCreatedAtDesc(Long categoryId);
+    List<Photo> findByCategoryIdOrderByCreatedAtDesc(Long categoryId);
     
     /**
      * Find photos by category with pagination
      */
-    Page<Photo> findByCategoryOrderBySortOrderAscCreatedAtDesc(PhotoCategory category, Pageable pageable);
+    Page<Photo> findByCategoryOrderByCreatedAtDesc(PhotoCategory category, Pageable pageable);
     
     /**
      * Find photos by category ID with pagination
      */
-    Page<Photo> findByCategoryIdOrderBySortOrderAscCreatedAtDesc(Long categoryId, Pageable pageable);
+    Page<Photo> findByCategoryIdOrderByCreatedAtDesc(Long categoryId, Pageable pageable);
     
     /**
-     * Find featured photos
+     * Find photos ordered by likes count descending
      */
-    List<Photo> findByIsFeaturedTrueOrderBySortOrderAscCreatedAtDesc();
+    List<Photo> findAllByOrderByLikesCountDesc();
     
     /**
-     * Find featured photos by category
+     * Find photos by category ordered by likes count descending
      */
-    List<Photo> findByCategoryAndIsFeaturedTrueOrderBySortOrderAscCreatedAtDesc(PhotoCategory category);
+    List<Photo> findByCategoryOrderByLikesCountDesc(PhotoCategory category);
+    
+    /**
+     * Find top N photos by likes count
+     */
+    List<Photo> findTop10ByOrderByLikesCountDesc();
     
     /**
      * Find photos by location
@@ -65,7 +70,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     @Query("SELECT p FROM Photo p WHERE " +
            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "ORDER BY p.sortOrder ASC, p.createdAt DESC")
+           "ORDER BY p.createdAt DESC")
     List<Photo> searchByKeyword(@Param("keyword") String keyword);
     
     /**
@@ -74,11 +79,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     @Query("SELECT p FROM Photo p WHERE " +
            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "ORDER BY p.sortOrder ASC, p.createdAt DESC")
+           "ORDER BY p.createdAt DESC")
     Page<Photo> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
-    
-    /**
-     * Find photos by camera info
-     */
-    List<Photo> findByCameraInfoContainingIgnoreCaseOrderByCreatedAtDesc(String cameraInfo);
 }

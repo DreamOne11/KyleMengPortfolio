@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MacOSFolderIcon from '../icons/MacOSFolderIcon';
 import { useResponsive, getResponsiveWindowSize } from '../../utils/responsive';
+import { PhotographyApiService } from '../../services/photographyApi';
+import { PhotoResponse } from '../../types/photography';
+import PhotoThumbnail from '../ui/PhotoThumbnail';
 
 // 直接在文件中定义所需类型和函数
 export interface FileItem {
@@ -51,19 +54,42 @@ type Props = {
   customFiles?: any[];
   onProjectDoubleClick?: (project: any) => void;
   isActive?: boolean; // 新增：是否处于活动状态
+  photoCategoryId?: number; // Photography分类ID，用于获取照片
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange, customFiles, onProjectDoubleClick, isActive = false }) => {
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange, customFiles, onProjectDoubleClick, isActive = false, photoCategoryId }) => {
   const responsive = useResponsive();
   
   // 使用useEffect来监听folderName变化并更新文件列表
   const [files, setFiles] = useState<FileItem[]>([]);
+  const [photos, setPhotos] = useState<PhotoResponse[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
 
   // 当folderName改变时，重新获取文件列表
   useEffect(() => {
     setFiles(getFilesForFolder(folderName));
     setSelectedItems([]); // 清空选中状态
   }, [folderName]);
+
+  // 获取照片数据的effect
+  useEffect(() => {
+    if (photoCategoryId) {
+      const fetchPhotos = async () => {
+        try {
+          setPhotosLoading(true);
+          const photoData = await PhotographyApiService.getPhotosByCategory(photoCategoryId);
+          setPhotos(photoData);
+        } catch (error) {
+          console.error('Failed to fetch photos:', error);
+          setPhotos([]);
+        } finally {
+          setPhotosLoading(false);
+        }
+      };
+
+      fetchPhotos();
+    }
+  }, [photoCategoryId]);
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   
@@ -781,7 +807,46 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
 
       {/* 文件列表区域，flex-1 保证 status bar 在底部 */}
       <div className="flex-1 overflow-auto">
-        {customFiles ? (
+        {photoCategoryId && photos.length > 0 ? (
+          // Photography files - use grid layout for photos
+          <div className="p-4">
+            {photosLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <span className="ml-2 text-gray-500">Loading photos...</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {photos.map((photo) => (
+                  <div key={photo.id} className="space-y-2">
+                    <PhotoThumbnail
+                      photo={photo}
+                      size="medium"
+                      showMetadata={true}
+                      onClick={() => {
+                        if (responsive.isMobile) {
+                          // Mobile: single click to view photo
+                          console.log('View photo:', photo.title);
+                        }
+                      }}
+                      onDoubleClick={() => {
+                        if (!responsive.isMobile) {
+                          // Desktop: double click to view photo
+                          console.log('View photo:', photo.title);
+                        }
+                      }}
+                      className="w-full aspect-[4/3]"
+                    />
+                    <div className="text-xs">
+                      <p className="font-medium truncate" title={photo.title}>{photo.title}</p>
+                      <p className="text-gray-500 truncate">{photo.location}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : customFiles ? (
           <div className="flex flex-col divide-y divide-gray-100">
             {customFiles.map((item, idx) => (
               <div
@@ -870,7 +935,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
           <span className="truncate">{folderName}</span>
         </div>
         <div className="ml-auto whitespace-nowrap">
-          {(customFiles ? customFiles.length : files.length)} items
+          {photoCategoryId ? photos.length : (customFiles ? customFiles.length : files.length)} {photoCategoryId ? 'photos' : 'items'}
           <span className="hidden sm:inline">, 2.1 GB available</span>
         </div>
       </div>

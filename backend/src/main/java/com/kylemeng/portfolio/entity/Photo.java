@@ -41,9 +41,6 @@ public class Photo {
     @Size(max = 500, message = "Thumbnail path must not exceed 500 characters")
     private String thumbnailPath;
     
-    @Column(columnDefinition = "JSONB")
-    private String metadata;
-    
     @Column(name = "taken_at")
     private LocalDateTime takenAt;
     
@@ -51,22 +48,8 @@ public class Photo {
     @Size(max = 200, message = "Location must not exceed 200 characters")
     private String location;
     
-    @Column(name = "camera_info", length = 200)
-    @Size(max = 200, message = "Camera info must not exceed 200 characters")
-    private String cameraInfo;
-    
-    @Column(name = "file_size")
-    private Long fileSize;
-    
-    @Column(length = 20)
-    @Size(max = 20, message = "Dimensions must not exceed 20 characters")
-    private String dimensions;
-    
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
-    
-    @Column(name = "is_featured")
-    private Boolean isFeatured = false;
+    @Column(name = "likes_count")
+    private Long likesCount = 0L;
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -135,14 +118,6 @@ public class Photo {
         this.thumbnailPath = thumbnailPath;
     }
     
-    public String getMetadata() {
-        return metadata;
-    }
-    
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
-    
     public LocalDateTime getTakenAt() {
         return takenAt;
     }
@@ -159,44 +134,12 @@ public class Photo {
         this.location = location;
     }
     
-    public String getCameraInfo() {
-        return cameraInfo;
+    public Long getLikesCount() {
+        return likesCount;
     }
     
-    public void setCameraInfo(String cameraInfo) {
-        this.cameraInfo = cameraInfo;
-    }
-    
-    public Long getFileSize() {
-        return fileSize;
-    }
-    
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
-    }
-    
-    public String getDimensions() {
-        return dimensions;
-    }
-    
-    public void setDimensions(String dimensions) {
-        this.dimensions = dimensions;
-    }
-    
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-    
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-    
-    public Boolean getIsFeatured() {
-        return isFeatured;
-    }
-    
-    public void setIsFeatured(Boolean isFeatured) {
-        this.isFeatured = isFeatured;
+    public void setLikesCount(Long likesCount) {
+        this.likesCount = likesCount;
     }
     
     public LocalDateTime getCreatedAt() {
@@ -222,7 +165,7 @@ public class Photo {
                 ", title='" + title + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", location='" + location + '\'' +
-                ", isFeatured=" + isFeatured +
+                ", likesCount=" + likesCount +
                 '}';
     }
 }
