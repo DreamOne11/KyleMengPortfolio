@@ -89,4 +89,7 @@ backend/.mvn/wrapper/maven-wrapper.jar
 .cursor/
 .cursor/rules/
 .cursor/rules/*.mdc
-.cursorrules 
+.cursorrules
+
+# Photography images (large files)
+frontend/public/images/photography/ 
