@@ -65,9 +65,13 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick, onCh
           {/* 两个文件夹 */}
           <div className="flex justify-center gap-4 flex-shrink-0">
             {folders.map((folder) => (
-              <div key={folder.id} className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-2"
+              <div
+                key={folder.id}
+                className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-2"
                 onClick={(e) => handleFolderClick(folder.id, e)}
-                onDoubleClick={(e) => handleFolderDoubleClick(folder.id, e)}>
+                onDoubleClick={(e) => handleFolderDoubleClick(folder.id, e)}
+                data-onboarding={folder.id === 'contact' ? 'contact-folder' : undefined}
+              >
                 <div className={`w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-2 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
                   <MacOSFolderIcon color={folder.color} />
                 </div>
@@ -106,9 +110,13 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick, onCh
       {/* Dynamic Folders */}
         <div className={`absolute left-8 flex gap-4 md:gap-4`} style={{ top: responsive.isMobile ? '6rem' : '6rem' }}>
           {folders.map((folder) => (
-            <div key={folder.id} className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
+            <div
+              key={folder.id}
+              className="flex flex-col items-center cursor-pointer group transition-all duration-200 rounded-lg p-1"
               onClick={(e) => handleFolderClick(folder.id, e)}
-              onDoubleClick={(e) => handleFolderDoubleClick(folder.id, e)}>
+              onDoubleClick={(e) => handleFolderDoubleClick(folder.id, e)}
+              data-onboarding={folder.id === 'contact' ? 'contact-folder' : undefined}
+            >
               <div className={`w-12 h-12 md:w-16 md:h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
                 <MacOSFolderIcon color={folder.color} />
               </div>

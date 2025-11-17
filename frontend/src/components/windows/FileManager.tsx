@@ -881,6 +881,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
                 className={`h-10 md:h-12 flex items-center border-b border-gray-100 hover:bg-blue-50 cursor-pointer ${
                   selectedItems.includes(file.id) ? 'bg-blue-100' : ''
                 }`}
+                data-onboarding={folderName === 'Contact' && file.name === 'Email' ? 'contact-email' : undefined}
                 onClick={(e) => {
                   // 移动端单击直接打开文件，桌面端单击选择文件
                   if (responsive.isMobile) {

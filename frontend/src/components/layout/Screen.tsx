@@ -8,7 +8,6 @@ import { useResponsive } from '../../utils/responsive';
 // 导入拆分后的屏幕组件
 import AboutMeScreen from '../screens/AboutMeScreen';
 import MyWorkScreen from '../screens/MyWorkScreen';
-import MyNoteScreen from '../screens/MyNoteScreen';
 import PhotographyScreen from '../screens/PhotographyScreen';
 
 type Props = {
@@ -16,9 +15,10 @@ type Props = {
   onScreenChange: (screen: number) => void;
   onAnyFileManagerMaximizedChange?: (isMax: boolean) => void;
   onChatExpandedChange?: (isExpanded: boolean) => void;
+  triggerContactFolder?: number;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange, triggerContactFolder }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
@@ -126,13 +126,40 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     }
   }, []);
 
+  // Auto-open/close Contact folder when triggered from onboarding
+  React.useEffect(() => {
+    if (triggerContactFolder === undefined) return;
+
+    const folderId = 'contact';
+
+    if (triggerContactFolder > 0) {
+      // Open Contact folder
+      const folderName = 'Contact';
+      const isAlreadyOpen = openFileManagers.some(fm => fm.id === folderId);
+
+      if (!isAlreadyOpen) {
+        const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
+
+        setOpenFileManagers(prev => [...prev, {
+          id: folderId,
+          folderName,
+          sourcePosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+          zIndex: maxZIndex + 1,
+          isMaximized: false
+        }]);
+      }
+    } else if (triggerContactFolder < 0) {
+      // Close Contact folder
+      setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
+    }
+  }, [triggerContactFolder]);
+
   
 
   const screens = [
     { id: 0, title: 'About Me', subtitle: 'Get to know me better', emoji: '👋' },
     { id: 1, title: 'My Work', subtitle: 'Projects & Experience', emoji: '💼' },
-    { id: 2, title: 'My Note', subtitle: 'Thoughts & Learning', emoji: '📝' },
-    { id: 3, title: 'Photography', subtitle: 'Visual Stories', emoji: '📸' }
+    { id: 2, title: 'Photography', subtitle: 'Visual Stories', emoji: '📸' }
   ];
 
   const handleScreenChange = (newScreen: number) => {
@@ -377,8 +404,6 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
               <AboutMeScreen onFolderDoubleClick={handleFolderDoubleClick} onChatExpandedChange={onChatExpandedChange} />
             ) : index === 1 ? (
               <MyWorkScreen onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick} />
-            ) : index === 2 ? (
-              <MyNoteScreen />
             ) : (
               <PhotographyScreen onPhotoClick={handlePhotoClick} />
             )}

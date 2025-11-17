@@ -14,8 +14,7 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
   const dockItems = [
     { id: 0, emoji: '👋', label: 'About Me', mobileLabel: 'About' },
     { id: 1, emoji: '💼', label: 'My Work', mobileLabel: 'Work' },
-    { id: 2, emoji: '📝', label: 'My Note', mobileLabel: 'Notes' },
-    { id: 3, emoji: '📸', label: 'Photography', mobileLabel: 'Photo' },
+    { id: 2, emoji: '📸', label: 'Photography', mobileLabel: 'Photo' },
   ];
 
   // 监听滚动事件
@@ -90,10 +89,10 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
   // 移动端顶部导航栏设计
   if (responsive.isMobile) {
     return (
-      <div className="absolute top-12 left-4 right-4 z-50">
+      <div className="absolute top-12 left-4 right-4 z-50 top-navigation">
         <div className={`rounded-3xl shadow-lg px-2 py-1 transition-all duration-300 ${
-          isScrolling 
-            ? 'bg-white/80 backdrop-blur-md border border-white/30' 
+          isScrolling
+            ? 'bg-white/80 backdrop-blur-md border border-white/30'
             : 'bg-transparent'
         }`}>
           <div className="flex justify-around items-center">
@@ -119,7 +118,7 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
 
   // 桌面端保持底部 Dock 设计
   return (
-    <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 px-3 md:px-6 py-1.5 md:py-3 rounded-[12px] md:rounded-[24px] bg-white/20 backdrop-blur-xl shadow-2xl border border-white/20">
+    <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-1 md:gap-2 px-3 md:px-6 py-1.5 md:py-3 rounded-[12px] md:rounded-[24px] bg-white/20 backdrop-blur-xl shadow-2xl border border-white/20 bottom-dock">
       {dockItems.map((item, idx) => (
         <React.Fragment key={item.id}>
           <button
