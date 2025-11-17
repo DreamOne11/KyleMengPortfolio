@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useResponsive } from '../../utils/responsive';
 
-const TopBar: React.FC = () => {
+type Props = {
+  onStartOnboarding: () => void;
+};
+
+const TopBar: React.FC<Props> = ({ onStartOnboarding }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState('🌤️');
   
@@ -58,9 +62,16 @@ const TopBar: React.FC = () => {
       {/* Center: Empty or App Name */}
       <div></div>
       
-      {/* Right: Weather, Date & Time */}
+      {/* Right: Weather, Date & Time, Onboarding Button */}
       <div className="flex items-center gap-2 md:gap-4 opacity-80">
         <span>{weather}</span>
+        <button
+          onClick={onStartOnboarding}
+          className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/30 hover:border-white/50 text-xs font-medium"
+          title="Start Tutorial"
+        >
+          📖 Guide
+        </button>
         <span className="hidden sm:inline">{formatDate(currentTime)}</span>
         <span>{formatTime(currentTime)}</span>
       </div>

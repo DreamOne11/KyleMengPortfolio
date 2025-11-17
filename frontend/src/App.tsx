@@ -17,23 +17,13 @@ function App() {
 
   // Check if onboarding has been completed
   useEffect(() => {
-    // TEMPORARY: Always show onboarding for testing
-    if (!isLoading) {
-      // Delay showing onboarding slightly after loading completes
+    const onboardingCompleted = localStorage.getItem('portfolio_onboarding_completed');
+    if (!onboardingCompleted && !isLoading) {
       const timer = setTimeout(() => {
         setShowOnboarding(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-
-    // Original code (commented out for testing):
-    // const onboardingCompleted = localStorage.getItem('portfolio_onboarding_completed');
-    // if (!onboardingCompleted && !isLoading) {
-    //   const timer = setTimeout(() => {
-    //     setShowOnboarding(true);
-    //   }, 500);
-    //   return () => clearTimeout(timer);
-    // }
   }, [isLoading]);
 
   const handleScreenChange = (screen: number) => {
@@ -46,6 +36,8 @@ function App() {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    // Reset trigger state after onboarding completes
+    setTriggerContactFolder(0);
   };
 
   const handleTriggerContactFolder = () => {
@@ -58,6 +50,16 @@ function App() {
     setTriggerContactFolder(-1);
   };
 
+  const handleStartOnboarding = () => {
+    // Reset folder trigger state and close any open Contact folder
+    setTriggerContactFolder(-1);
+    // Small delay to ensure folder closes before starting onboarding
+    setTimeout(() => {
+      setTriggerContactFolder(0);
+      setShowOnboarding(true);
+    }, 100);
+  };
+
 
   if (isLoading) {
     return <LoadingScreen onComplete={handleLoadingComplete} />;
@@ -67,7 +69,7 @@ function App() {
     <div className={`transition-opacity duration-1000 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
       <ParticleBackground />
       <DesktopContainer>
-        <TopBar />
+        <TopBar onStartOnboarding={handleStartOnboarding} />
         <Screen
           currentScreen={currentScreen}
           onScreenChange={handleScreenChange}

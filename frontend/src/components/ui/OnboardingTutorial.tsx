@@ -193,8 +193,11 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
     if (currentStepData.autoTrigger) {
       const timer = setTimeout(() => {
         currentStepData.autoTrigger?.();
-        // Update positions after trigger
+        // Update positions after trigger with longer delay to ensure DOM is ready
+        setTimeout(updatePositions, 100);
         setTimeout(updatePositions, 300);
+        setTimeout(updatePositions, 600);
+        setTimeout(updatePositions, 1000);
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -270,12 +273,12 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       )}
 
       {/* Tooltip card */}
-      {tooltipPosition && (
+      {(tooltipPosition || !highlightRect) && (
         <div
           className="absolute pointer-events-auto transition-all duration-500 ease-out px-4 md:px-0"
           style={{
-            top: tooltipPosition.top,
-            left: tooltipPosition.left,
+            top: tooltipPosition?.top ?? window.innerHeight / 2 - 150,
+            left: tooltipPosition?.left ?? window.innerWidth / 2,
             transform: 'translateX(-50%)',
             maxWidth: window.innerWidth < 768 ? 'calc(100vw - 32px)' : 'none',
           }}

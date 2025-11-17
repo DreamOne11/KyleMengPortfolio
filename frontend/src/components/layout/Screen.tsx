@@ -149,10 +149,10 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
         }]);
       }
     } else if (triggerContactFolder < 0) {
-      // Close Contact folder
+      // Close Contact folder - always close regardless of current state
       setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
     }
-  }, [triggerContactFolder]);
+  }, [triggerContactFolder, openFileManagers]);
 
   
 
