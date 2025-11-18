@@ -46,18 +46,29 @@ else
     echo -e "${GREEN}✓ 找到JAR文件${NC}"
 fi
 
-echo -e "\n${YELLOW}[2/5] 创建备份...${NC}"
+echo -e "\n${YELLOW}[2/5] 准备部署环境...${NC}"
 ssh -i "$SSH_KEY" "$EC2_HOST" "
+    # 创建应用目录（如果不存在）
+    if [ ! -d $REMOTE_APP_DIR ]; then
+        sudo mkdir -p $REMOTE_APP_DIR
+        sudo chown ec2-user:ec2-user $REMOTE_APP_DIR
+        echo '✓ 应用目录已创建'
+    fi
+    
+    # 备份现有文件
     if [ -f $REMOTE_APP_DIR/$REMOTE_JAR_NAME ]; then
         sudo cp $REMOTE_APP_DIR/$REMOTE_JAR_NAME $REMOTE_APP_DIR/$REMOTE_JAR_NAME.backup.\$(date +%Y%m%d_%H%M%S)
         echo '✓ 备份已创建'
     else
-        echo '! 无现有文件需要备份'
+        echo '! 首次部署，无需备份'
     fi
 "
 
 echo -e "\n${YELLOW}[3/5] 上传新版本...${NC}"
-scp -i "$SSH_KEY" "$LOCAL_JAR_PATH" "$EC2_HOST:$REMOTE_APP_DIR/$REMOTE_JAR_NAME.new"
+# 首次部署直接上传，更新时上传为临时文件
+ssh -i "$SSH_KEY" "$EC2_HOST" "[ -f $REMOTE_APP_DIR/$REMOTE_JAR_NAME ]" && \
+    scp -i "$SSH_KEY" "$LOCAL_JAR_PATH" "$EC2_HOST:$REMOTE_APP_DIR/$REMOTE_JAR_NAME.new" || \
+    scp -i "$SSH_KEY" "$LOCAL_JAR_PATH" "$EC2_HOST:$REMOTE_APP_DIR/$REMOTE_JAR_NAME"
 echo -e "${GREEN}✓ 文件上传完成${NC}"
 
 echo -e "\n${YELLOW}[4/5] 部署新版本...${NC}"

@@ -112,14 +112,14 @@ aws rds create-db-instance \
     --db-instance-identifier "${PROJECT_NAME}-db" \
     --db-instance-class "$DB_INSTANCE_CLASS" \
     --engine postgres \
-    --engine-version 15.4 \
+    --engine-version 15.15 \
     --master-username "$DB_USERNAME" \
     --master-user-password "$DB_PASSWORD" \
     --allocated-storage "$DB_ALLOCATED_STORAGE" \
-    --storage-type gp3 \
+    --storage-type gp2 \
     --db-name "$DB_NAME" \
     --vpc-security-group-ids "$RDS_SG_ID" \
-    --backup-retention-period 7 \
+    --backup-retention-period 0 \
     --publicly-accessible \
     --region "$REGION" \
     --tags Key=Project,Value="$PROJECT_NAME" \
@@ -175,7 +175,7 @@ echo "使用AMI: $AMI_ID"
 # 启动实例
 INSTANCE_ID=$(aws ec2 run-instances \
     --image-id "$AMI_ID" \
-    --instance-type t2.micro \
+    --instance-type t3.micro \
     --key-name "$KEY_NAME" \
     --security-group-ids "$EC2_SG_ID" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${PROJECT_NAME}-backend},{Key=Project,Value=${PROJECT_NAME}}]" \

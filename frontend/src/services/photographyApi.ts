@@ -8,9 +8,11 @@ import {
 } from '../types/photography';
 
 // API Base Configuration
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '/api' 
-  : 'http://localhost:8080/api';
+// 使用环境变量或默认值
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'production' 
+    ? 'http://44.223.49.55:8080/api'  // AWS 后端地址
+    : 'http://localhost:8080/api');    // 本地开发地址
 
 // Create Axios instance with base configuration
 const apiClient = axios.create({

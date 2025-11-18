@@ -16,6 +16,12 @@ backend/target/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+
+# AWS Deployment files
+deployment/*.pem
+deployment/aws-config.env
+deployment/.db-password.txt
 
 # Logs
 npm-debug.log*
