@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -64,121 +63,100 @@ public class DataInitializer implements CommandLineRunner {
     
     private void initializeSamplePhotos() {
         logger.info("Initializing sample photos...");
-        
+
         List<PhotoCategory> categories = photoService.getAllCategories();
         if (categories.isEmpty()) {
             logger.warn("No photo categories found, skipping photo initialization");
             return;
         }
-        
+
+        // Check if photos already exist
+        boolean photosExist = categories.stream()
+            .anyMatch(category -> !photoService.getPhotosByCategoryId(category.getId()).isEmpty());
+
+        if (photosExist) {
+            logger.info("Sample photos already exist, skipping initialization");
+            return;
+        }
+
         // Create sample photos for each category
         for (PhotoCategory category : categories) {
             createSamplePhotosForCategory(category);
         }
-        
+
         logger.info("Sample photos initialization completed");
     }
     
     private void createSamplePhotosForCategory(PhotoCategory category) {
         String categoryName = category.getName().toLowerCase();
-        
+
         switch (categoryName) {
             case "portrait":
-                createPhoto(category, "Portrait Study 1", 
-                    "Professional portrait capturing natural expression", 
-                    "/images/photography/portrait/DSC_4661.jpg",
-                    "/images/photography/portrait/DSC_4661.jpg",
-                    "Studio Session", 25L);
-                
-                createPhoto(category, "Portrait Study 2", 
-                    "Character portrait with dramatic lighting", 
-                    "/images/photography/portrait/DSC_4679.jpg",
-                    "/images/photography/portrait/DSC_4679.jpg",
-                    "Portrait Studio", 18L);
-                
-                createPhoto(category, "Portrait Study 3", 
-                    "Environmental portrait in natural setting", 
-                    "/images/photography/portrait/DSC_4769.jpg",
-                    "/images/photography/portrait/DSC_4769.jpg",
-                    "Outdoor Location", 32L);
-                
-                createPhoto(category, "Portrait Study 4", 
-                    "Classic portrait with soft lighting", 
-                    "/images/photography/portrait/DSC_4872.jpg",
-                    "/images/photography/portrait/DSC_4872.jpg",
-                    "Studio Session", 41L);
-                
-                createPhoto(category, "Portrait Study 5", 
-                    "Contemporary portrait with modern aesthetic", 
-                    "/images/photography/portrait/DSC_4873.jpg",
-                    "/images/photography/portrait/DSC_4873.jpg",
-                    "Portrait Studio", 29L);
+                createPhoto(category, "Portrait Study 1",
+                    "/images/photography/portrait/thumbnails/DSC_4661-full.webp",
+                    "/images/photography/portrait/thumbnails/DSC_4661-card.webp");
+
+                createPhoto(category, "Portrait Study 2",
+                    "/images/photography/portrait/thumbnails/DSC_4679-full.webp",
+                    "/images/photography/portrait/thumbnails/DSC_4679-card.webp");
+
+                createPhoto(category, "Portrait Study 3",
+                    "/images/photography/portrait/thumbnails/DSC_4769-full.webp",
+                    "/images/photography/portrait/thumbnails/DSC_4769-card.webp");
+
+                createPhoto(category, "Portrait Study 4",
+                    "/images/photography/portrait/thumbnails/DSC_4872-full.webp",
+                    "/images/photography/portrait/thumbnails/DSC_4872-card.webp");
+
+                createPhoto(category, "Portrait Study 5",
+                    "/images/photography/portrait/thumbnails/DSC_4873-full.webp",
+                    "/images/photography/portrait/thumbnails/DSC_4873-card.webp");
                 break;
-                
+
             case "landscape":
-                createPhoto(category, "Mountain Vista", 
-                    "Breathtaking mountain landscape at golden hour", 
-                    "/images/photography/landscape/DSC_1093.jpg",
-                    "/images/photography/landscape/DSC_1093.jpg",
-                    "Mountain Range", 67L);
-                
-                createPhoto(category, "Serene Waters", 
-                    "Peaceful lake reflection with mountain backdrop", 
-                    "/images/photography/landscape/DSC_1174.jpg",
-                    "/images/photography/landscape/DSC_1174.jpg",
-                    "Alpine Lake", 54L);
-                
-                createPhoto(category, "Natural Beauty", 
-                    "Stunning natural landscape with dramatic sky", 
-                    "/images/photography/landscape/DSC_1180.jpg",
-                    "/images/photography/landscape/DSC_1180.jpg",
-                    "Nature Reserve", 43L);
-                
-                createPhoto(category, "Wilderness Scene", 
-                    "Untouched wilderness capturing nature's essence", 
-                    "/images/photography/landscape/DSC_1190.jpg",
-                    "/images/photography/landscape/DSC_1190.jpg",
-                    "National Park", 38L);
-                
-                createPhoto(category, "Scenic Overlook", 
-                    "Panoramic view from scenic mountain overlook", 
-                    "/images/photography/landscape/DSC_1195.jpg",
-                    "/images/photography/landscape/DSC_1195.jpg",
-                    "Scenic Viewpoint", 52L);
+                createPhoto(category, "Mountain Vista",
+                    "/images/photography/landscape/thumbnails/DSC_1093-full.webp",
+                    "/images/photography/landscape/thumbnails/DSC_1093-card.webp");
+
+                createPhoto(category, "Serene Waters",
+                    "/images/photography/landscape/thumbnails/DSC_1174-full.webp",
+                    "/images/photography/landscape/thumbnails/DSC_1174-card.webp");
+
+                createPhoto(category, "Natural Beauty",
+                    "/images/photography/landscape/thumbnails/DSC_1180-full.webp",
+                    "/images/photography/landscape/thumbnails/DSC_1180-card.webp");
+
+                createPhoto(category, "Wilderness Scene",
+                    "/images/photography/landscape/thumbnails/DSC_1190-full.webp",
+                    "/images/photography/landscape/thumbnails/DSC_1190-card.webp");
+
+                createPhoto(category, "Scenic Overlook",
+                    "/images/photography/landscape/thumbnails/DSC_1195-full.webp",
+                    "/images/photography/landscape/thumbnails/DSC_1195-card.webp");
                 break;
-                
+
             case "humanist":
-                createPhoto(category, "Human Connection", 
-                    "Authentic moment capturing human emotion", 
-                    "/images/photography/humanist/DSC_3590.jpg",
-                    "/images/photography/humanist/DSC_3590.jpg",
-                    "Urban Setting", 73L);
-                
-                createPhoto(category, "Daily Life", 
-                    "Candid documentation of everyday moments", 
-                    "/images/photography/humanist/DSC_3592.jpg",
-                    "/images/photography/humanist/DSC_3592.jpg",
-                    "City Streets", 61L);
-                
-                createPhoto(category, "Cultural Expression", 
-                    "Cultural moment showcasing human diversity", 
-                    "/images/photography/humanist/DSC_3595.jpg",
-                    "/images/photography/humanist/DSC_3595.jpg",
-                    "Cultural District", 45L);
-                
-                createPhoto(category, "Social Documentary", 
-                    "Documentary style capturing social interaction", 
-                    "/images/photography/humanist/DSC_3597.jpg",
-                    "/images/photography/humanist/DSC_3597.jpg",
-                    "Public Space", 59L);
-                
-                createPhoto(category, "Life Stories", 
-                    "Storytelling through humanistic photography", 
-                    "/images/photography/humanist/DSC_3642.jpg",
-                    "/images/photography/humanist/DSC_3642.jpg",
-                    "Community Center", 48L);
+                createPhoto(category, "Human Connection",
+                    "/images/photography/humanist/thumbnails/DSC_3590-full.webp",
+                    "/images/photography/humanist/thumbnails/DSC_3590-card.webp");
+
+                createPhoto(category, "Daily Life",
+                    "/images/photography/humanist/thumbnails/DSC_3592-full.webp",
+                    "/images/photography/humanist/thumbnails/DSC_3592-card.webp");
+
+                createPhoto(category, "Cultural Expression",
+                    "/images/photography/humanist/thumbnails/DSC_3595-full.webp",
+                    "/images/photography/humanist/thumbnails/DSC_3595-card.webp");
+
+                createPhoto(category, "Social Documentary",
+                    "/images/photography/humanist/thumbnails/DSC_3597-full.webp",
+                    "/images/photography/humanist/thumbnails/DSC_3597-card.webp");
+
+                createPhoto(category, "Life Stories",
+                    "/images/photography/humanist/thumbnails/DSC_3642-full.webp",
+                    "/images/photography/humanist/thumbnails/DSC_3642-card.webp");
                 break;
-                
+
             default:
                 logger.warn("Unknown category: {}, skipping sample photos", categoryName);
         }
@@ -194,22 +172,18 @@ public class DataInitializer implements CommandLineRunner {
         return category;
     }
     
-    private void createPhoto(PhotoCategory category, String title, String description, 
-                           String filePath, String thumbnailPath, String location, Long likesCount) {
+    private void createPhoto(PhotoCategory category, String title,
+                           String filePath, String thumbnailPath) {
         try {
             Photo photo = new Photo();
             photo.setCategory(category);
             photo.setTitle(title);
-            photo.setDescription(description);
             photo.setFilePath(filePath);
             photo.setThumbnailPath(thumbnailPath);
-            photo.setLocation(location);
-            photo.setLikesCount(likesCount);
-            photo.setTakenAt(LocalDateTime.now().minusDays((long) (Math.random() * 365)));
-            
+
             Photo saved = photoService.createPhoto(photo);
-            logger.info("Created sample photo: {} for category: {} with {} likes", 
-                       saved.getTitle(), category.getDisplayName(), likesCount);
+            logger.info("Created sample photo: {} for category: {}",
+                       saved.getTitle(), category.getDisplayName());
         } catch (Exception e) {
             logger.error("Failed to create sample photo: {} for category: {}", title, category.getDisplayName(), e);
         }

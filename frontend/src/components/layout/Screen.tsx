@@ -10,15 +10,25 @@ import AboutMeScreen from '../screens/AboutMeScreen';
 import MyWorkScreen from '../screens/MyWorkScreen';
 import PhotographyScreen from '../screens/PhotographyScreen';
 
+import { PhotoCategoryResponse, PhotoResponse } from '../../types/photography';
+
+type PhotographyData = {
+  categories: PhotoCategoryResponse[];
+  categoryPhotos: { [key: number]: PhotoResponse[] };
+  allCategoryPhotos: { [key: number]: PhotoResponse[] };
+  isLoaded: boolean;
+};
+
 type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
   onAnyFileManagerMaximizedChange?: (isMax: boolean) => void;
   onChatExpandedChange?: (isExpanded: boolean) => void;
   triggerContactFolder?: number;
+  photographyData: PhotographyData;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange, triggerContactFolder }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange, triggerContactFolder, photographyData }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
@@ -304,32 +314,40 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     }]);
   };
 
-  // 处理照片点击事件的函数
-  const handlePhotoClick = (photo: any) => {
-    // TODO: 实现照片详情显示功能
-    // 这里可以打开一个照片详情窗口或者模态框
-    console.log('Photo clicked:', photo);
-    
-    // 示例：创建一个照片查看器窗口
-    const photoViewerId = `photo-viewer-${photo.id}`;
-    const isAlreadyOpen = openFileManagers.some(fm => fm.id === photoViewerId);
+  // 处理照片分类文件夹双击事件 - 打开包含该分类所有照片的 FileManager
+  const handlePhotoCategoryFolderDoubleClick = (
+    categoryId: number,
+    categoryName: string,
+    photos: any[],
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+
+    const folderId = `photo-category-${categoryId}`;
+    const isAlreadyOpen = openFileManagers.some(fm => fm.id === folderId);
+
     if (isAlreadyOpen) {
       setOpenFileManagers(prev => prev.map(fm => ({
         ...fm,
-        zIndex: fm.id === photoViewerId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+        zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
       })));
       return;
     }
-    
+
+    const folderElement = e.currentTarget.querySelector('svg') || e.currentTarget;
+    const rect = folderElement.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
     const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
+
     setOpenFileManagers(prev => [...prev, {
-      id: photoViewerId,
-      folderName: `Photo: ${photo.title}`,
-      sourcePosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+      id: folderId,
+      folderName: categoryName,
+      sourcePosition: { x: centerX, y: centerY },
       zIndex: maxZIndex + 1,
       isMaximized: false,
-      customFiles: [photo], // Single photo for viewing
-      photoCategoryId: photo.categoryId
+      customFiles: photos,
+      photoCategoryId: categoryId
     }]);
   };
 
@@ -400,13 +418,22 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            {index === 0 ? (
+            {/* 始终渲染所有屏幕，使用 CSS 控制显示/隐藏 */}
+            <div className={index === 0 ? 'w-full h-full' : 'hidden'}>
               <AboutMeScreen onFolderDoubleClick={handleFolderDoubleClick} onChatExpandedChange={onChatExpandedChange} />
-            ) : index === 1 ? (
+            </div>
+            <div className={index === 1 ? 'w-full h-full' : 'hidden'}>
               <MyWorkScreen onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick} />
-            ) : (
-              <PhotographyScreen onPhotoClick={handlePhotoClick} />
-            )}
+            </div>
+            <div className={index === 2 ? 'w-full h-full' : 'hidden'}>
+              <PhotographyScreen
+                onPhotoCategoryFolderDoubleClick={handlePhotoCategoryFolderDoubleClick}
+                photoCategories={photographyData.categories}
+                categoryPhotos={photographyData.categoryPhotos}
+                allCategoryPhotos={photographyData.allCategoryPhotos}
+                isDataLoaded={photographyData.isLoaded}
+              />
+            </div>
           </div>
         ))}
       </div>

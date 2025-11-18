@@ -4,9 +4,7 @@ import {
   PhotoCategoryResponse,
   PhotoResponse,
   ApiError,
-  PaginationParams,
-  SearchParams,
-  LikeResponse
+  PaginationParams
 } from '../types/photography';
 
 // API Base Configuration
@@ -142,22 +140,6 @@ export class PhotographyApiService {
     }
   }
 
-  // Search photos by keyword
-  static async searchPhotos(params: SearchParams): Promise<PhotoResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoResponse[]>('/photos/search', {
-        params: {
-          keyword: params.keyword,
-          page: params.page || 0,
-          size: params.size || 20
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
-  }
-
   // Get all photos with optional pagination
   static async getAllPhotos(params?: PaginationParams): Promise<PhotoResponse[]> {
     try {
@@ -167,26 +149,6 @@ export class PhotographyApiService {
           size: params?.size || 20
         }
       });
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
-  }
-
-  // Like a photo
-  static async likePhoto(photoId: number): Promise<PhotoResponse> {
-    try {
-      const response = await apiClient.post<PhotoResponse>(`/photos/${photoId}/like`);
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
-  }
-
-  // Unlike a photo
-  static async unlikePhoto(photoId: number): Promise<PhotoResponse> {
-    try {
-      const response = await apiClient.post<PhotoResponse>(`/photos/${photoId}/unlike`);
       return response.data;
     } catch (error) {
       throw error as ApiError;

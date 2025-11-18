@@ -14,18 +14,19 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
   photos,
   categoryName,
   categoryColor,
-  onPhotoClick,
   className = ''
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0); // 当前拖拽偏移量
   const dragStartX = useRef<number>(0);
-  const dragThreshold = 50; // 拖拽阈值
+  const dragThreshold = 100; // 拖拽切换的临界点（像素）
   const responsive = useResponsive();
 
   // 切换到下一张图片
   const nextPhoto = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % photos.length);
+    setDragOffset(0); // 重置拖拽偏移
   }, [photos.length]);
 
   // 鼠标事件处理（桌面端）
@@ -38,17 +39,26 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || responsive.isMobile) return;
-    
+
     const deltaX = e.clientX - dragStartX.current;
-    
-    // 向左拖拽切换到下一张（负值）
-    if (deltaX < -dragThreshold) {
-      nextPhoto();
-      setIsDragging(false);
+
+    // 只允许向左拖拽（负值），限制最大拖拽距离
+    if (deltaX < 0) {
+      setDragOffset(Math.max(deltaX, -dragThreshold * 1.5));
     }
   };
 
   const handleMouseUp = () => {
+    if (!isDragging) return;
+
+    // 如果拖拽超过临界点，切换到下一张
+    if (dragOffset < -dragThreshold) {
+      nextPhoto();
+    } else {
+      // 否则回弹
+      setDragOffset(0);
+    }
+
     setIsDragging(false);
   };
 
@@ -61,77 +71,116 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !responsive.isMobile) return;
-    
+
     const deltaX = e.touches[0].clientX - dragStartX.current;
-    
-    // 向左滑动切换到下一张（负值）
-    if (deltaX < -dragThreshold) {
-      nextPhoto();
-      setIsDragging(false);
+
+    // 只允许向左拖拽（负值），限制最大拖拽距离
+    if (deltaX < 0) {
+      setDragOffset(Math.max(deltaX, -dragThreshold * 1.5));
     }
   };
 
   const handleTouchEnd = () => {
+    if (!isDragging) return;
+
+    // 如果拖拽超过临界点，切换到下一张
+    if (dragOffset < -dragThreshold) {
+      nextPhoto();
+    } else {
+      // 否则回弹
+      setDragOffset(0);
+    }
+
     setIsDragging(false);
   };
 
-  // 处理照片点击
-  const handlePhotoClick = (photo: PhotoResponse) => {
-    if (!isDragging && onPhotoClick) {
-      onPhotoClick(photo);
-    }
-  };
 
-  // 获取卡片样式
+  // 获取卡片样式 - 根据拖拽偏移动态调整
   const getCardStyle = (index: number) => {
     const relativeIndex = (index - currentIndex + photos.length) % photos.length;
-    
+
+    // 计算拖拽进度（0-1）
+    const dragProgress = Math.min(Math.abs(dragOffset) / dragThreshold, 1);
+
     if (relativeIndex === 0) {
-      // 当前卡片
+      // 当前卡片 - 跟随拖拽移动
+      const translateX = dragOffset;
+      const opacity = 1; // 保持100%不透明
+      const scale = 1 - dragProgress * 0.05; // 稍微缩小
+
       return {
-        transform: 'translate3d(0, 0, 0) rotateY(0deg) scale(1)',
+        transform: `translate3d(${translateX}px, 0, 0) rotateY(0deg) rotateZ(${dragProgress * -5}deg) scale(${scale})`,
         zIndex: 5,
-        opacity: 1,
+        opacity: opacity,
+        transition: isDragging ? 'none' : 'all 0.3s ease-out',
       };
     } else if (relativeIndex === 1) {
-      // 第二张卡片
+      // 下一张卡片 - 逐渐显现、放大、上浮
+      const baseX = 12;
+      const baseY = 2;
+      const baseZ = -20;
+      const baseRotateY = -8;
+      const baseRotateZ = 2;
+      const baseScale = 0.98;
+
+      // 根据拖拽进度，向当前卡片位置移动
+      const translateX = baseX - dragProgress * baseX; // 从12px移动到0
+      const translateY = baseY - dragProgress * baseY; // 从2px移动到0
+      const translateZ = baseZ + dragProgress * baseZ; // 从-20px移动到0
+      const rotateY = baseRotateY + dragProgress * baseRotateY; // 从-8deg移动到0
+      const rotateZ = baseRotateZ - dragProgress * baseRotateZ; // 从2deg移动到0
+      const scale = baseScale + dragProgress * (1 - baseScale); // 从0.98放大到1
+      const opacity = 0.95 + dragProgress * 0.05; // 从0.95到1
+
       return {
-        transform: 'translate3d(20px, 10px, -50px) rotateY(-10deg) scale(0.95)',
+        transform: `translate3d(${translateX}px, ${translateY}px, ${translateZ}px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) scale(${scale})`,
         zIndex: 4,
-        opacity: 0.8,
+        opacity: opacity,
+        transition: isDragging ? 'none' : 'all 0.3s ease-out',
       };
     } else if (relativeIndex === 2) {
       // 第三张卡片
       return {
-        transform: 'translate3d(40px, 20px, -100px) rotateY(-15deg) scale(0.9)',
+        transform: 'translate3d(24px, 4px, -40px) rotateY(-12deg) rotateZ(3deg) scale(0.96)',
         zIndex: 3,
-        opacity: 0.6,
+        opacity: 0.9,
+        transition: isDragging ? 'none' : 'all 0.3s ease-out',
       };
     } else if (relativeIndex === 3) {
       // 第四张卡片
       return {
-        transform: 'translate3d(60px, 30px, -150px) rotateY(-20deg) scale(0.85)',
+        transform: 'translate3d(36px, 6px, -60px) rotateY(-16deg) rotateZ(4deg) scale(0.94)',
         zIndex: 2,
-        opacity: 0.4,
+        opacity: 0.85,
+        transition: isDragging ? 'none' : 'all 0.3s ease-out',
+      };
+    } else if (relativeIndex === 4) {
+      // 第五张卡片
+      return {
+        transform: 'translate3d(48px, 8px, -80px) rotateY(-20deg) rotateZ(5deg) scale(0.92)',
+        zIndex: 1,
+        opacity: 0.8,
+        transition: isDragging ? 'none' : 'all 0.3s ease-out',
       };
     } else {
       // 其他卡片
       return {
-        transform: 'translate3d(80px, 40px, -200px) rotateY(-25deg) scale(0.8)',
-        zIndex: 1,
-        opacity: 0.2,
+        transform: 'translate3d(60px, 10px, -100px) rotateY(-24deg) rotateZ(6deg) scale(0.9)',
+        zIndex: 0,
+        opacity: 0.75,
+        transition: isDragging ? 'none' : 'all 0.3s ease-out',
       };
     }
   };
 
-  // 响应式尺寸
+  // 响应式尺寸 - 纵向卡片 (高 > 宽)
   const getCardSize = () => {
     if (responsive.isMobile) {
-      return { width: '280px', height: '200px' };
+      return { width: '200px', height: '280px' };
     } else if (responsive.isTablet) {
-      return { width: '320px', height: '240px' };
+      return { width: '240px', height: '340px' };
     } else {
-      return { width: '360px', height: '270px' };
+      return { width: '280px', height: '400px' };
     }
   };
 
@@ -153,20 +202,25 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
     );
   }
 
+  // 计算可见的卡片索引（渲染5张卡片形成扇形堆叠）
+  const getVisibleIndexes = () => {
+    const indexes = [];
+    // 渲染当前卡片及后续4张，形成扇形堆叠
+    for (let i = 0; i < 5; i++) {
+      indexes.push((currentIndex + i) % photos.length);
+    }
+    return indexes;
+  };
+
+  const visibleIndexes = getVisibleIndexes();
+
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      {/* 简化的提示信息 */}
-      <div className="mb-3 text-center">
-        <p className="text-xs text-gray-400">
-          {responsive.isMobile ? 'Swipe left to browse' : 'Drag left to browse'} • {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
-        </p>
-      </div>
-
       {/* 卡片容器 */}
-      <div 
+      <div
         className="relative cursor-grab active:cursor-grabbing select-none"
-        style={{ 
-          width: cardSize.width, 
+        style={{
+          width: cardSize.width,
           height: cardSize.height,
           perspective: '1000px'
         }}
@@ -178,28 +232,39 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {photos.map((photo, index) => (
-          <div
-            key={photo.id}
-            className="absolute top-0 left-0 w-full h-full transition-all duration-500 ease-out rounded-lg overflow-hidden shadow-lg bg-white"
-            style={{
-              ...getCardStyle(index),
-              backfaceVisibility: 'hidden',
-            }}
-            onClick={() => handlePhotoClick(photo)}
-          >
-            {/* 照片内容 */}
-            <div className="relative w-full h-full">
-              {photo.thumbnailPath ? (
-                <img
-                  src={photo.thumbnailPath}
-                  alt={photo.title}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                  onError={(e) => {
-                    // 如果缩略图加载失败，尝试加载原图
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== photo.filePath) {
+        {photos.map((photo, index) => {
+          // 只渲染可见的卡片（当前±1）
+          if (!visibleIndexes.includes(index)) {
+            return null;
+          }
+
+          return (
+            <div
+              key={photo.id}
+              className="absolute top-0 left-0 w-full h-full overflow-hidden"
+              style={{
+                ...getCardStyle(index),
+                backfaceVisibility: 'hidden',
+                border: '8px solid white',
+                borderRadius: '16px',
+              }}
+            >
+              {/* 照片内容 */}
+              <div className="relative w-full h-full bg-white"
+                style={{ borderRadius: '8px' }}
+              >
+                {photo.thumbnailPath ? (
+                  <img
+                    src={photo.thumbnailPath}
+                    alt={photo.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    draggable={false}
+                    style={{ objectFit: 'cover' }}
+                    onError={(e) => {
+                      // 如果缩略图加载失败，尝试加载原图
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== photo.filePath) {
                       target.src = photo.filePath;
                     }
                   }}
@@ -209,31 +274,10 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
                   <p className="text-gray-500">No image</p>
                 </div>
               )}
-              
-              {/* 照片信息遮罩 */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                <h4 className="text-white font-semibold text-sm truncate">
-                  {photo.title}
-                </h4>
-              </div>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* 进度指示器 */}
-      <div className="flex space-x-1 mt-3">
-        {photos.map((_, index) => (
-          <button
-            key={index}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? 'bg-blue-500 scale-125' 
-                : 'bg-gray-300 hover:bg-gray-400'
-            }`}
-            onClick={() => setCurrentIndex(index)}
-          />
-        ))}
+          );
+        })}
       </div>
     </div>
   );

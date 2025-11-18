@@ -818,30 +818,25 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {photos.map((photo) => (
-                  <div key={photo.id} className="space-y-2">
-                    <PhotoThumbnail
-                      photo={photo}
-                      size="medium"
-                      showMetadata={true}
-                      onClick={() => {
-                        if (responsive.isMobile) {
-                          // Mobile: single click to view photo
-                          console.log('View photo:', photo.title);
-                        }
-                      }}
-                      onDoubleClick={() => {
-                        if (!responsive.isMobile) {
-                          // Desktop: double click to view photo
-                          console.log('View photo:', photo.title);
-                        }
-                      }}
-                      className="w-full aspect-[4/3]"
-                    />
-                    <div className="text-xs">
-                      <p className="font-medium truncate" title={photo.title}>{photo.title}</p>
-                      <p className="text-gray-500 truncate">{photo.location}</p>
-                    </div>
-                  </div>
+                  <PhotoThumbnail
+                    key={photo.id}
+                    photo={photo}
+                    size="medium"
+                    showMetadata={false}
+                    onClick={() => {
+                      if (responsive.isMobile) {
+                        // Mobile: single click to view photo
+                        console.log('View photo:', photo.title);
+                      }
+                    }}
+                    onDoubleClick={() => {
+                      if (!responsive.isMobile) {
+                        // Desktop: double click to view photo
+                        console.log('View photo:', photo.title);
+                      }
+                    }}
+                    className="w-full aspect-[4/3]"
+                  />
                 ))}
               </div>
             )}
