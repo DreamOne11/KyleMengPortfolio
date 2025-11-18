@@ -9,9 +9,10 @@ import {
 
 // API Base Configuration
 // 使用环境变量或默认值
+// 生产环境使用相对路径（通过 Nginx 反向代理）
 const API_BASE_URL = process.env.REACT_APP_API_URL || 
   (process.env.NODE_ENV === 'production' 
-    ? 'http://44.223.49.55:8080/api'  // AWS 后端地址
+    ? '/api'  // 生产环境：通过 Nginx 代理访问后端
     : 'http://localhost:8080/api');    // 本地开发地址
 
 // Create Axios instance with base configuration
