@@ -15,5 +15,20 @@ module.exports = {
       
       return webpackConfig;
     }
+  },
+  devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+        onError: function (err, req, res) {
+          console.log('Proxy Error:', err);
+        },
+        onProxyReq: function (proxyReq, req, res) {
+          console.log('Proxying request:', req.method, req.url);
+        }
+      }
+    }
   }
 }; 

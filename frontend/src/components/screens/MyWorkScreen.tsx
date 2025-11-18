@@ -64,7 +64,7 @@ const MyWorkScreen: React.FC<MyWorkScreenProps> = ({ onAllProjectsFolderDoubleCl
     } else if (responsive.isTablet) {
       return { folder: '10.5rem', cards: '20rem' };
     } else {
-      return { folder: '10.5rem', cards: '22rem' };
+      return { folder: '10.5rem', cards: '18rem' };
     }
   };
   

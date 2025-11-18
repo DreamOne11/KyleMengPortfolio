@@ -28,45 +28,15 @@ public class Photo {
     @NotBlank(message = "Photo title is required")
     @Size(max = 200, message = "Title must not exceed 200 characters")
     private String title;
-    
-    @Column(columnDefinition = "TEXT")
-    private String description;
-    
+
     @Column(name = "file_path", nullable = false, length = 500)
     @NotBlank(message = "File path is required")
     @Size(max = 500, message = "File path must not exceed 500 characters")
     private String filePath;
-    
+
     @Column(name = "thumbnail_path", length = 500)
     @Size(max = 500, message = "Thumbnail path must not exceed 500 characters")
     private String thumbnailPath;
-    
-    @Column(columnDefinition = "JSONB")
-    private String metadata;
-    
-    @Column(name = "taken_at")
-    private LocalDateTime takenAt;
-    
-    @Column(length = 200)
-    @Size(max = 200, message = "Location must not exceed 200 characters")
-    private String location;
-    
-    @Column(name = "camera_info", length = 200)
-    @Size(max = 200, message = "Camera info must not exceed 200 characters")
-    private String cameraInfo;
-    
-    @Column(name = "file_size")
-    private Long fileSize;
-    
-    @Column(length = 20)
-    @Size(max = 20, message = "Dimensions must not exceed 20 characters")
-    private String dimensions;
-    
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
-    
-    @Column(name = "is_featured")
-    private Boolean isFeatured = false;
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -111,14 +81,6 @@ public class Photo {
         this.title = title;
     }
     
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
     public String getFilePath() {
         return filePath;
     }
@@ -134,71 +96,7 @@ public class Photo {
     public void setThumbnailPath(String thumbnailPath) {
         this.thumbnailPath = thumbnailPath;
     }
-    
-    public String getMetadata() {
-        return metadata;
-    }
-    
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
-    
-    public LocalDateTime getTakenAt() {
-        return takenAt;
-    }
-    
-    public void setTakenAt(LocalDateTime takenAt) {
-        this.takenAt = takenAt;
-    }
-    
-    public String getLocation() {
-        return location;
-    }
-    
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    
-    public String getCameraInfo() {
-        return cameraInfo;
-    }
-    
-    public void setCameraInfo(String cameraInfo) {
-        this.cameraInfo = cameraInfo;
-    }
-    
-    public Long getFileSize() {
-        return fileSize;
-    }
-    
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
-    }
-    
-    public String getDimensions() {
-        return dimensions;
-    }
-    
-    public void setDimensions(String dimensions) {
-        this.dimensions = dimensions;
-    }
-    
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-    
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-    }
-    
-    public Boolean getIsFeatured() {
-        return isFeatured;
-    }
-    
-    public void setIsFeatured(Boolean isFeatured) {
-        this.isFeatured = isFeatured;
-    }
-    
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -221,8 +119,6 @@ public class Photo {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", filePath='" + filePath + '\'' +
-                ", location='" + location + '\'' +
-                ", isFeatured=" + isFeatured +
                 '}';
     }
 }

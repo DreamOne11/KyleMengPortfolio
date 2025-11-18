@@ -8,17 +8,27 @@ import { useResponsive } from '../../utils/responsive';
 // 导入拆分后的屏幕组件
 import AboutMeScreen from '../screens/AboutMeScreen';
 import MyWorkScreen from '../screens/MyWorkScreen';
-import MyNoteScreen from '../screens/MyNoteScreen';
 import PhotographyScreen from '../screens/PhotographyScreen';
+
+import { PhotoCategoryResponse, PhotoResponse } from '../../types/photography';
+
+type PhotographyData = {
+  categories: PhotoCategoryResponse[];
+  categoryPhotos: { [key: number]: PhotoResponse[] };
+  allCategoryPhotos: { [key: number]: PhotoResponse[] };
+  isLoaded: boolean;
+};
 
 type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
   onAnyFileManagerMaximizedChange?: (isMax: boolean) => void;
   onChatExpandedChange?: (isExpanded: boolean) => void;
+  triggerContactFolder?: number;
+  photographyData: PhotographyData;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange, triggerContactFolder, photographyData }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
@@ -33,6 +43,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     zIndex: number;
     isMaximized?: boolean;
     customFiles?: any[];
+    photoCategoryId?: number;
   }>>([]);
   const [openEmailComposers, setOpenEmailComposers] = useState<Array<{
     id: string;
@@ -125,13 +136,40 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     }
   }, []);
 
+  // Auto-open/close Contact folder when triggered from onboarding
+  React.useEffect(() => {
+    if (triggerContactFolder === undefined) return;
+
+    const folderId = 'contact';
+
+    if (triggerContactFolder > 0) {
+      // Open Contact folder
+      const folderName = 'Contact';
+      const isAlreadyOpen = openFileManagers.some(fm => fm.id === folderId);
+
+      if (!isAlreadyOpen) {
+        const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
+
+        setOpenFileManagers(prev => [...prev, {
+          id: folderId,
+          folderName,
+          sourcePosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+          zIndex: maxZIndex + 1,
+          isMaximized: false
+        }]);
+      }
+    } else if (triggerContactFolder < 0) {
+      // Close Contact folder - always close regardless of current state
+      setOpenFileManagers(prev => prev.filter(fm => fm.id !== folderId));
+    }
+  }, [triggerContactFolder, openFileManagers]);
+
   
 
   const screens = [
     { id: 0, title: 'About Me', subtitle: 'Get to know me better', emoji: '👋' },
     { id: 1, title: 'My Work', subtitle: 'Projects & Experience', emoji: '💼' },
-    { id: 2, title: 'My Note', subtitle: 'Thoughts & Learning', emoji: '📝' },
-    { id: 3, title: 'Photography', subtitle: 'Visual Stories', emoji: '📸' }
+    { id: 2, title: 'Photography', subtitle: 'Visual Stories', emoji: '📸' }
   ];
 
   const handleScreenChange = (newScreen: number) => {
@@ -276,6 +314,43 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
     }]);
   };
 
+  // 处理照片分类文件夹双击事件 - 打开包含该分类所有照片的 FileManager
+  const handlePhotoCategoryFolderDoubleClick = (
+    categoryId: number,
+    categoryName: string,
+    photos: any[],
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+
+    const folderId = `photo-category-${categoryId}`;
+    const isAlreadyOpen = openFileManagers.some(fm => fm.id === folderId);
+
+    if (isAlreadyOpen) {
+      setOpenFileManagers(prev => prev.map(fm => ({
+        ...fm,
+        zIndex: fm.id === folderId ? Math.max(...prev.map(f => f.zIndex)) + 1 : fm.zIndex
+      })));
+      return;
+    }
+
+    const folderElement = e.currentTarget.querySelector('svg') || e.currentTarget;
+    const rect = folderElement.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const maxZIndex = openFileManagers.length > 0 ? Math.max(...openFileManagers.map(fm => fm.zIndex)) : 1000;
+
+    setOpenFileManagers(prev => [...prev, {
+      id: folderId,
+      folderName: categoryName,
+      sourcePosition: { x: centerX, y: centerY },
+      zIndex: maxZIndex + 1,
+      isMaximized: false,
+      customFiles: photos,
+      photoCategoryId: categoryId
+    }]);
+  };
+
   // 邮件发送框处理函数
   const handleOpenEmailComposer = () => {
     if (openEmailComposers.length > 0) {
@@ -343,15 +418,22 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            {index === 0 ? (
+            {/* 始终渲染所有屏幕，使用 CSS 控制显示/隐藏 */}
+            <div className={index === 0 ? 'w-full h-full' : 'hidden'}>
               <AboutMeScreen onFolderDoubleClick={handleFolderDoubleClick} onChatExpandedChange={onChatExpandedChange} />
-            ) : index === 1 ? (
+            </div>
+            <div className={index === 1 ? 'w-full h-full' : 'hidden'}>
               <MyWorkScreen onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick} />
-            ) : index === 2 ? (
-              <MyNoteScreen />
-            ) : (
-              <PhotographyScreen />
-            )}
+            </div>
+            <div className={index === 2 ? 'w-full h-full' : 'hidden'}>
+              <PhotographyScreen
+                onPhotoCategoryFolderDoubleClick={handlePhotoCategoryFolderDoubleClick}
+                photoCategories={photographyData.categories}
+                categoryPhotos={photographyData.categoryPhotos}
+                allCategoryPhotos={photographyData.allCategoryPhotos}
+                isDataLoaded={photographyData.isLoaded}
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -373,6 +455,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             ));
           }}
           customFiles={fileManager.customFiles}
+          photoCategoryId={fileManager.photoCategoryId}
           onProjectDoubleClick={(project: any) => {
             setProjectDetailWindows(prev => {
               // 若已存在同 id 的弹窗，则聚焦（提升 zIndex）

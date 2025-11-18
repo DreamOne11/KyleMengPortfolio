@@ -96,7 +96,7 @@ public class PhotoService {
      */
     @Transactional(readOnly = true)
     public List<Photo> getPhotosByCategoryId(Long categoryId) {
-        return photoRepository.findByCategoryIdOrderBySortOrderAscCreatedAtDesc(categoryId);
+        return photoRepository.findByCategoryIdOrderByCreatedAtDesc(categoryId);
     }
     
     /**
@@ -104,31 +104,7 @@ public class PhotoService {
      */
     @Transactional(readOnly = true)
     public Page<Photo> getPhotosByCategoryId(Long categoryId, Pageable pageable) {
-        return photoRepository.findByCategoryIdOrderBySortOrderAscCreatedAtDesc(categoryId, pageable);
-    }
-    
-    /**
-     * Get featured photos
-     */
-    @Transactional(readOnly = true)
-    public List<Photo> getFeaturedPhotos() {
-        return photoRepository.findByIsFeaturedTrueOrderBySortOrderAscCreatedAtDesc();
-    }
-    
-    /**
-     * Search photos by keyword
-     */
-    @Transactional(readOnly = true)
-    public List<Photo> searchPhotos(String keyword) {
-        return photoRepository.searchByKeyword(keyword);
-    }
-    
-    /**
-     * Search photos by keyword with pagination
-     */
-    @Transactional(readOnly = true)
-    public Page<Photo> searchPhotos(String keyword, Pageable pageable) {
-        return photoRepository.searchByKeyword(keyword, pageable);
+        return photoRepository.findByCategoryIdOrderByCreatedAtDesc(categoryId, pageable);
     }
     
     /**
@@ -160,19 +136,4 @@ public class PhotoService {
         return photoRepository.countByCategoryId(categoryId);
     }
     
-    /**
-     * Get photos by location
-     */
-    @Transactional(readOnly = true)
-    public List<Photo> getPhotosByLocation(String location) {
-        return photoRepository.findByLocationContainingIgnoreCaseOrderByCreatedAtDesc(location);
-    }
-    
-    /**
-     * Get photos by camera info
-     */
-    @Transactional(readOnly = true)
-    public List<Photo> getPhotosByCameraInfo(String cameraInfo) {
-        return photoRepository.findByCameraInfoContainingIgnoreCaseOrderByCreatedAtDesc(cameraInfo);
-    }
 }

@@ -119,56 +119,6 @@ public class PhotoController {
     }
     
     /**
-     * GET /api/photos/featured
-     * Get featured photos
-     */
-    @GetMapping("/photos/featured")
-    public ResponseEntity<List<PhotoResponse>> getFeaturedPhotos() {
-        try {
-            List<Photo> photos = photoService.getFeaturedPhotos();
-            List<PhotoResponse> response = photos.stream()
-                    .map(PhotoResponse::new)
-                    .collect(Collectors.toList());
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-    
-    /**
-     * GET /api/photos/search
-     * Search photos by keyword
-     */
-    @GetMapping("/photos/search")
-    public ResponseEntity<List<PhotoResponse>> searchPhotos(
-            @RequestParam String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        try {
-            List<Photo> photos;
-            
-            if (page >= 0 && size > 0) {
-                // Use pagination
-                Pageable pageable = PageRequest.of(page, size);
-                Page<Photo> photoPage = photoService.searchPhotos(keyword, pageable);
-                photos = photoPage.getContent();
-            } else {
-                // Get all search results
-                photos = photoService.searchPhotos(keyword);
-            }
-            
-            List<PhotoResponse> response = photos.stream()
-                    .map(PhotoResponse::new)
-                    .collect(Collectors.toList());
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-    
-    /**
      * GET /api/photos
      * Get all photos with optional pagination
      */

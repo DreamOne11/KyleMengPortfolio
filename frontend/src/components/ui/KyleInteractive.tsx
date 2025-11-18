@@ -268,9 +268,9 @@ const KyleInteractive: React.FC<KyleInteractiveProps> = ({ onChatExpandedChange 
   }
 
   return (
-    <div className={layout.container}>
+    <div className={`${layout.container} kyle-interactive`}>
       {/* 3D Model */}
-      <div 
+      <div
         className={layout.modelContainer}
         onDoubleClick={!responsive.isMobile ? handle3DModelDoubleClick : undefined}
         onClick={responsive.isMobile ? handleTouch : undefined}
