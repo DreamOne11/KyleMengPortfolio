@@ -5,17 +5,13 @@ import com.kylemeng.portfolio.entity.Photo;
 import java.time.LocalDateTime;
 
 public class PhotoResponse {
-    
+
     private Long id;
     private Long categoryId;
     private String categoryName;
     private String title;
-    private String description;
     private String filePath;
     private String thumbnailPath;
-    private LocalDateTime takenAt;
-    private String location;
-    private Long likesCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -28,12 +24,8 @@ public class PhotoResponse {
         this.categoryId = photo.getCategory() != null ? photo.getCategory().getId() : null;
         this.categoryName = photo.getCategory() != null ? photo.getCategory().getDisplayName() : null;
         this.title = photo.getTitle();
-        this.description = photo.getDescription();
         this.filePath = photo.getFilePath();
         this.thumbnailPath = photo.getThumbnailPath();
-        this.takenAt = photo.getTakenAt();
-        this.location = photo.getLocation();
-        this.likesCount = photo.getLikesCount();
         this.createdAt = photo.getCreatedAt();
         this.updatedAt = photo.getUpdatedAt();
     }
@@ -70,15 +62,7 @@ public class PhotoResponse {
     public void setTitle(String title) {
         this.title = title;
     }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
+
     public String getFilePath() {
         return filePath;
     }
@@ -94,31 +78,7 @@ public class PhotoResponse {
     public void setThumbnailPath(String thumbnailPath) {
         this.thumbnailPath = thumbnailPath;
     }
-    
-    public LocalDateTime getTakenAt() {
-        return takenAt;
-    }
-    
-    public void setTakenAt(LocalDateTime takenAt) {
-        this.takenAt = takenAt;
-    }
-    
-    public String getLocation() {
-        return location;
-    }
-    
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    
-    public Long getLikesCount() {
-        return likesCount;
-    }
-    
-    public void setLikesCount(Long likesCount) {
-        this.likesCount = likesCount;
-    }
-    
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

@@ -16,12 +16,8 @@ export interface Photo {
   categoryId: number;
   categoryName: string;
   title: string;
-  description: string;
   filePath: string;
   thumbnailPath: string;
-  takenAt: string;
-  location: string;
-  likesCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,12 +40,8 @@ export interface PhotoResponse {
   categoryId: number;
   categoryName: string;
   title: string;
-  description: string;
   filePath: string;
   thumbnailPath: string;
-  takenAt: string;
-  location: string;
-  likesCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,21 +60,8 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
-// Like interaction types
-export interface LikeResponse {
-  photoId: number;
-  likesCount: number;
-  success: boolean;
-}
-
 // Pagination Types
 export interface PaginationParams {
   page?: number;
   size?: number;
-}
-
-// Search Types
-export interface SearchParams extends PaginationParams {
-  keyword?: string;
-  categoryId?: number;
 }

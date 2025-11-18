@@ -155,16 +155,10 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      {/* 分类标题 */}
-      <div className="mb-4 text-center">
-        <h3 className="text-lg font-bold mb-1" style={{ color: categoryColor }}>
-          {categoryName}
-        </h3>
-        <p className="text-sm text-gray-600">
-          {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          {responsive.isMobile ? 'Swipe left to browse' : 'Drag left to browse'}
+      {/* 简化的提示信息 */}
+      <div className="mb-3 text-center">
+        <p className="text-xs text-gray-400">
+          {responsive.isMobile ? 'Swipe left to browse' : 'Drag left to browse'} • {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
         </p>
       </div>
 
@@ -218,25 +212,9 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
               
               {/* 照片信息遮罩 */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                <h4 className="text-white font-semibold text-sm mb-1 truncate">
+                <h4 className="text-white font-semibold text-sm truncate">
                   {photo.title}
                 </h4>
-                {photo.location && (
-                  <p className="text-white/80 text-xs truncate">
-                    📍 {photo.location}
-                  </p>
-                )}
-                <div className="flex items-center justify-between mt-1">
-                  {photo.takenAt && (
-                    <p className="text-white/60 text-xs">
-                      {new Date(photo.takenAt).toLocaleDateString()}
-                    </p>
-                  )}
-                  <div className="flex items-center space-x-1">
-                    <span className="text-red-400 text-xs">❤️</span>
-                    <span className="text-white/80 text-xs">{photo.likesCount}</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

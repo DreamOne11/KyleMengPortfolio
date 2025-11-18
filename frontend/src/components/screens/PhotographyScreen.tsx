@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CardCarousel from '../ui/CardCarousel';
+import MacOSFolderIcon from '../icons/MacOSFolderIcon';
+import PhotoGridViewer from '../ui/PhotoGridViewer';
 import { useResponsive } from '../../utils/responsive';
 import { PhotographyApiService, handleApiError } from '../../services/photographyApi';
 import { PhotoCategoryResponse, PhotoResponse, ApiError } from '../../types/photography';
@@ -13,6 +15,7 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({ onPhotoClick }) =
   const [categoryPhotos, setCategoryPhotos] = useState<{ [key: number]: PhotoResponse[] }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PhotoCategoryResponse | null>(null);
   const responsive = useResponsive();
   
   // Load photo categories and their photos from API
@@ -81,6 +84,16 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({ onPhotoClick }) =
     if (onPhotoClick) {
       onPhotoClick(photo);
     }
+  };
+
+  // 处理文件夹点击
+  const handleFolderClick = (category: PhotoCategoryResponse) => {
+    setSelectedCategory(category);
+  };
+
+  // 关闭文件夹视图
+  const handleCloseGridViewer = () => {
+    setSelectedCategory(null);
   };
 
   // Loading state
@@ -182,14 +195,28 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({ onPhotoClick }) =
             {/* Card Carousels */}
             <div className="space-y-8">
               {photoCategories.map((category) => (
-                <CardCarousel
-                  key={category.id}
-                  photos={categoryPhotos[category.id] || []}
-                  categoryName={category.displayName}
-                  categoryColor={category.iconColor || '#3B82F6'}
-                  onPhotoClick={handlePhotoClick}
-                  className="w-full"
-                />
+                <div key={category.id} className="flex flex-col items-center">
+                  {/* Folder Button Above Carousel */}
+                  <div
+                    className="flex flex-col items-center cursor-pointer group mb-4"
+                    onClick={() => handleFolderClick(category)}
+                  >
+                    <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-2">
+                      <MacOSFolderIcon color={category.iconColor === '#3B82F6' ? 'blue' : 'purple'} />
+                    </div>
+                    <h3 className="font-semibold text-sm text-white px-3 py-1 rounded">
+                      {category.displayName}
+                    </h3>
+                  </div>
+
+                  <CardCarousel
+                    photos={categoryPhotos[category.id] || []}
+                    categoryName={category.displayName}
+                    categoryColor={category.iconColor || '#3B82F6'}
+                    onPhotoClick={handlePhotoClick}
+                    className="w-full"
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -224,18 +251,41 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({ onPhotoClick }) =
           <div className="absolute top-48 left-8 right-8 bottom-8 overflow-y-auto">
             <div className={`grid ${responsive.isDesktop ? 'grid-cols-3' : responsive.isTablet ? 'grid-cols-2' : 'grid-cols-1'} gap-8 justify-items-center`}>
               {photoCategories.map((category) => (
-                <CardCarousel
-                  key={category.id}
-                  photos={categoryPhotos[category.id] || []}
-                  categoryName={category.displayName}
-                  categoryColor={category.iconColor || '#3B82F6'}
-                  onPhotoClick={handlePhotoClick}
-                  className="w-full"
-                />
+                <div key={category.id} className="flex flex-col items-center">
+                  {/* Folder Button Above Carousel */}
+                  <div
+                    className="flex flex-col items-center cursor-pointer group mb-4"
+                    onClick={() => handleFolderClick(category)}
+                  >
+                    <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-2">
+                      <MacOSFolderIcon color={category.iconColor === '#3B82F6' ? 'blue' : 'purple'} />
+                    </div>
+                    <h3 className="font-semibold text-sm text-white px-3 py-1 rounded">
+                      {category.displayName}
+                    </h3>
+                  </div>
+
+                  <CardCarousel
+                    photos={categoryPhotos[category.id] || []}
+                    categoryName={category.displayName}
+                    categoryColor={category.iconColor || '#3B82F6'}
+                    onPhotoClick={handlePhotoClick}
+                    className="w-full"
+                  />
+                </div>
               ))}
             </div>
           </div>
         </>
+      )}
+
+      {/* Photo Grid Viewer Modal */}
+      {selectedCategory && (
+        <PhotoGridViewer
+          category={selectedCategory}
+          onClose={handleCloseGridViewer}
+          onPhotoClick={handlePhotoClick}
+        />
       )}
     </div>
   );

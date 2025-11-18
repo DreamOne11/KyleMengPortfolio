@@ -28,28 +28,15 @@ public class Photo {
     @NotBlank(message = "Photo title is required")
     @Size(max = 200, message = "Title must not exceed 200 characters")
     private String title;
-    
-    @Column(columnDefinition = "TEXT")
-    private String description;
-    
+
     @Column(name = "file_path", nullable = false, length = 500)
     @NotBlank(message = "File path is required")
     @Size(max = 500, message = "File path must not exceed 500 characters")
     private String filePath;
-    
+
     @Column(name = "thumbnail_path", length = 500)
     @Size(max = 500, message = "Thumbnail path must not exceed 500 characters")
     private String thumbnailPath;
-    
-    @Column(name = "taken_at")
-    private LocalDateTime takenAt;
-    
-    @Column(length = 200)
-    @Size(max = 200, message = "Location must not exceed 200 characters")
-    private String location;
-    
-    @Column(name = "likes_count")
-    private Long likesCount = 0L;
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -94,14 +81,6 @@ public class Photo {
         this.title = title;
     }
     
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
     public String getFilePath() {
         return filePath;
     }
@@ -117,31 +96,7 @@ public class Photo {
     public void setThumbnailPath(String thumbnailPath) {
         this.thumbnailPath = thumbnailPath;
     }
-    
-    public LocalDateTime getTakenAt() {
-        return takenAt;
-    }
-    
-    public void setTakenAt(LocalDateTime takenAt) {
-        this.takenAt = takenAt;
-    }
-    
-    public String getLocation() {
-        return location;
-    }
-    
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    
-    public Long getLikesCount() {
-        return likesCount;
-    }
-    
-    public void setLikesCount(Long likesCount) {
-        this.likesCount = likesCount;
-    }
-    
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -164,8 +119,6 @@ public class Photo {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", filePath='" + filePath + '\'' +
-                ", location='" + location + '\'' +
-                ", likesCount=" + likesCount +
                 '}';
     }
 }
