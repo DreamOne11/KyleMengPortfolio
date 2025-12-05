@@ -1,0 +1,118 @@
+name: Deploy Frontend to AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend
+        env:
+          REACT_APP_ENV: production
+          GENERATE_SOURCEMAP: false
+        run: |
+          cd frontend
+          npm run build
+          
+      - name: Create deployment package
+        run: |
+          cd frontend/build
+          tar -czf ../../frontend-build.tar.gz .
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.FRONTEND_EC2_SSH_KEY }}" > ~/.ssh/frontend_key.pem
+          chmod 600 ~/.ssh/frontend_key.pem
+          ssh-keyscan -H ${{ secrets.FRONTEND_EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Frontend EC2
+        env:
+          FRONTEND_HOST: ${{ secrets.FRONTEND_EC2_HOST }}
+        run: |
+          # Upload build package
+          scp -i ~/.ssh/frontend_key.pem frontend-build.tar.gz ubuntu@${FRONTEND_HOST}:/tmp/
+          
+          # Deploy on EC2
+          ssh -i ~/.ssh/frontend_key.pem ubuntu@${FRONTEND_HOST} << 'ENDSSH'
+            # Use existing deployment directory (kylemeng11.com)
+            DEPLOY_DIR=/var/www/kylemeng11.com
+            
+            # Backup current version
+            if [ -d "$DEPLOY_DIR" ]; then
+              sudo tar -czf "$DEPLOY_DIR.backup.$(date +%Y%m%d_%H%M%S).tar.gz" -C "$DEPLOY_DIR" . 2>/dev/null || true
+            fi
+            
+            # Clear old files
+            sudo rm -rf $DEPLOY_DIR/*
+            
+            # Extract new files
+            cd $DEPLOY_DIR
+            sudo tar -xzf /tmp/frontend-build.tar.gz
+            sudo chown -R ubuntu:ubuntu $DEPLOY_DIR
+            
+            # Clean up
+            rm /tmp/frontend-build.tar.gz
+            
+            # Reload web server
+            if command -v nginx > /dev/null; then
+              echo "✓ Reloading Nginx..."
+              sudo nginx -t && sudo systemctl reload nginx
+            elif command -v httpd > /dev/null; then
+              echo "✓ Reloading Apache..."
+              sudo systemctl reload httpd
+            fi
+            
+            echo "✓ Frontend deployment completed"
+          ENDSSH
+
+      - name: Verify deployment
+        env:
+          FRONTEND_HOST: ${{ secrets.FRONTEND_EC2_HOST }}
+        run: |
+          sleep 3
+          if curl -f http://${FRONTEND_HOST} > /dev/null 2>&1; then
+            echo "✓ Frontend is accessible"
+          else
+            echo "! Frontend check failed, but deployment completed"
+          fi
+
+      - name: Send notification
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Frontend deployment successful!"
+            echo "🌐 Access at: http://${{ secrets.FRONTEND_EC2_HOST }}"
+          else
+            echo "❌ Frontend deployment failed!"
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/frontend_key.pem
+          rm -f frontend-build.tar.gz
+
