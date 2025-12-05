@@ -18,10 +18,8 @@ backend/target/
 .env.production.local
 .env.production
 
-# AWS Deployment files
-deployment/*.pem
-deployment/aws-config.env
-deployment/.db-password.txt
+# AWS Deployment files - ignore entire directory for security
+deployment/
 
 # Logs
 npm-debug.log*
