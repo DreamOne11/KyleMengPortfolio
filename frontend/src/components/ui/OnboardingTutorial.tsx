@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useResponsive } from '../../utils/responsive';
 
 type Props = {
@@ -58,7 +58,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
   const currentStepData = steps[currentStep];
 
   // Update highlight and tooltip position
-  const updatePositions = () => {
+  const updatePositions = useCallback(() => {
     if (!currentStepData) return;
 
     const element = document.querySelector(currentStepData.targetSelector);
@@ -152,7 +152,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       setHighlightRect(null);
       setTooltipPosition(null);
     }
-  };
+  }, [currentStepData, currentStep]);
 
   // Watch for DOM changes to update positions
   useEffect(() => {
@@ -186,7 +186,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       window.removeEventListener('scroll', updatePositions, true);
       clearInterval(retryInterval);
     };
-  }, [currentStep]);
+  }, [currentStep, highlightRect, updatePositions]);
 
   // Auto-trigger action for current step
   useEffect(() => {
@@ -201,7 +201,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [currentStep]);
+  }, [currentStep, currentStepData, updatePositions]);
 
   const handleNext = () => {
     // Close Contact folder when moving from step 2 (Email) to step 3 (Chat)

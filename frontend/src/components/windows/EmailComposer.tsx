@@ -61,13 +61,6 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
   // 移动设备交互模式判断
   const isMobileDevice = responsive.isMobile;
 
-  // 在移动设备上自动最大化窗口
-  useEffect(() => {
-    if (isMobileDevice && !isMaximized) {
-      handleMaximize();
-    }
-  }, [isMobileDevice]);
-
   // 打开动画
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -135,7 +128,7 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
   };
 
   // 最大化/恢复窗口
-  const handleMaximize = () => {
+  const handleMaximize = useCallback(() => {
     if (isMaximized) {
       if (preMaximizeState) {
         setWindowSize(preMaximizeState.size);
@@ -155,7 +148,14 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
       onMaximizeChange?.(true); // 通知最大化
     }
     onFocus?.();
-  };
+  }, [isMaximized, preMaximizeState, windowSize, windowPosition, onMaximizeChange, onFocus]);
+
+  // 在移动设备上自动最大化窗口
+  useEffect(() => {
+    if (isMobileDevice && !isMaximized) {
+      handleMaximize();
+    }
+  }, [isMobileDevice, isMaximized, handleMaximize]);
 
   // 修改 handleDragStart，在最大化状态下禁用拖拽
   const handleDragStart = (e: React.MouseEvent) => {
@@ -292,7 +292,7 @@ const EmailComposer: React.FC<Props> = ({ onClose, onFocus, windowOffset, zIndex
       setWindowSize({ width: newWidth, height: newHeight });
       setWindowPosition({ x: newX, y: newY });
     }
-  }, []); // 空依赖数组确保函数稳定
+  }, [responsive.isMobile]); // 添加 responsive.isMobile 依赖
 
   const handleMouseUp = useCallback(() => {
     // 清理动画帧

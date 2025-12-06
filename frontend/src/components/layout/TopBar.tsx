@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useResponsive } from '../../utils/responsive';
 
 type Props = {
   onStartOnboarding: () => void;

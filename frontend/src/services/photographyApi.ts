@@ -67,22 +67,14 @@ apiClient.interceptors.response.use(
 export class PhotographyApiService {
   // Get all photo categories with photo counts
   static async getPhotoCategories(): Promise<PhotoCategoryResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoCategoryResponse[]>('/photo-categories');
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoCategoryResponse[]>('/photo-categories');
+    return response.data;
   }
 
   // Get specific photo category by ID
   static async getPhotoCategoryById(id: number): Promise<PhotoCategoryResponse> {
-    try {
-      const response = await apiClient.get<PhotoCategoryResponse>(`/photo-categories/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoCategoryResponse>(`/photo-categories/${id}`);
+    return response.data;
   }
 
   // Get photos by category ID with optional pagination
@@ -90,72 +82,48 @@ export class PhotographyApiService {
     categoryId: number, 
     params?: PaginationParams
   ): Promise<PhotoResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoResponse[]>(`/photos/category/${categoryId}`, {
-        params: {
-          page: params?.page || 0,
-          size: params?.size || 20
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoResponse[]>(`/photos/category/${categoryId}`, {
+      params: {
+        page: params?.page || 0,
+        size: params?.size || 20
+      }
+    });
+    return response.data;
   }
 
   // Get specific photo by ID
   static async getPhotoById(id: number): Promise<PhotoResponse> {
-    try {
-      const response = await apiClient.get<PhotoResponse>(`/photos/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoResponse>(`/photos/${id}`);
+    return response.data;
   }
 
   // Get popular photos ordered by likes count
   static async getPopularPhotos(): Promise<PhotoResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoResponse[]>('/photos/popular');
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoResponse[]>('/photos/popular');
+    return response.data;
   }
 
   // Get top photos by likes count
   static async getTopPhotos(): Promise<PhotoResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoResponse[]>('/photos/top');
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoResponse[]>('/photos/top');
+    return response.data;
   }
 
   // Get popular photos by category ordered by likes count
   static async getPopularPhotosByCategory(categoryId: number): Promise<PhotoResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoResponse[]>(`/photos/category/${categoryId}/popular`);
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoResponse[]>(`/photos/category/${categoryId}/popular`);
+    return response.data;
   }
 
   // Get all photos with optional pagination
   static async getAllPhotos(params?: PaginationParams): Promise<PhotoResponse[]> {
-    try {
-      const response = await apiClient.get<PhotoResponse[]>('/photos', {
-        params: {
-          page: params?.page || 0,
-          size: params?.size || 20
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw error as ApiError;
-    }
+    const response = await apiClient.get<PhotoResponse[]>('/photos', {
+      params: {
+        page: params?.page || 0,
+        size: params?.size || 20
+      }
+    });
+    return response.data;
   }
 
   // Health check endpoint to test API connection
@@ -190,7 +158,7 @@ export const retryApiCall = async <T>(
   maxRetries: number = 3,
   delay: number = 1000
 ): Promise<T> => {
-  let lastError: ApiError;
+  let lastError: ApiError | null = null;
   
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -210,7 +178,8 @@ export const retryApiCall = async <T>(
     }
   }
   
-  throw lastError!;
+  // Throw error object properly
+  throw new Error(lastError?.message || 'Max retries exceeded');
 };
 
 export default PhotographyApiService;
