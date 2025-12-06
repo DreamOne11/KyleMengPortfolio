@@ -33,6 +33,7 @@ jobs:
         env:
           REACT_APP_ENV: production
           GENERATE_SOURCEMAP: false
+          CI: false
         run: |
           cd frontend
           npm run build
