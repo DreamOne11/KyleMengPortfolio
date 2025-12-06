@@ -1,6 +1,29 @@
 # AWS 部署工具包
 
-本目录包含Kyle Meng Portfolio后端应用的完整AWS部署工具和文档。
+本目录包含 Kyle Meng Portfolio 的完整 AWS 部署工具和脚本。
+
+## 🎯 部署方式对比
+
+| 方式 | 适用场景 | 优势 | 使用方法 |
+|------|----------|------|----------|
+| **GitHub Actions** ⭐ | 日常开发，自动化部署 | 自动化，无需本地操作 | `git push origin main` |
+| **本地脚本** | 紧急修复，手动部署，测试 | 灵活，不依赖 GitHub | 见下方说明 |
+
+### 推荐使用 GitHub Actions
+
+本项目已配置 GitHub Actions 自动部署：
+- 修改 `frontend/` 代码 → 自动部署前端
+- 修改 `backend/` 代码 → 自动部署后端
+- 查看部署状态：https://github.com/YOUR_USERNAME/KyleMengPortfolio/actions
+
+### 何时使用本地脚本？
+
+- 🚨 紧急情况需要快速热修复
+- 🧪 测试新的部署配置
+- 🔧 GitHub Actions 暂时不可用
+- 🏠 在没有 GitHub 的环境中部署
+
+---
 
 ## 📁 文件说明
 

@@ -33,7 +33,6 @@ jobs:
         env:
           REACT_APP_ENV: production
           GENERATE_SOURCEMAP: false
-          CI: false
         run: |
           cd frontend
           npm run build
@@ -116,4 +115,3 @@ jobs:
         run: |
           rm -f ~/.ssh/frontend_key.pem
           rm -f frontend-build.tar.gz
-

@@ -18,10 +18,23 @@ backend/target/
 .env.production.local
 .env.production
 
-# AWS Deployment files
+# AWS Deployment files - 敏感信息
 deployment/*.pem
 deployment/aws-config.env
 deployment/.db-password.txt
+deployment/.env.production
+
+# Deployment documentation - 可能包含敏感配置的文档
+deployment/QUICK_REFERENCE.md
+deployment/AWS_DEPLOYMENT_COMPLETE.md
+deployment/DEPLOYMENT_SUCCESS.md
+deployment/FRONTEND_DEPLOY_NOW.md
+deployment/FRONTEND_DEPLOYMENT_GUIDE.md
+docs/DEPLOYMENT_STATUS.md
+
+# Local deployment configs
+deployment/local-*.md
+deployment/*-local.env
 
 # Logs
 npm-debug.log*

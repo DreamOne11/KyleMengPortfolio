@@ -15,11 +15,24 @@ echo -e "${GREEN}=====================================${NC}"
 echo -e "${GREEN}Kyle Meng Portfolio - 前端部署脚本${NC}"
 echo -e "${GREEN}=====================================${NC}\n"
 
-# 配置变量（从截图中的EC2实例）
-FRONTEND_EC2_HOST="${FRONTEND_EC2_HOST:-ec2-user@3.22.167.117}"
+# 配置变量（需要通过环境变量提供）
+FRONTEND_EC2_HOST="${FRONTEND_EC2_HOST}"
 SSH_KEY="${SSH_KEY:-./kyle-portfolio-key.pem}"
 REMOTE_DIR="${REMOTE_DIR:-/var/www/kyle-portfolio}"
-BACKEND_API_URL="http://44.223.49.55:8080/api"
+BACKEND_API_URL="${BACKEND_API_URL}"
+
+# 检查必需的环境变量
+if [ -z "$FRONTEND_EC2_HOST" ]; then
+    echo -e "${RED}错误: 请设置 FRONTEND_EC2_HOST 环境变量${NC}"
+    echo "例如: export FRONTEND_EC2_HOST=ubuntu@your-frontend-ip"
+    exit 1
+fi
+
+if [ -z "$BACKEND_API_URL" ]; then
+    echo -e "${RED}错误: 请设置 BACKEND_API_URL 环境变量${NC}"
+    echo "例如: export BACKEND_API_URL=http://your-backend-ip:8080/api"
+    exit 1
+fi
 
 # 检查SSH密钥
 if [ ! -f "$SSH_KEY" ]; then
@@ -126,18 +139,18 @@ echo -e "${GREEN}前端部署成功完成！${NC}"
 echo -e "${GREEN}=====================================${NC}\n"
 
 echo -e "${YELLOW}访问地址:${NC}"
-echo "  http://3.22.167.117"
+echo "  http://${FRONTEND_EC2_HOST#*@}"
 echo ""
 
 echo -e "${YELLOW}验证步骤:${NC}"
-echo "  1. 打开浏览器访问: http://3.22.167.117"
+echo "  1. 打开浏览器访问前端地址"
 echo "  2. 打开开发者工具 > Network 标签"
 echo "  3. 检查 API 请求是否发送到: $BACKEND_API_URL"
 echo ""
 
 echo -e "${YELLOW}如果遇到 CORS 问题，需要在后端添加 CORS 配置${NC}"
 echo -e "${YELLOW}后端配置文件: backend/src/main/resources/application-prod.properties${NC}"
-echo "  cors.allowed-origins=http://3.22.167.117"
+echo "  cors.allowed-origins=http://${FRONTEND_EC2_HOST#*@}"
 echo ""
 
 echo -e "${YELLOW}查看前端日志:${NC}"
