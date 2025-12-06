@@ -186,7 +186,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       window.removeEventListener('scroll', updatePositions, true);
       clearInterval(retryInterval);
     };
-  }, [currentStep]);
+  }, [currentStep, highlightRect, updatePositions]);
 
   // Auto-trigger action for current step
   useEffect(() => {
@@ -201,7 +201,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [currentStep]);
+  }, [currentStep, currentStepData, updatePositions]);
 
   const handleNext = () => {
     // Close Contact folder when moving from step 2 (Email) to step 3 (Chat)

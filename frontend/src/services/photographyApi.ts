@@ -158,7 +158,7 @@ export const retryApiCall = async <T>(
   maxRetries: number = 3,
   delay: number = 1000
 ): Promise<T> => {
-  let lastError: ApiError;
+  let lastError: ApiError | null = null;
   
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -178,7 +178,8 @@ export const retryApiCall = async <T>(
     }
   }
   
-  throw lastError!;
+  // Throw error object properly
+  throw new Error(lastError?.message || 'Max retries exceeded');
 };
 
 export default PhotographyApiService;
