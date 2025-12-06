@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useResponsive } from '../../utils/responsive';
 
 type Props = {
@@ -58,7 +58,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
   const currentStepData = steps[currentStep];
 
   // Update highlight and tooltip position
-  const updatePositions = () => {
+  const updatePositions = useCallback(() => {
     if (!currentStepData) return;
 
     const element = document.querySelector(currentStepData.targetSelector);
@@ -152,7 +152,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       setHighlightRect(null);
       setTooltipPosition(null);
     }
-  };
+  }, [currentStepData, currentStep]);
 
   // Watch for DOM changes to update positions
   useEffect(() => {
