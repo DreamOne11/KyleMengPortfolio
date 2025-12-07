@@ -34,29 +34,22 @@ jobs:
           cd backend/target
           mv portfolio-0.0.1-SNAPSHOT.jar portfolio.jar
           
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key.pem
+          echo "${{ secrets.FRONTEND_EC2_SSH_KEY }}" > ~/.ssh/deploy_key.pem
           chmod 600 ~/.ssh/deploy_key.pem
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.FRONTEND_EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
+      - name: Deploy to Frontend EC2 (Merged Server)
         env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_HOST: ${{ secrets.FRONTEND_EC2_HOST }}
         run: |
           # Upload JAR file
-          scp -i ~/.ssh/deploy_key.pem backend/target/portfolio.jar ec2-user@${EC2_HOST}:/opt/kyle-portfolio/portfolio.jar.new
+          scp -i ~/.ssh/deploy_key.pem backend/target/portfolio.jar ubuntu@${EC2_HOST}:/opt/kyle-portfolio/portfolio.jar.new
           
           # Deploy on EC2
-          ssh -i ~/.ssh/deploy_key.pem ec2-user@${EC2_HOST} << 'ENDSSH'
+          ssh -i ~/.ssh/deploy_key.pem ubuntu@${EC2_HOST} << 'ENDSSH'
             # Backup current version
             if [ -f /opt/kyle-portfolio/portfolio.jar ]; then
               sudo cp /opt/kyle-portfolio/portfolio.jar /opt/kyle-portfolio/portfolio.jar.backup.$(date +%Y%m%d_%H%M%S)
@@ -67,7 +60,7 @@ jobs:
             
             # Replace JAR
             sudo mv /opt/kyle-portfolio/portfolio.jar.new /opt/kyle-portfolio/portfolio.jar
-            sudo chown ec2-user:ec2-user /opt/kyle-portfolio/portfolio.jar
+            sudo chown ubuntu:ubuntu /opt/kyle-portfolio/portfolio.jar
             
             # Start service
             sudo systemctl start kyle-portfolio
