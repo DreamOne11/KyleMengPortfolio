@@ -93,68 +93,68 @@ public class DataInitializer implements CommandLineRunner {
         switch (categoryName) {
             case "portrait":
                 createPhoto(category, "Portrait Study 1",
-                    "/images/photography/portrait/thumbnails/DSC_4661-full.webp",
-                    "/images/photography/portrait/thumbnails/DSC_4661-card.webp");
+                    "/photos/photography/portrait/thumbnails/DSC_4661-full.webp",
+                    "/photos/photography/portrait/thumbnails/DSC_4661-card.webp");
 
                 createPhoto(category, "Portrait Study 2",
-                    "/images/photography/portrait/thumbnails/DSC_4679-full.webp",
-                    "/images/photography/portrait/thumbnails/DSC_4679-card.webp");
+                    "/photos/photography/portrait/thumbnails/DSC_4679-full.webp",
+                    "/photos/photography/portrait/thumbnails/DSC_4679-card.webp");
 
                 createPhoto(category, "Portrait Study 3",
-                    "/images/photography/portrait/thumbnails/DSC_4769-full.webp",
-                    "/images/photography/portrait/thumbnails/DSC_4769-card.webp");
+                    "/photos/photography/portrait/thumbnails/DSC_4769-full.webp",
+                    "/photos/photography/portrait/thumbnails/DSC_4769-card.webp");
 
                 createPhoto(category, "Portrait Study 4",
-                    "/images/photography/portrait/thumbnails/DSC_4872-full.webp",
-                    "/images/photography/portrait/thumbnails/DSC_4872-card.webp");
+                    "/photos/photography/portrait/thumbnails/DSC_4872-full.webp",
+                    "/photos/photography/portrait/thumbnails/DSC_4872-card.webp");
 
                 createPhoto(category, "Portrait Study 5",
-                    "/images/photography/portrait/thumbnails/DSC_4873-full.webp",
-                    "/images/photography/portrait/thumbnails/DSC_4873-card.webp");
+                    "/photos/photography/portrait/thumbnails/DSC_4873-full.webp",
+                    "/photos/photography/portrait/thumbnails/DSC_4873-card.webp");
                 break;
 
             case "landscape":
                 createPhoto(category, "Mountain Vista",
-                    "/images/photography/landscape/thumbnails/DSC_1093-full.webp",
-                    "/images/photography/landscape/thumbnails/DSC_1093-card.webp");
+                    "/photos/photography/landscape/thumbnails/DSC_1093-full.webp",
+                    "/photos/photography/landscape/thumbnails/DSC_1093-card.webp");
 
                 createPhoto(category, "Serene Waters",
-                    "/images/photography/landscape/thumbnails/DSC_1174-full.webp",
-                    "/images/photography/landscape/thumbnails/DSC_1174-card.webp");
+                    "/photos/photography/landscape/thumbnails/DSC_1174-full.webp",
+                    "/photos/photography/landscape/thumbnails/DSC_1174-card.webp");
 
                 createPhoto(category, "Natural Beauty",
-                    "/images/photography/landscape/thumbnails/DSC_1180-full.webp",
-                    "/images/photography/landscape/thumbnails/DSC_1180-card.webp");
+                    "/photos/photography/landscape/thumbnails/DSC_1180-full.webp",
+                    "/photos/photography/landscape/thumbnails/DSC_1180-card.webp");
 
                 createPhoto(category, "Wilderness Scene",
-                    "/images/photography/landscape/thumbnails/DSC_1190-full.webp",
-                    "/images/photography/landscape/thumbnails/DSC_1190-card.webp");
+                    "/photos/photography/landscape/thumbnails/DSC_1190-full.webp",
+                    "/photos/photography/landscape/thumbnails/DSC_1190-card.webp");
 
                 createPhoto(category, "Scenic Overlook",
-                    "/images/photography/landscape/thumbnails/DSC_1195-full.webp",
-                    "/images/photography/landscape/thumbnails/DSC_1195-card.webp");
+                    "/photos/photography/landscape/thumbnails/DSC_1195-full.webp",
+                    "/photos/photography/landscape/thumbnails/DSC_1195-card.webp");
                 break;
 
             case "humanist":
                 createPhoto(category, "Human Connection",
-                    "/images/photography/humanist/thumbnails/DSC_3590-full.webp",
-                    "/images/photography/humanist/thumbnails/DSC_3590-card.webp");
+                    "/photos/photography/humanist/thumbnails/DSC_3590-full.webp",
+                    "/photos/photography/humanist/thumbnails/DSC_3590-card.webp");
 
                 createPhoto(category, "Daily Life",
-                    "/images/photography/humanist/thumbnails/DSC_3592-full.webp",
-                    "/images/photography/humanist/thumbnails/DSC_3592-card.webp");
+                    "/photos/photography/humanist/thumbnails/DSC_3592-full.webp",
+                    "/photos/photography/humanist/thumbnails/DSC_3592-card.webp");
 
                 createPhoto(category, "Cultural Expression",
-                    "/images/photography/humanist/thumbnails/DSC_3595-full.webp",
-                    "/images/photography/humanist/thumbnails/DSC_3595-card.webp");
+                    "/photos/photography/humanist/thumbnails/DSC_3595-full.webp",
+                    "/photos/photography/humanist/thumbnails/DSC_3595-card.webp");
 
                 createPhoto(category, "Social Documentary",
-                    "/images/photography/humanist/thumbnails/DSC_3597-full.webp",
-                    "/images/photography/humanist/thumbnails/DSC_3597-card.webp");
+                    "/photos/photography/humanist/thumbnails/DSC_3597-full.webp",
+                    "/photos/photography/humanist/thumbnails/DSC_3597-card.webp");
 
                 createPhoto(category, "Life Stories",
-                    "/images/photography/humanist/thumbnails/DSC_3642-full.webp",
-                    "/images/photography/humanist/thumbnails/DSC_3642-card.webp");
+                    "/photos/photography/humanist/thumbnails/DSC_3642-full.webp",
+                    "/photos/photography/humanist/thumbnails/DSC_3642-card.webp");
                 break;
 
             default:
