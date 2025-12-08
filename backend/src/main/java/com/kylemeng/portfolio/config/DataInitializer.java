@@ -93,24 +93,24 @@ public class DataInitializer implements CommandLineRunner {
         switch (categoryName) {
             case "portrait":
                 createPhoto(category, "Portrait Study 1",
-                    "/photos/photography/portrait/thumbnails/DSC_4661-full.webp",
-                    "/photos/photography/portrait/thumbnails/DSC_4661-card.webp");
-
-                createPhoto(category, "Portrait Study 2",
-                    "/photos/photography/portrait/thumbnails/DSC_4679-full.webp",
-                    "/photos/photography/portrait/thumbnails/DSC_4679-card.webp");
-
-                createPhoto(category, "Portrait Study 3",
                     "/photos/photography/portrait/thumbnails/DSC_4769-full.webp",
                     "/photos/photography/portrait/thumbnails/DSC_4769-card.webp");
 
+                createPhoto(category, "Portrait Study 2",
+                    "/photos/photography/portrait/thumbnails/DSC_6428-full.webp",
+                    "/photos/photography/portrait/thumbnails/DSC_6428-card.webp");
+
+                createPhoto(category, "Portrait Study 3",
+                    "/photos/photography/portrait/thumbnails/IMG_2781-full.webp",
+                    "/photos/photography/portrait/thumbnails/IMG_2781-card.webp");
+
                 createPhoto(category, "Portrait Study 4",
-                    "/photos/photography/portrait/thumbnails/DSC_4872-full.webp",
-                    "/photos/photography/portrait/thumbnails/DSC_4872-card.webp");
+                    "/photos/photography/portrait/thumbnails/IMG_2923-full.webp",
+                    "/photos/photography/portrait/thumbnails/IMG_2923-card.webp");
 
                 createPhoto(category, "Portrait Study 5",
-                    "/photos/photography/portrait/thumbnails/DSC_4873-full.webp",
-                    "/photos/photography/portrait/thumbnails/DSC_4873-card.webp");
+                    "/photos/photography/portrait/thumbnails/IMG_4382-full.webp",
+                    "/photos/photography/portrait/thumbnails/IMG_4382-card.webp");
                 break;
 
             case "landscape":
