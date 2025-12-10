@@ -112,3 +112,5 @@ backend/.mvn/wrapper/maven-wrapper.jar
 
 # Photography images (large files)
 frontend/public/images/photography/ 
+
+docs/*
