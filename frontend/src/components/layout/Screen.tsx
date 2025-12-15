@@ -6,8 +6,7 @@ import ProjectDetailWindow from '../windows/ProjectDetailWindow';
 import { useResponsive } from '../../utils/responsive';
 
 // 导入拆分后的屏幕组件
-import AboutMeScreen from '../screens/AboutMeScreen';
-import MyWorkScreen from '../screens/MyWorkScreen';
+import HomeScreen from '../screens/HomeScreen';
 import PhotographyScreen from '../screens/PhotographyScreen';
 
 import { PhotoCategoryResponse, PhotoResponse } from '../../types/photography';
@@ -167,9 +166,8 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
   
 
   const screens = [
-    { id: 0, title: 'About Me', subtitle: 'Get to know me better', emoji: '👋' },
-    { id: 1, title: 'My Work', subtitle: 'Projects & Experience', emoji: '💼' },
-    { id: 2, title: 'Photography', subtitle: 'Visual Stories', emoji: '📸' }
+    { id: 0, title: 'Home', subtitle: 'About Me & My Work', emoji: '👋' },
+    { id: 1, title: 'Photography', subtitle: 'Visual Stories', emoji: '📸' }
   ];
 
   const handleScreenChange = (newScreen: number) => {
@@ -420,12 +418,13 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
           >
             {/* 始终渲染所有屏幕，使用 CSS 控制显示/隐藏 */}
             <div className={index === 0 ? 'w-full h-full' : 'hidden'}>
-              <AboutMeScreen onFolderDoubleClick={handleFolderDoubleClick} onChatExpandedChange={onChatExpandedChange} />
+              <HomeScreen
+                onFolderDoubleClick={handleFolderDoubleClick}
+                onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick}
+                onChatExpandedChange={onChatExpandedChange}
+              />
             </div>
             <div className={index === 1 ? 'w-full h-full' : 'hidden'}>
-              <MyWorkScreen onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick} />
-            </div>
-            <div className={index === 2 ? 'w-full h-full' : 'hidden'}>
               <PhotographyScreen
                 onPhotoCategoryFolderDoubleClick={handlePhotoCategoryFolderDoubleClick}
                 photoCategories={photographyData.categories}
