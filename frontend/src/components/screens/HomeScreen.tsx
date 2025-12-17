@@ -1,44 +1,27 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import MacOSFolderIcon from '../icons/MacOSFolderIcon';
 import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
 import KyleInteractive from '../ui/KyleInteractive';
 import ProjectCard from '../ui/ProjectCard';
-import { useResponsive } from '../../utils/responsive';
+import { useResponsive, getResponsiveScale } from '../../utils/responsive';
 
 type HomeScreenProps = {
   onFolderDoubleClick: (folderId: string, e: React.MouseEvent, folderName: string) => void;
   onAllProjectsFolderDoubleClick: (e: React.MouseEvent) => void;
   onChatExpandedChange?: (isExpanded: boolean) => void;
+  onProjectDoubleClick?: (projectId: string) => void;
 };
-
-type CardPosition = { x: number; y: number };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({
   onFolderDoubleClick,
   onAllProjectsFolderDoubleClick,
-  onChatExpandedChange
+  onChatExpandedChange,
+  onProjectDoubleClick
 }) => {
   const responsive = useResponsive();
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-
-  // 卡片位置状态 (仅桌面端使用)
-  const [cardPositions, setCardPositions] = useState<{
-    suogogo: CardPosition;
-    searchEngine: CardPosition;
-    dataPipeline: CardPosition;
-    ithink: CardPosition;
-  }>({
-    suogogo: { x: 0, y: 0 },
-    searchEngine: { x: 0, y: 0 },
-    dataPipeline: { x: 0, y: 0 },
-    ithink: { x: 0, y: 0 }
-  });
-
-  // 拖动相关 refs
-  const isDragging = useRef(false);
-  const draggedCard = useRef<string | null>(null);
-  const startMouse = useRef({ x: 0, y: 0 });
-  const startPosition = useRef({ x: 0, y: 0 });
+  const [scale, setScale] = useState(getResponsiveScale());
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   // 合并所有文件夹配置
   const folders = [
@@ -52,6 +35,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     if (responsive.isMobile) return '1.5rem';
     if (responsive.isTablet) return '1.75rem';
     return '2rem';
+  };
+
+  const getSubtitleSize = () => {
+    if (responsive.isMobile) return '1rem';
+    if (responsive.isTablet) return '1.25rem';
+    return '1.5rem';
   };
 
   const getCardWidth = () => {
@@ -90,8 +79,67 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handleBackgroundClick = () => setSelectedFolder(null);
 
+  // Z-index 管理函数
+  const getCardZIndex = (cardId: string): number => {
+    // 默认堆叠顺序 (从下到上)
+    const stackOrder = ['portfolio', 'suogogo', 'searchEngine', 'dataPipeline', 'ithink'];
+    return 10 + stackOrder.indexOf(cardId);
+  };
+
+  // 计算卡片位置偏移 - hover 时下方卡片向下移动
+  const getCardTopOffset = (cardId: string, baseOffset: number): number => {
+    if (!hoveredCard) return baseOffset;
+
+    const stackOrder = ['portfolio', 'suogogo', 'searchEngine', 'dataPipeline', 'ithink'];
+    const hoveredIndex = stackOrder.indexOf(hoveredCard);
+    const currentIndex = stackOrder.indexOf(cardId);
+
+    // 如果当前卡片在 hover 卡片下方，向下偏移为展开的卡片让出空间
+    if (currentIndex > hoveredIndex) {
+      return baseOffset + 100; // 卡片展开高度约 200px，偏移 100px
+    }
+
+    return baseOffset;
+  };
+
+  // 悬停回调函数
+  const handleCardHover = (cardId: string, isHovered: boolean) => {
+    setHoveredCard(isHovered ? cardId : null);
+  };
+
+  // 双击卡片处理函数
+  const handleCardDoubleClick = (cardId: string) => {
+    if (!onProjectDoubleClick) return;
+
+    // 映射 HomeScreen card ID 到 Screen allProjects ID
+    const projectIdMap: { [key: string]: string } = {
+      'portfolio': 'portfolio',
+      'suogogo': 'suogogo',
+      'searchEngine': 'searchengine',
+      'dataPipeline': 'datapipeline',
+      'ithink': 'ithink'
+    };
+
+    // 传递映射后的项目 ID
+    const mappedId = projectIdMap[cardId] || cardId;
+    onProjectDoubleClick(mappedId);
+  };
+
   // 项目数据配置
   const projectsData = {
+    portfolio: {
+      title: 'Kyle\'s Portfolio',
+      description: 'A desktop-inspired personal portfolio.',
+      techStack: ['React', 'Three.js', 'GSAP'],
+      link: 'https://github.com/DreamOne11/KyleMengPortfolio',
+      icon: (
+        <img
+          src="/kyle-avatar.png"
+          alt="Kyle"
+          className="w-6 h-6 rounded-full object-cover"
+        />
+      )
+    },
     suogogo: {
       title: 'Suogogo Platform',
       description: 'Suogogo is a shipping platform for cross-board logistics.',
@@ -132,59 +180,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     }
   };
 
-  // 拖动处理函数 (仅桌面端)
-  const handleCardDragStart = (cardId: string, e: React.MouseEvent) => {
-    if (responsive.isMobile) return; // 移动端不启用拖动
 
-    e.preventDefault();
-    e.stopPropagation();
-
-    isDragging.current = true;
-    draggedCard.current = cardId;
-    startMouse.current = { x: e.clientX, y: e.clientY };
-    startPosition.current = { ...cardPositions[cardId as keyof typeof cardPositions] };
-
-    document.body.style.cursor = 'move';
-    document.body.style.userSelect = 'none';
-  };
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isDragging.current && draggedCard.current) {
-      const deltaX = e.clientX - startMouse.current.x;
-      const deltaY = e.clientY - startMouse.current.y;
-
-      const newX = startPosition.current.x + deltaX;
-      const newY = startPosition.current.y + deltaY;
-
-      setCardPositions(prev => ({
-        ...prev,
-        [draggedCard.current!]: { x: newX, y: newY }
-      }));
-    }
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    if (isDragging.current) {
-      isDragging.current = false;
-      draggedCard.current = null;
-
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    }
-  }, []);
-
-  // 监听鼠标移动和松开事件
+  // 监听窗口大小变化，更新缩放比例
   useEffect(() => {
-    if (!responsive.isMobile) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+    const handleResize = () => {
+      setScale(getResponsiveScale());
+    };
 
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [handleMouseMove, handleMouseUp, responsive.isMobile]);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 移动端垂直布局
   if (responsive.isMobile) {
@@ -227,8 +232,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* 项目展示卡片 - 垂直堆叠 */}
           <div className="flex flex-col items-center gap-6">
+            <ProjectCard {...projectsData.portfolio} cardWidth={getCardWidth()} />
             <ProjectCard {...projectsData.suogogo} cardWidth={getCardWidth()} />
             <ProjectCard {...projectsData.searchEngine} cardWidth={getCardWidth()} />
+            <ProjectCard {...projectsData.dataPipeline} cardWidth={getCardWidth()} />
             <ProjectCard {...projectsData.ithink} cardWidth={getCardWidth()} />
           </div>
 
@@ -278,59 +285,47 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
         ))}
       </div>
 
+      {/* Projects Subtitle - 在文件夹和卡片之间 */}
+      <div className="absolute left-8" style={{ top: '210px' }}>
+        <h4 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide"
+            style={{ fontSize: getSubtitleSize(), letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
+          Projects
+        </h4>
+      </div>
+
       {/* 键帽 Logo - 居中显示 */}
       <div className="flex w-full h-full items-center justify-center pointer-events-none">
         <KeyboardLogoStacked />
       </div>
 
-      {/* 项目卡片 - 围绕键盘 Logo 定位 */}
-      {/* Left side - Card 1: Suogogo */}
-      <div
-        className="absolute left-[5%] top-[38%] transform -translate-y-1/2 cursor-move"
-        style={{
-          transform: `translate(${cardPositions.suogogo.x}px, ${cardPositions.suogogo.y}px) translateY(-50%)`,
-          transition: isDragging.current && draggedCard.current === 'suogogo' ? 'none' : 'transform 0.2s ease-out'
-        }}
-        onMouseDown={(e) => handleCardDragStart('suogogo', e)}
-      >
-        <ProjectCard {...projectsData.suogogo} cardWidth={getCardWidth()} />
-      </div>
-
-      {/* Left side - Card 2: Search Engine */}
-      <div
-        className="absolute left-[5%] top-[68%] transform -translate-y-1/2 cursor-move"
-        style={{
-          transform: `translate(${cardPositions.searchEngine.x}px, ${cardPositions.searchEngine.y}px) translateY(-50%)`,
-          transition: isDragging.current && draggedCard.current === 'searchEngine' ? 'none' : 'transform 0.2s ease-out'
-        }}
-        onMouseDown={(e) => handleCardDragStart('searchEngine', e)}
-      >
-        <ProjectCard {...projectsData.searchEngine} cardWidth={getCardWidth()} />
-      </div>
-
-      {/* Right side - Card 3: Data Pipeline */}
-      <div
-        className="absolute right-[6%] top-[38%] transform -translate-y-1/2 cursor-move"
-        style={{
-          transform: `translate(${cardPositions.dataPipeline.x}px, ${cardPositions.dataPipeline.y}px) translateY(-50%)`,
-          transition: isDragging.current && draggedCard.current === 'dataPipeline' ? 'none' : 'transform 0.2s ease-out'
-        }}
-        onMouseDown={(e) => handleCardDragStart('dataPipeline', e)}
-      >
-        <ProjectCard {...projectsData.dataPipeline} cardWidth={getCardWidth()} />
-      </div>
-
-      {/* Right side - Card 4: iThink */}
-      <div
-        className="absolute right-[6%] top-[68%] transform -translate-y-1/2 cursor-move"
-        style={{
-          transform: `translate(${cardPositions.ithink.x}px, ${cardPositions.ithink.y}px) translateY(-50%)`,
-          transition: isDragging.current && draggedCard.current === 'ithink' ? 'none' : 'transform 0.2s ease-out'
-        }}
-        onMouseDown={(e) => handleCardDragStart('ithink', e)}
-      >
-        <ProjectCard {...projectsData.ithink} cardWidth={getCardWidth()} />
-      </div>
+      {/* 项目卡片 - 左侧堆叠布局，相对于文件夹位置 */}
+      {[
+        { id: 'portfolio', data: projectsData.portfolio, topOffset: 0 },
+        { id: 'suogogo', data: projectsData.suogogo, topOffset: 60 },
+        { id: 'searchEngine', data: projectsData.searchEngine, topOffset: 120 },
+        { id: 'dataPipeline', data: projectsData.dataPipeline, topOffset: 180 },
+        { id: 'ithink', data: projectsData.ithink, topOffset: 240 }
+      ].map(({ id, data, topOffset }) => (
+        <div
+          key={id}
+          className="absolute cursor-pointer origin-left"
+          style={{
+            left: '2rem',
+            top: `${240 + getCardTopOffset(id, topOffset)}px`,
+            transform: `scale(${scale * (hoveredCard === id ? 1.02 : 1)})`,
+            zIndex: getCardZIndex(id),
+            transition: 'transform 0.3s ease-out, top 0.3s ease-out, z-index 0s'
+          }}
+          onDoubleClick={() => handleCardDoubleClick(id)}
+        >
+          <ProjectCard
+            {...data}
+            cardWidth={getCardWidth()}
+            isCollapsed={hoveredCard !== id}
+            onHoverChange={(isHovered) => handleCardHover(id, isHovered)}
+          />
+        </div>
+      ))}
     </div>
   );
 };

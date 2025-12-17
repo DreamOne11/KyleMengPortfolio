@@ -95,12 +95,12 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
         github: 'https://github.com/DreamOne11/SearchEngine'
       }
     },
-    { 
-      id: 'ithink', 
-      name: 'iThink Ideas Investment Platform', 
-      date: '2020-12-15', 
-      size: 'Team', 
-      kind: 'Java, Spring Boot', 
+    {
+      id: 'ithink',
+      name: 'iThink Ideas Investment Platform',
+      date: '2020-12-15',
+      size: 'Team',
+      kind: 'Java, Spring Boot',
       desc: 'A platform for idea investment and collaboration.',
       detailedDesc: 'A comprehensive idea investment and collaboration platform that connects innovators with investors. Features idea submission, evaluation workflows, funding mechanisms, and project management tools. Includes both web platform and WeChat Mini Program for mobile access.',
       screenshot: '/img/projects/iThink.png',
@@ -108,6 +108,21 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
       links: {
         website: null,
         github: 'https://github.com/Chocolate-Prince-and-Six-Dwarfs/iThink/'
+      }
+    },
+    {
+      id: 'datapipeline',
+      name: 'E-commerce Data Pipeline',
+      date: '2024-03-15',
+      size: 'Team',
+      kind: 'Snowflake, Airflow, dbt',
+      desc: 'A data pipeline for e-commerce data.',
+      detailedDesc: 'A scalable data pipeline solution for processing and analyzing e-commerce data at scale. Features automated ETL workflows, data quality monitoring, and real-time analytics capabilities. Built with modern data engineering tools to handle millions of transactions and provide actionable insights.',
+      screenshot: '/img/projects/dataPipeline.jpg',
+      techStack: ['Snowflake', 'Airflow', 'dbt', 'Python', 'SQL'],
+      links: {
+        website: null,
+        github: null
       }
     },
   ];
@@ -422,6 +437,22 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
                 onFolderDoubleClick={handleFolderDoubleClick}
                 onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick}
                 onChatExpandedChange={onChatExpandedChange}
+                onProjectDoubleClick={(projectId: string) => {
+                  // 从 allProjects 中查找完整的项目信息
+                  const project = allProjects.find(p => p.id === projectId);
+                  if (!project) return;
+
+                  setProjectDetailWindows(prev => {
+                    // 若已存在同 id 的弹窗，则聚焦（提升 zIndex）
+                    const exist = prev.find(w => w.id === projectId);
+                    if (exist) {
+                      const maxZ = Math.max(...prev.map(w => w.zIndex));
+                      return prev.map(w => w.id === projectId ? {...w, zIndex: maxZ + 1} : w);
+                    }
+                    const maxZ = prev.length > 0 ? Math.max(...prev.map(w => w.zIndex)) : 2000;
+                    return [...prev, {id: projectId, project, zIndex: maxZ + 1, windowOffset: {x: prev.length * 40, y: prev.length * 40}}];
+                  });
+                }}
               />
             </div>
             <div className={index === 1 ? 'w-full h-full' : 'hidden'}>
