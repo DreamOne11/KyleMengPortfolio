@@ -12,9 +12,8 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
   const [isScrolling, setIsScrolling] = useState(false);
 
   const dockItems = [
-    { id: 0, emoji: '👋', label: 'About Me', mobileLabel: 'About' },
-    { id: 1, emoji: '💼', label: 'My Work', mobileLabel: 'Work' },
-    { id: 2, emoji: '📸', label: 'Photography', mobileLabel: 'Photo' },
+    { id: 0, emoji: '👋', label: 'Home', mobileLabel: 'Home' },
+    { id: 1, emoji: '📸', label: 'Photography', mobileLabel: 'Photo' },
   ];
 
   // 监听滚动事件

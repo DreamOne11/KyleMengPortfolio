@@ -625,9 +625,9 @@ export default function KeyboardLogoStacked() {
       {/* </> SVG 图标 */}
       <div
         className="absolute"
-        style={{ 
-          ...getPosition('div'), 
-          zIndex: 1,
+        style={{
+          ...getPosition('div'),
+          zIndex: 2,
           transform: 'rotate(5deg)'
         }}
       >
@@ -679,7 +679,7 @@ export default function KeyboardLogoStacked() {
         alt="note-bg"
         draggable={false}
         className={`absolute ${getSize('note')}`}
-        style={{ ...getPosition('note'), zIndex: 0 }}
+        style={{ ...getPosition('note'), zIndex: 1 }}
       />
       
       {/* 指针图标 */}
