@@ -174,13 +174,18 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
   };
 
   // 响应式尺寸 - 纵向卡片 (高 > 宽)
+  // 使用视窗单位实现自适应缩放
   const getCardSize = () => {
     if (responsive.isMobile) {
       return { width: '200px', height: '280px' };
     } else if (responsive.isTablet) {
-      return { width: '240px', height: '340px' };
+      // 平板端：2列布局，使用视窗单位
+      return { width: '18vw', height: '40vh' };
     } else {
-      return { width: '280px', height: '400px' };
+      // 桌面端：3列布局，使用视窗单位自适应
+      // 宽度：视窗宽度的16%，确保3列能放下
+      // 高度：视窗高度的40%，保持纵向比例
+      return { width: '16vw', height: '40vh' };
     }
   };
 

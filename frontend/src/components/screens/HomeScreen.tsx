@@ -258,7 +258,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Title - 左上角 */}
-      <div className="absolute top-8 left-8 right-8 z-10">
+      <div className="absolute top-8 z-10">
         <h3 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4"
             style={{ fontSize: getTitleSize(), letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
           HOME
