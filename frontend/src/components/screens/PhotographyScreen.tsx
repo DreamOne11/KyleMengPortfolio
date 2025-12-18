@@ -73,7 +73,7 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
   if (!isDataLoaded || photoCategories.length === 0) {
     return (
       <div className="relative w-full h-full overflow-hidden">
-        <div className="absolute top-8 left-8 right-8 z-10">
+        <div className="absolute top-8 z-10">
           <h3
             className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide mb-4"
             style={{
@@ -190,8 +190,8 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
           </div>
           
           {/* Card Carousels Container */}
-          <div className="absolute top-40 left-8 right-8 bottom-24 overflow-hidden">
-            <div className={`grid ${responsive.isDesktop ? 'grid-cols-3' : responsive.isTablet ? 'grid-cols-2' : 'grid-cols-1'} gap-8 justify-items-center`}>
+          <div className="absolute top-24 left-4 right-4 bottom-12 overflow-hidden flex items-center justify-center">
+            <div className={`grid ${responsive.isDesktop ? 'grid-cols-3' : responsive.isTablet ? 'grid-cols-2' : 'grid-cols-1'} gap-6 justify-items-center items-center w-full`}>
               {photoCategories.map((category) => (
                 <div key={category.id} className="flex flex-col items-center">
                   {/* Folder Button Above Carousel */}
@@ -200,7 +200,7 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
                     onClick={(e) => handleFolderClick(category, e)}
                     onDoubleClick={(e) => handleFolderDoubleClick(category, e)}
                   >
-                    <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-2">
+                    <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10">
                       <MacOSFolderIcon color={category.iconColor === '#3B82F6' ? 'blue' : 'purple'} />
                     </div>
                     <h3 className="font-semibold text-sm text-white px-3 py-1 rounded">
