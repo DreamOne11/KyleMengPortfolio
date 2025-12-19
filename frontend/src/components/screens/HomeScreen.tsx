@@ -3,6 +3,7 @@ import MacOSFolderIcon from '../icons/MacOSFolderIcon';
 import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
 import KyleInteractive from '../ui/KyleInteractive';
 import ProjectCard from '../ui/ProjectCard';
+import WidgetsSidebar from '../ui/WidgetsSidebar';
 import { useResponsive, getResponsiveScale } from '../../utils/responsive';
 
 type HomeScreenProps = {
@@ -239,6 +240,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             <ProjectCard {...projectsData.ithink} cardWidth={getCardWidth()} />
           </div>
 
+          {/* Widgets Sidebar - mobile */}
+          <div className="w-full mt-6">
+            <WidgetsSidebar />
+          </div>
+
           {/* KeyboardLogoStacked - 底部 */}
           <div className="flex justify-center flex-shrink-0 mt-8">
             <KeyboardLogoStacked />
@@ -296,6 +302,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* 键帽 Logo - 居中显示 */}
       <div className="flex w-full h-full items-center justify-center pointer-events-none">
         <KeyboardLogoStacked />
+      </div>
+
+      {/* Widgets Sidebar - 右侧，与项目卡片对齐 */}
+      <div className="absolute right-8 top-[240px] z-10">
+        <WidgetsSidebar />
       </div>
 
       {/* 项目卡片 - 左侧堆叠布局，相对于文件夹位置 */}
