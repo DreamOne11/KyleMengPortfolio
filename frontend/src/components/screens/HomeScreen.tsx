@@ -292,7 +292,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Projects Subtitle - 在文件夹和卡片之间 */}
-      <div className="absolute left-8" style={{ top: '210px' }}>
+      <div className="absolute left-0 top-[22.5vh]">
         <h4 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide"
             style={{ fontSize: getSubtitleSize(), letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
           Projects
@@ -305,7 +305,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Widgets Sidebar - 右侧，与项目卡片对齐 */}
-      <div className="absolute right-8 top-[240px] z-10">
+      <div className="absolute top-[22.5vh] right-0 z-10">
         <WidgetsSidebar />
       </div>
 
@@ -321,8 +321,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           key={id}
           className="absolute cursor-pointer origin-left"
           style={{
-            left: '2rem',
-            top: `${240 + getCardTopOffset(id, topOffset)}px`,
+            left: '1rem',
+            top: `calc(26vh + ${getCardTopOffset(id, topOffset)}px)`,
             transform: `scale(${scale * (hoveredCard === id ? 1.02 : 1)})`,
             zIndex: getCardZIndex(id),
             transition: 'transform 0.3s ease-out, top 0.3s ease-out, z-index 0s'

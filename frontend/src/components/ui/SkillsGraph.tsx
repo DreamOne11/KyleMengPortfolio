@@ -179,8 +179,8 @@ const SkillsGraph: React.FC = () => {
           // 添加画布边界约束力 - 保持节点在可视区域内
           const boundaryForce = () => {
             // 限制在可视区域内，给予足够空间
-            const maxWidth = dimensions.width * 0.3; // 使用40%的宽度
-            const maxHeight = dimensions.height * 0.3; // 使用40%的高度
+            const maxWidth = dimensions.width * 0.4; // 使用40%的宽度
+            const maxHeight = dimensions.height * 0.4; // 使用40%的高度
             const strength = 0.2; // 适度约束力
 
             graphData.nodes.forEach((node: any) => {
@@ -398,6 +398,7 @@ const SkillsGraph: React.FC = () => {
         height={dimensions.height}
         nodeRelSize={1}
         nodeVal={(node: any) => (node as SkillNode).val}
+        nodeLabel={() => ''} // 禁用默认的黑底白字标签
         nodeCanvasObject={paintNode}
         linkCanvasObject={paintLink}
         onNodeHover={handleNodeHover}

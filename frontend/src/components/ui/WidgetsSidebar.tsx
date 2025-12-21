@@ -22,11 +22,15 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
     { id: 'experience', label: 'Experience' }
   ];
 
-  // Responsive container classes - using viewport units for proportional sizing
+  // Responsive container classes - using viewport units with breakpoints for different screen sizes
   const getContainerClass = () => {
     if (responsive.isMobile) return 'w-full min-h-[500px] flex-col';
     if (responsive.isTablet) return 'w-[16vw] h-[50vh] flex-col';
-    return 'w-[25vw] h-[45vh] flex-col';
+    // Desktop: 小屏幕（笔记本）用较大值，大屏幕（外接显示器）用较小值
+    // 基础桌面（1024-1440px）: 25vw, 45vh
+    // 大屏（1440-1920px）: 22vw, 40vh
+    // 超大屏（>=1920px）: 18.5vw, 37vh
+    return 'w-[25vw] h-[45vh] xl:w-[22vw] xl:h-[40vh] 2xl:w-[18.5vw] 2xl:h-[37vh] flex-col';
   };
 
   // Responsive tab navigation classes - horizontal tabs at top for all devices
@@ -39,7 +43,7 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
       className={`
         ${getContainerClass()}
         ${className}
-        bg-white/15 backdrop-blur-lg border border-white/30
+        bg-transparent border border-white/30
         rounded-2xl shadow-xl overflow-hidden flex
       `}
     >
