@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useResponsive } from '../../utils/responsive';
+import SkillsGraph from './SkillsGraph';
 
 type TabType = 'about' | 'skills' | 'experience';
 
@@ -23,9 +24,9 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
 
   // Responsive container classes - using viewport units for proportional sizing
   const getContainerClass = () => {
-    if (responsive.isMobile) return 'w-full h-auto flex-col';
+    if (responsive.isMobile) return 'w-full min-h-[500px] flex-col';
     if (responsive.isTablet) return 'w-[16vw] h-[50vh] flex-col';
-    return 'w-[20vw] h-[40vh] flex-col';
+    return 'w-[25vw] h-[45vh] flex-col';
   };
 
   // Responsive tab navigation classes - horizontal tabs at top for all devices
@@ -97,8 +98,8 @@ const AboutContent = () => (
 );
 
 const SkillsContent = () => (
-  <div className="flex items-center justify-center h-full">
-    <p className="text-gray-600 text-sm">Skills content placeholder</p>
+  <div className="w-full h-full">
+    <SkillsGraph />
   </div>
 );
 
