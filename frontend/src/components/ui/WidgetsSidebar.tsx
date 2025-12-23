@@ -3,7 +3,7 @@ import { useResponsive } from '../../utils/responsive';
 import SkillsGraph from './SkillsGraph';
 import { Quote } from 'lucide-react';
 
-type TabType = 'about' | 'skills' | 'experience';
+type TabType = 'about' | 'skills';
 
 type WidgetsSidebarProps = {
   className?: string;
@@ -19,8 +19,7 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
 
   const tabs: Array<{ id: TabType; label: string }> = [
     { id: 'about', label: 'About' },
-    { id: 'skills', label: 'Skills' },
-    { id: 'experience', label: 'Experience' }
+    { id: 'skills', label: 'Skills' }
   ];
 
   // Responsive container classes - using viewport units with breakpoints for different screen sizes
@@ -84,8 +83,7 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
 const TabContent: React.FC<{ tab: TabType }> = ({ tab }) => {
   const contentMap = {
     about: <AboutContent />,
-    skills: <SkillsContent />,
-    experience: <ExperienceContent />
+    skills: <SkillsContent />
   };
 
   return (
@@ -104,10 +102,10 @@ const AboutContent = () => {
   const titleSize = responsive.isMobile ? 'text-base' : 'text-sm';
 
   return (
-    <div className="h-full w-full bg-white/70 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/30 shadow-lg overflow-y-auto custom-scrollbar">
+    <div className="h-full w-full bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/20 shadow-2xl overflow-y-auto custom-scrollbar">
       {/* Header: Quote Icon + Title */}
       <div className="flex items-start gap-3 mb-4">
-        <Quote className="w-8 h-8 md:w-10 md:h-10 text-gray-400 flex-shrink-0" />
+        <Quote className="w-8 h-8 md:w-10 md:h-10 text-gray-500 flex-shrink-0" />
         <h3 className={`${titleSize} font-semibold text-gray-900 pt-1`}>
           Hi, I'm Kyle (Xiangyi)
         </h3>
@@ -115,7 +113,7 @@ const AboutContent = () => {
 
       {/* Content paragraphs */}
       <div className="space-y-3">
-        <p className={`${textSize} text-gray-700 leading-relaxed`}>
+        <p className={`${textSize} text-gray-800 leading-relaxed`}>
           I specialize in AI-driven applications, exploring{' '}
           <span className="text-purple-600">prompt engineering</span>,{' '}
           <span className="text-purple-600">AI agents</span>,{' '}
@@ -126,7 +124,7 @@ const AboutContent = () => {
           experiment with how AI systems can reason, retrieve, and act more effectively.
         </p>
 
-        <p className={`${textSize} text-gray-700 leading-relaxed`}>
+        <p className={`${textSize} text-gray-800 leading-relaxed`}>
           I also have a passion for{' '}
           <span className="text-blue-600">data engineering</span>. During my
           undergraduate studies, I built a distributed search engine, sparking my
@@ -141,12 +139,6 @@ const AboutContent = () => {
 const SkillsContent = () => (
   <div className="w-full h-full">
     <SkillsGraph />
-  </div>
-);
-
-const ExperienceContent = () => (
-  <div className="flex items-center justify-center h-full">
-    <p className="text-gray-600 text-sm">Experience content placeholder</p>
   </div>
 );
 

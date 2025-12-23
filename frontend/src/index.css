@@ -54,22 +54,13 @@ code {
   .key.to-grid:nth-child(7) {@apply top-32 left-56;}
   .key.to-grid:nth-child(8) {@apply top-32 left-84;}
 
-  /* Custom dark scrollbar for About widget */
+  /* Hidden scrollbar for About widget - scrollable but invisible */
+  .custom-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
   .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    display: none;  /* Chrome, Safari, Opera */
   }
 }
