@@ -259,7 +259,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <div className="relative w-full h-full overflow-hidden" onClick={handleBackgroundClick}>
       {/* KyleInteractive - 右上角 */}
-      <div className="absolute top-2 right-2 z-20">
+      <div className="absolute -top-8 right-2 z-20">
         <KyleInteractive onChatExpandedChange={onChatExpandedChange} />
       </div>
 
@@ -272,7 +272,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* 文件夹 - 左侧水平排列 */}
-      <div className="absolute top-24 left-8 flex gap-4 md:gap-4">
+      <div className="absolute top-20 left-8 flex gap-4 md:gap-4">
         {folders.map((folder) => (
           <div
             key={folder.id}
@@ -319,7 +319,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       ].map(({ id, data, topOffset }) => (
         <div
           key={id}
-          className="absolute cursor-pointer origin-left"
+          className="absolute origin-left cursor-pointer pointer-events-auto"
           style={{
             left: '1rem',
             top: `calc(26vh + ${getCardTopOffset(id, topOffset)}px)`,

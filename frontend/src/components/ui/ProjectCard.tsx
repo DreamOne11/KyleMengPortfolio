@@ -28,10 +28,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     ? 'bg-white/5 backdrop-blur-sm border border-white/10 opacity-40'
     : '';
 
+  const isClickable = !isPlaceholder;
+
   return (
     <div
-      className={`relative ${cardWidth} font-sans transition-all duration-300`}
-      style={{ fontFamily: "Inter, Poppins, Manrope, sans-serif" }}
+      className={`relative ${cardWidth} font-sans transition-all duration-300 ${isClickable ? 'cursor-pointer' : 'cursor-default'} pointer-events-auto`}
+      style={{
+        fontFamily: "Inter, Poppins, Manrope, sans-serif"
+      }}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : -1}
       onMouseEnter={() => onHoverChange?.(true)}
       onMouseLeave={() => onHoverChange?.(false)}
     >
