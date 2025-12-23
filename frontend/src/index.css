@@ -53,4 +53,23 @@ code {
   .key.to-grid:nth-child(6) {@apply top-32 left-28;}
   .key.to-grid:nth-child(7) {@apply top-32 left-56;}
   .key.to-grid:nth-child(8) {@apply top-32 left-84;}
+
+  /* Custom dark scrollbar for About widget */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 }

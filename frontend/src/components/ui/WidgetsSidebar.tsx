@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useResponsive } from '../../utils/responsive';
 import SkillsGraph from './SkillsGraph';
+import { Quote } from 'lucide-react';
 
 type TabType = 'about' | 'skills' | 'experience';
 
@@ -72,7 +73,7 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
       </div>
 
       {/* Content Area - Below tabs for all devices */}
-      <div className="flex-1 p-4 overflow-y-auto order-2">
+      <div className="flex-1 p-4 overflow-hidden order-2">
         <TabContent tab={activeTab} />
       </div>
     </div>
@@ -95,11 +96,47 @@ const TabContent: React.FC<{ tab: TabType }> = ({ tab }) => {
 };
 
 // Placeholder Content Components
-const AboutContent = () => (
-  <div className="flex items-center justify-center h-full">
-    <p className="text-gray-600 text-sm">About content placeholder</p>
-  </div>
-);
+const AboutContent = () => {
+  const responsive = useResponsive();
+
+  // Responsive text sizing
+  const textSize = responsive.isMobile ? 'text-sm' : 'text-xs';
+  const titleSize = responsive.isMobile ? 'text-base' : 'text-sm';
+
+  return (
+    <div className="h-full w-full bg-white/70 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/30 shadow-lg overflow-y-auto custom-scrollbar">
+      {/* Header: Quote Icon + Title */}
+      <div className="flex items-start gap-3 mb-4">
+        <Quote className="w-8 h-8 md:w-10 md:h-10 text-gray-400 flex-shrink-0" />
+        <h3 className={`${titleSize} font-semibold text-gray-900 pt-1`}>
+          Hi, I'm Kyle (Xiangyi)
+        </h3>
+      </div>
+
+      {/* Content paragraphs */}
+      <div className="space-y-3">
+        <p className={`${textSize} text-gray-700 leading-relaxed`}>
+          I specialize in AI-driven applications, exploring{' '}
+          <span className="text-purple-600">prompt engineering</span>,{' '}
+          <span className="text-purple-600">AI agents</span>,{' '}
+          <span className="text-purple-600">MCP servers</span>, and LLM frameworks like{' '}
+          <span className="font-medium text-gray-900">LangChain</span> and{' '}
+          <span className="font-medium text-gray-900">LangGraph</span>.
+          I design practical, production-oriented agent workflows and continuously
+          experiment with how AI systems can reason, retrieve, and act more effectively.
+        </p>
+
+        <p className={`${textSize} text-gray-700 leading-relaxed`}>
+          I also have a passion for{' '}
+          <span className="text-blue-600">data engineering</span>. During my
+          undergraduate studies, I built a distributed search engine, sparking my
+          enthusiasm for big-data processing and distributed systems. Since then,
+          I've deepened my expertise in data pipelines and large-scale system design.
+        </p>
+      </div>
+    </div>
+  );
+};
 
 const SkillsContent = () => (
   <div className="w-full h-full">
