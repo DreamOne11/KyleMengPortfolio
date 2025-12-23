@@ -10,6 +10,7 @@ export type ProjectCardProps = {
   cardWidth?: string;
   isCollapsed?: boolean;
   onHoverChange?: (isHovered: boolean) => void;
+  isMobileCarousel?: boolean;
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -21,7 +22,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   isPlaceholder = false,
   cardWidth = 'w-[300px]',
   isCollapsed = false,
-  onHoverChange
+  onHoverChange,
+  isMobileCarousel = false
 }) => {
   // Placeholder card has different styling
   const cardStyle = isPlaceholder
@@ -32,7 +34,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <div
-      className={`relative ${cardWidth} font-sans transition-all duration-300 ${isClickable ? 'cursor-pointer' : 'cursor-default'} pointer-events-auto`}
+      className={`relative ${cardWidth} font-sans transition-all duration-300 ${isClickable ? 'cursor-pointer' : 'cursor-default'} pointer-events-auto rounded-2xl overflow-hidden`}
       style={{
         fontFamily: "Inter, Poppins, Manrope, sans-serif"
       }}
@@ -56,11 +58,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       )}
 
       {/* Content layer */}
-      <div className={`${cardStyle} rounded-2xl p-6 flex flex-col gap-4 relative`}>
+      <div className={`${cardStyle} rounded-2xl ${isMobileCarousel ? 'p-4 gap-2' : 'p-6 gap-4'} flex flex-col relative h-full`}>
         {/* Title section - ALWAYS visible */}
-        <div className="flex items-center gap-3 mb-2">
+        <div className={`flex items-center ${isMobileCarousel ? 'gap-2 mb-1.5' : 'gap-3 mb-2'}`}>
           <span
-            className="text-lg font-bold truncate max-w-[240px]"
+            className={`${isMobileCarousel ? 'text-lg' : 'text-lg'} font-bold truncate max-w-[240px]`}
             style={{
               color: '#1A1A1A',
               fontWeight: 700,
@@ -85,19 +87,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* Content section - smooth collapse/expand with max-height transition */}
         <div
           className={`
-            transition-all duration-300 ease-in-out overflow-hidden
+            transition-all duration-300 ease-in-out overflow-hidden flex-1
             ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[500px] opacity-100'}
           `}
         >
-          <div className="description text-sm mb-2" style={{ color: '#333' }}>
+          <div
+            className={`description ${isMobileCarousel ? 'text-sm mb-2' : 'text-sm mb-2'}`}
+            style={{ color: '#333' }}
+          >
             {description}
           </div>
           {techStack.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className={`flex flex-wrap ${isMobileCarousel ? 'gap-1.5 mt-2' : 'gap-2 mt-2'}`}>
               {techStack.map((tech, index) => (
                 <span
                   key={index}
-                  className="text-xs font-semibold px-2 py-1"
+                  className={`${isMobileCarousel ? 'text-xs px-2 py-1' : 'text-xs px-2 py-1'} font-semibold`}
                   style={{
                     color: '#1A1A1A',
                     background: 'rgba(255,255,255,0.1)',

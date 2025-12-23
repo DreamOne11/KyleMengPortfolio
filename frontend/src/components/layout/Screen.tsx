@@ -435,6 +435,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
               <HomeScreen
                 onFolderDoubleClick={handleFolderDoubleClick}
                 onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick}
+                allProjects={allProjects}
                 onProjectDoubleClick={(projectId: string) => {
                   // 从 allProjects 中查找完整的项目信息
                   const project = allProjects.find(p => p.id === projectId);
