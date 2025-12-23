@@ -97,7 +97,7 @@ const KyleInteractive: React.FC<KyleInteractiveProps> = ({ onChatExpandedChange 
     
     // 通知父组件聊天状态变化
     if (onChatExpandedChange) {
-      onChatExpandedChange(newExpandedState && responsive.isMobile);
+      onChatExpandedChange(newExpandedState);
     }
     
     if (!isChatExpanded) {
@@ -327,8 +327,13 @@ const KyleInteractive: React.FC<KyleInteractiveProps> = ({ onChatExpandedChange 
                       <p className="text-xs text-teal-100">Ask me a question</p>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => setIsChatExpanded(false)}
+                  <button
+                    onClick={() => {
+                      setIsChatExpanded(false);
+                      if (onChatExpandedChange) {
+                        onChatExpandedChange(false);
+                      }
+                    }}
                     className="text-white/80 hover:text-white text-xl w-6 h-6 flex items-center justify-center"
                   >
                     ×

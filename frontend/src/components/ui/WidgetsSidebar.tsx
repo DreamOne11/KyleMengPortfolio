@@ -1,21 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useResponsive } from '../../utils/responsive';
 import SkillsGraph from './SkillsGraph';
 import { Quote } from 'lucide-react';
+import { gsap } from 'gsap';
 
 type TabType = 'about' | 'skills';
 
 type WidgetsSidebarProps = {
   className?: string;
   defaultTab?: TabType;
+  isChatExpanded?: boolean;
 };
 
 const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
   className = '',
-  defaultTab = 'skills'
+  defaultTab = 'skills',
+  isChatExpanded = false
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
   const responsive = useResponsive();
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<gsap.core.Tween | null>(null);
+
+  // Set initial position without animation on mount
+  useEffect(() => {
+    if (!responsive.isDesktop || !sidebarRef.current) return;
+
+    gsap.set(sidebarRef.current, {
+      x: isChatExpanded ? '100%' : 0
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Animate on chat state changes (desktop only)
+  useEffect(() => {
+    if (!responsive.isDesktop || !sidebarRef.current) return;
+
+    // Kill previous animation if exists
+    if (animationRef.current) {
+      animationRef.current.kill();
+    }
+
+    // Animate sidebar position
+    animationRef.current = gsap.to(sidebarRef.current, {
+      x: isChatExpanded ? '100%' : 0,
+      duration: 0.5,
+      ease: 'power2.inOut',
+      overwrite: 'auto'
+    });
+
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.kill();
+      }
+    };
+  }, [isChatExpanded, responsive.isDesktop]);
 
   const tabs: Array<{ id: TabType; label: string }> = [
     { id: 'about', label: 'About' },
@@ -40,6 +78,7 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
 
   return (
     <div
+      ref={sidebarRef}
       className={`
         ${getContainerClass()}
         ${className}

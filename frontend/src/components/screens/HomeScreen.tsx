@@ -23,6 +23,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [scale, setScale] = useState(getResponsiveScale());
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
+
+  // Handle chat expanded state change
+  const handleChatExpandedChange = (isExpanded: boolean) => {
+    setIsChatExpanded(isExpanded);
+    // Still call parent's callback if it exists
+    if (onChatExpandedChange) {
+      onChatExpandedChange(isExpanded);
+    }
+  };
 
   // 合并所有文件夹配置
   const folders = [
@@ -260,7 +270,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     <div className="relative w-full h-full overflow-hidden" onClick={handleBackgroundClick}>
       {/* KyleInteractive - 右上角 */}
       <div className="absolute -top-8 right-2 z-20">
-        <KyleInteractive onChatExpandedChange={onChatExpandedChange} />
+        <KyleInteractive onChatExpandedChange={handleChatExpandedChange} />
       </div>
 
       {/* Title - 左上角 */}
@@ -306,7 +316,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* Widgets Sidebar - 右侧，与项目卡片对齐 */}
       <div className="absolute top-[22.5vh] right-0 z-10">
-        <WidgetsSidebar />
+        <WidgetsSidebar isChatExpanded={isChatExpanded} />
       </div>
 
       {/* 项目卡片 - 左侧堆叠布局，相对于文件夹位置 */}
