@@ -22,12 +22,11 @@ type Props = {
   currentScreen: number;
   onScreenChange: (screen: number) => void;
   onAnyFileManagerMaximizedChange?: (isMax: boolean) => void;
-  onChatExpandedChange?: (isExpanded: boolean) => void;
   triggerContactFolder?: number;
   photographyData: PhotographyData;
 };
 
-const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, onChatExpandedChange, triggerContactFolder, photographyData }) => {
+const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManagerMaximizedChange, triggerContactFolder, photographyData }) => {
   const startXRef = useRef<number>(0);
   const startYRef = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
@@ -436,7 +435,6 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
               <HomeScreen
                 onFolderDoubleClick={handleFolderDoubleClick}
                 onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick}
-                onChatExpandedChange={onChatExpandedChange}
                 onProjectDoubleClick={(projectId: string) => {
                   // 从 allProjects 中查找完整的项目信息
                   const project = allProjects.find(p => p.id === projectId);
