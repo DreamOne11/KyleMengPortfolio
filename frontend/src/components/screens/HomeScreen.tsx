@@ -3,6 +3,7 @@ import MacOSFolderIcon from '../icons/MacOSFolderIcon';
 import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
 import KyleInteractive from '../ui/KyleInteractive';
 import ProjectCard from '../ui/ProjectCard';
+import WidgetsSidebar from '../ui/WidgetsSidebar';
 import { useResponsive, getResponsiveScale } from '../../utils/responsive';
 
 type HomeScreenProps = {
@@ -22,6 +23,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [scale, setScale] = useState(getResponsiveScale());
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
+
+  // Handle chat expanded state change
+  const handleChatExpandedChange = (isExpanded: boolean) => {
+    setIsChatExpanded(isExpanded);
+    // Still call parent's callback if it exists
+    if (onChatExpandedChange) {
+      onChatExpandedChange(isExpanded);
+    }
+  };
 
   // 合并所有文件夹配置
   const folders = [
@@ -239,6 +250,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             <ProjectCard {...projectsData.ithink} cardWidth={getCardWidth()} />
           </div>
 
+          {/* Widgets Sidebar - mobile */}
+          <div className="w-full mt-6">
+            <WidgetsSidebar />
+          </div>
+
           {/* KeyboardLogoStacked - 底部 */}
           <div className="flex justify-center flex-shrink-0 mt-8">
             <KeyboardLogoStacked />
@@ -253,8 +269,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <div className="relative w-full h-full overflow-hidden" onClick={handleBackgroundClick}>
       {/* KyleInteractive - 右上角 */}
-      <div className="absolute top-2 right-2 z-20">
-        <KyleInteractive onChatExpandedChange={onChatExpandedChange} />
+      <div className="absolute -top-8 right-2 z-20">
+        <KyleInteractive onChatExpandedChange={handleChatExpandedChange} />
       </div>
 
       {/* Title - 左上角 */}
@@ -266,7 +282,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* 文件夹 - 左侧水平排列 */}
-      <div className="absolute top-24 left-8 flex gap-4 md:gap-4">
+      <div className="absolute top-20 left-8 flex gap-4 md:gap-4">
         {folders.map((folder) => (
           <div
             key={folder.id}
@@ -286,7 +302,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Projects Subtitle - 在文件夹和卡片之间 */}
-      <div className="absolute left-8" style={{ top: '210px' }}>
+      <div className="absolute left-0 top-[22.5vh]">
         <h4 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide"
             style={{ fontSize: getSubtitleSize(), letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
           Projects
@@ -296,6 +312,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* 键帽 Logo - 居中显示 */}
       <div className="flex w-full h-full items-center justify-center pointer-events-none">
         <KeyboardLogoStacked />
+      </div>
+
+      {/* Widgets Sidebar - 右侧，与项目卡片对齐 */}
+      <div className="absolute top-[22.5vh] right-0 z-10">
+        <WidgetsSidebar isChatExpanded={isChatExpanded} />
       </div>
 
       {/* 项目卡片 - 左侧堆叠布局，相对于文件夹位置 */}
@@ -308,10 +329,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       ].map(({ id, data, topOffset }) => (
         <div
           key={id}
-          className="absolute cursor-pointer origin-left"
+          className="absolute origin-left cursor-pointer pointer-events-auto"
           style={{
-            left: '2rem',
-            top: `${240 + getCardTopOffset(id, topOffset)}px`,
+            left: '1rem',
+            top: `calc(26vh + ${getCardTopOffset(id, topOffset)}px)`,
             transform: `scale(${scale * (hoveredCard === id ? 1.02 : 1)})`,
             zIndex: getCardZIndex(id),
             transition: 'transform 0.3s ease-out, top 0.3s ease-out, z-index 0s'
