@@ -3,6 +3,7 @@ import MacOSFolderIcon from '../icons/MacOSFolderIcon';
 import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
 import KyleInteractive from '../ui/KyleInteractive';
 import ProjectCard from '../ui/ProjectCard';
+import ProjectCarousel from '../ui/ProjectCarousel';
 import WidgetsSidebar from '../ui/WidgetsSidebar';
 import { useResponsive, getResponsiveScale } from '../../utils/responsive';
 
@@ -11,13 +12,15 @@ type HomeScreenProps = {
   onAllProjectsFolderDoubleClick: (e: React.MouseEvent) => void;
   onChatExpandedChange?: (isExpanded: boolean) => void;
   onProjectDoubleClick?: (projectId: string) => void;
+  allProjects?: Array<any>;
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({
   onFolderDoubleClick,
   onAllProjectsFolderDoubleClick,
   onChatExpandedChange,
-  onProjectDoubleClick
+  onProjectDoubleClick,
+  allProjects = []
 }) => {
   const responsive = useResponsive();
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
@@ -55,7 +58,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   const getCardWidth = () => {
-    if (responsive.isMobile) return 'w-full max-w-[320px]';
+    if (responsive.isMobile) return 'w-full';
     if (responsive.isTablet) return 'w-[280px]';
     return 'w-[300px]';
   };
@@ -140,7 +143,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const projectsData = {
     portfolio: {
       title: 'Kyle\'s Portfolio',
-      description: 'A desktop-inspired personal portfolio.',
+      description: 'A desktop-inspired personal portfolio for showing my ideas and creations.',
       techStack: ['React', 'Three.js', 'GSAP'],
       link: 'https://github.com/DreamOne11/KyleMengPortfolio',
       icon: (
@@ -153,7 +156,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     suogogo: {
       title: 'Suogogo Platform',
-      description: 'Suogogo is a shipping platform for cross-board logistics.',
+      description: 'Suogogo is a shipping platform for cross-board logistics built with React and TypeScript.',
       techStack: ['React', 'TypeScript', 'TailwindCSS'],
       link: 'https://www.suogogo.com',
       icon: (
@@ -164,7 +167,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     searchEngine: {
       title: 'Campus Search Engine',
-      description: 'A distributed search engine base on Hadoop.',
+      description: 'A distributed search engine base on Hadoop for web page crawling, indexing and searching.',
       techStack: ['Java', 'Hadoop', 'MapReduce'],
       link: 'https://github.com/DreamOne11/SearchEngine',
       icon: (
@@ -175,7 +178,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     dataPipeline: {
       title: 'E-commerce Data Pipeline',
-      description: 'A data pipeline for e-commerce data.',
+      description: 'A data pipeline for e-commerce data for data analysis and reporting.',
       techStack: ['Snowflake', 'Airflow', 'dbt'],
     },  
     ithink: {
@@ -241,14 +244,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             ))}
           </div>
 
-          {/* 项目展示卡片 - 垂直堆叠 */}
-          <div className="flex flex-col items-center gap-6">
-            <ProjectCard {...projectsData.portfolio} cardWidth={getCardWidth()} />
-            <ProjectCard {...projectsData.suogogo} cardWidth={getCardWidth()} />
-            <ProjectCard {...projectsData.searchEngine} cardWidth={getCardWidth()} />
-            <ProjectCard {...projectsData.dataPipeline} cardWidth={getCardWidth()} />
-            <ProjectCard {...projectsData.ithink} cardWidth={getCardWidth()} />
-          </div>
+          {/* 项目展示卡片 - 滑动轮播 */}
+          {allProjects.length > 0 && onProjectDoubleClick && (
+            <ProjectCarousel
+              projects={allProjects}
+              projectsData={projectsData}
+              onProjectClick={onProjectDoubleClick}
+              cardWidth={getCardWidth()}
+            />
+          )}
 
           {/* Widgets Sidebar - mobile */}
           <div className="w-full mt-6">

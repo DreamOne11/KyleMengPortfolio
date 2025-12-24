@@ -102,7 +102,12 @@ const SkillsGraph: React.FC = () => {
   const [highlightLinks, setHighlightLinks] = useState<Set<string>>(new Set());
   const [dimensions, setDimensions] = useState({ width: 1000, height: 800 });
 
-  // 计算容器尺寸
+  // 检测是否为移动设备
+  const [isMobile, setIsMobile] = useState(() => {
+    return window.innerWidth <= 768 || 'ontouchstart' in window;
+  });
+
+  // 计算容器尺寸和设备类型
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -111,6 +116,9 @@ const SkillsGraph: React.FC = () => {
         const newHeight = height || 800;
         console.log('SkillsGraph dimensions:', { width: newWidth, height: newHeight });
         setDimensions({ width: newWidth, height: newHeight });
+
+        // 更新移动设备检测
+        setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
       }
     };
 
@@ -408,10 +416,14 @@ const SkillsGraph: React.FC = () => {
         enablePanInteraction={true}
         enableNodeDrag={true}
         nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
-          // 增大节点可点击区域
+          // 移动端使用更大的触摸区域，提升节点拖拽识别
+          // 桌面端: 12px 半径
+          // 移动端: 20px 半径（约 40px 直径，适合手指触摸）
+          const touchRadius = isMobile ? 20 : 12;
+
           ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.arc(node.x, node.y, 10, 0, 2 * Math.PI); // 适配缩小的节点
+          ctx.arc(node.x, node.y, touchRadius, 0, 2 * Math.PI);
           ctx.fill();
         }}
         d3AlphaDecay={0.02}

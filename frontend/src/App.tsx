@@ -13,7 +13,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentScreen, setCurrentScreen] = useState(0);
   const [isAnyFileManagerMaximized, setIsAnyFileManagerMaximized] = useState(false);
-  const [isChatExpanded, setIsChatExpanded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [triggerContactFolder, setTriggerContactFolder] = useState(0);
 
@@ -150,7 +149,6 @@ function App() {
           currentScreen={currentScreen}
           onScreenChange={handleScreenChange}
           onAnyFileManagerMaximizedChange={setIsAnyFileManagerMaximized}
-          onChatExpandedChange={setIsChatExpanded}
           triggerContactFolder={triggerContactFolder}
           photographyData={{
             categories: photoCategories,
@@ -162,7 +160,7 @@ function App() {
         <BottomDock
           currentScreen={currentScreen}
           onScreenChange={handleScreenChange}
-          isHidden={isAnyFileManagerMaximized || isChatExpanded}
+          isHidden={isAnyFileManagerMaximized}
         />
       </DesktopContainer>
 
