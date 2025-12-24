@@ -221,7 +221,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* KyleInteractive - 顶部 */}
           <div className="w-full h-32 flex-shrink-0">
-            <KyleInteractive onChatExpandedChange={onChatExpandedChange} />
+            <KyleInteractive onChatExpandedChange={handleChatExpandedChange} />
           </div>
 
           {/* 所有文件夹 - 水平并排 */}
