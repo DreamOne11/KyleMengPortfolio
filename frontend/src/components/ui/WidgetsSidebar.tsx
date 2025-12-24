@@ -62,7 +62,7 @@ const WidgetsSidebar: React.FC<WidgetsSidebarProps> = ({
 
   // Responsive container classes - using viewport units with breakpoints for different screen sizes
   const getContainerClass = () => {
-    if (responsive.isMobile) return 'w-full min-h-[500px] flex-col';
+    if (responsive.isMobile) return 'w-full h-[400px] flex-col';
     if (responsive.isTablet) return 'w-[16vw] h-[50vh] flex-col';
     // Desktop: 小屏幕（笔记本）用较大值，大屏幕（外接显示器）用较小值
     // 基础桌面（1024-1440px）: 25vw, 45vh
