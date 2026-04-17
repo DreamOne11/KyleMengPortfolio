@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PhotoCategory {
+  id          BigInt    @id @default(autoincrement())
+  createdAt   DateTime? @map("created_at") @db.Timestamp(6)
+  description String?
+  displayName String    @map("display_name") @db.VarChar(100)
+  iconColor   String?   @map("icon_color") @db.VarChar(20)
+  name        String    @unique(map: "ukjhxrhq2p1ylg6x0nirigiov3j") @db.VarChar(100)
+  sortOrder   Int?      @map("sort_order")
+  updatedAt   DateTime? @updatedAt @map("updated_at") @db.Timestamp(6)
+  photos      Photo[]
+
+  @@map("photo_categories")
+}
+
+model Photo {
+  id            BigInt        @id @default(autoincrement())
+  createdAt     DateTime?     @map("created_at") @db.Timestamp(6)
+  description   String?
+  filePath      String        @map("file_path") @db.VarChar(500)
+  likes_count   BigInt?
+  location      String?       @db.VarChar(200)
+  taken_at      DateTime?     @db.Timestamp(6)
+  thumbnailPath String?       @map("thumbnail_path") @db.VarChar(500)
+  title         String        @db.VarChar(200)
+  updatedAt     DateTime?     @updatedAt @map("updated_at") @db.Timestamp(6)
+  categoryId    BigInt        @map("category_id")
+  category      PhotoCategory @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fkrk928x1onmsd3tf6r9pal3xhc")
+
+  @@map("photos")
+}

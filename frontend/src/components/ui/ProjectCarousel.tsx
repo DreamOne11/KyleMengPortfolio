@@ -358,11 +358,9 @@ const ProjectCarousel: React.FC<ProjectCarouselProps> = ({
         })}
       </div>
 
-      {/* Pagination dots - right side vertical, only show during drag/transition */}
+      {/* Pagination dots - right side vertical, always visible to hint users */}
       <div
-        className={`absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 transition-opacity duration-300 ${
-          isDragging || isTransitioning ? 'opacity-100' : 'opacity-0'
-        }`}
+        className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 opacity-100"
         style={{ pointerEvents: 'none' }}
       >
         {projects.map((_, index) => (

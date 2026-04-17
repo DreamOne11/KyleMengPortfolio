@@ -20,7 +20,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Spring Boot Backend
+  # Node.js TypeScript Backend
   backend:
     build:
       context: ../backend
@@ -31,9 +31,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: jdbc:postgresql://postgres:5432/kyle_portfolio
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/kyle_portfolio
       FRONTEND_URL: http://localhost:3000
       PORT: 8080
     ports:
@@ -43,7 +42,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 15s
 
 volumes:
   postgres_data:

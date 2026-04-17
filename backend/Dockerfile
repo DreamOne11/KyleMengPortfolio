@@ -1,35 +1,34 @@
-# Multi-stage build for Kyle Meng Portfolio Backend
-
 # Stage 1: Build
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy source code and build
+COPY prisma ./prisma
+RUN npx prisma generate
+
+COPY tsconfig.json ./
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN npm run build
+
+RUN npm ci --omit=dev
 
 # Stage 2: Runtime
-FROM eclipse-temurin:17-jre-alpine
+FROM node:22-alpine AS runtime
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
-# Copy JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build --chown=appuser:appgroup /app/dist ./dist
+COPY --from=build --chown=appuser:appgroup /app/node_modules ./node_modules
+COPY --from=build --chown=appuser:appgroup /app/prisma ./prisma
+COPY --from=build --chown=appuser:appgroup /app/package.json ./package.json
 
-# Expose port
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
 
-# Run application
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
-
+CMD ["node", "dist/server.js"]
