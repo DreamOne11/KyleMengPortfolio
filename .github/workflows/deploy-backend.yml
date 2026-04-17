@@ -82,8 +82,10 @@ jobs:
             cd /opt/kyle-portfolio
             sudo tar -xzf /tmp/backend-deploy.tar.gz
             sudo npm ci --omit=dev
-            sudo npx prisma generate
-            sudo npx prisma migrate deploy
+            # Load DATABASE_URL from .env.production for Prisma commands
+            export $(grep -v '^#' /opt/kyle-portfolio/.env.production | xargs)
+            sudo -E npx prisma generate
+            sudo -E npx prisma migrate deploy
             sudo chown -R ubuntu:ubuntu /opt/kyle-portfolio
             rm /tmp/backend-deploy.tar.gz
 
