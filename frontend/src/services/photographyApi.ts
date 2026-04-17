@@ -79,16 +79,13 @@ export class PhotographyApiService {
 
   // Get photos by category ID with optional pagination
   static async getPhotosByCategory(
-    categoryId: number, 
+    categoryId: number,
     params?: PaginationParams
   ): Promise<PhotoResponse[]> {
-    const response = await apiClient.get<PhotoResponse[]>(`/photos/category/${categoryId}`, {
-      params: {
-        page: params?.page || 0,
-        size: params?.size || 20
-      }
-    });
-    return response.data;
+    const queryParams = params ? { page: params.page ?? 0, size: params.size ?? 20 } : undefined;
+    const response = await apiClient.get(`/photos/category/${categoryId}`, { params: queryParams });
+    const data = response.data;
+    return Array.isArray(data) ? data : (data.content ?? []);
   }
 
   // Get specific photo by ID
@@ -117,13 +114,10 @@ export class PhotographyApiService {
 
   // Get all photos with optional pagination
   static async getAllPhotos(params?: PaginationParams): Promise<PhotoResponse[]> {
-    const response = await apiClient.get<PhotoResponse[]>('/photos', {
-      params: {
-        page: params?.page || 0,
-        size: params?.size || 20
-      }
-    });
-    return response.data;
+    const queryParams = params ? { page: params.page ?? 0, size: params.size ?? 20 } : undefined;
+    const response = await apiClient.get('/photos', { params: queryParams });
+    const data = response.data;
+    return Array.isArray(data) ? data : (data.content ?? []);
   }
 
   // Health check endpoint to test API connection
