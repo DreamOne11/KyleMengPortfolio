@@ -12,28 +12,47 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
-      - name: Build with Maven
+      - name: Install dependencies
         run: |
           cd backend
-          mvn clean package -DskipTests
-        
-      - name: Create deployment package
+          npm ci
+
+      - name: Generate Prisma client
         run: |
-          cd backend/target
-          mv portfolio-0.0.1-SNAPSHOT.jar portfolio.jar
-          
+          cd backend
+          npx prisma generate
+
+      - name: Build TypeScript
+        run: |
+          cd backend
+          npm run build
+
+      - name: Run tests
+        run: |
+          cd backend
+          npm test
+
+      - name: Create deployment archive
+        run: |
+          cd backend
+          tar -czf ../backend-deploy.tar.gz \
+            dist/ \
+            prisma/ \
+            package.json \
+            package-lock.json
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -41,62 +60,67 @@ jobs:
           chmod 600 ~/.ssh/deploy_key.pem
           ssh-keyscan -H ${{ secrets.FRONTEND_EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Frontend EC2 (Merged Server)
+      - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.FRONTEND_EC2_HOST }}
         run: |
-          # Upload JAR file
-          scp -i ~/.ssh/deploy_key.pem backend/target/portfolio.jar ubuntu@${EC2_HOST}:/opt/kyle-portfolio/portfolio.jar.new
-          
-          # Deploy on EC2
+          scp -i ~/.ssh/deploy_key.pem backend-deploy.tar.gz ubuntu@${EC2_HOST}:/tmp/backend-deploy.tar.gz
+
           ssh -i ~/.ssh/deploy_key.pem ubuntu@${EC2_HOST} << 'ENDSSH'
-            # Backup current version
-            if [ -f /opt/kyle-portfolio/portfolio.jar ]; then
-              sudo cp /opt/kyle-portfolio/portfolio.jar /opt/kyle-portfolio/portfolio.jar.backup.$(date +%Y%m%d_%H%M%S)
+            set -e
+
+            # Backup current dist
+            if [ -d /opt/kyle-portfolio/dist ]; then
+              sudo tar -czf /opt/kyle-portfolio/dist.backup.$(date +%Y%m%d_%H%M%S).tar.gz \
+                -C /opt/kyle-portfolio dist/ 2>/dev/null || true
             fi
-            
+
             # Stop service
             sudo systemctl stop kyle-portfolio
-            
-            # Replace JAR
-            sudo mv /opt/kyle-portfolio/portfolio.jar.new /opt/kyle-portfolio/portfolio.jar
-            sudo chown ubuntu:ubuntu /opt/kyle-portfolio/portfolio.jar
-            
+
+            # Deploy new build
+            cd /opt/kyle-portfolio
+            sudo tar -xzf /tmp/backend-deploy.tar.gz
+            sudo npm ci --omit=dev
+            sudo npx prisma generate
+            sudo npx prisma migrate deploy
+            sudo chown -R ubuntu:ubuntu /opt/kyle-portfolio
+            rm /tmp/backend-deploy.tar.gz
+
             # Start service
             sudo systemctl start kyle-portfolio
-            
-            # Wait for service to start
             sleep 5
-            
-            # Check if service is running
+
+            # Verify service started
             if sudo systemctl is-active --quiet kyle-portfolio; then
-              echo "✓ Service started successfully"
+              echo "Service started successfully"
             else
-              echo "✗ Service failed to start"
+              echo "Service failed to start"
               sudo journalctl -u kyle-portfolio -n 50 --no-pager
               exit 1
             fi
-            
-            # Check health endpoint
-            if curl -f http://localhost:8080/api/health; then
-              echo "✓ Health check passed"
+
+            # Health check
+            if curl -sf http://localhost:8080/api/health; then
+              echo "Health check passed"
             else
-              echo "! Health check failed"
+              echo "Health check failed"
               sudo journalctl -u kyle-portfolio -n 20 --no-pager
+              exit 1
             fi
           ENDSSH
 
       - name: Send notification
         if: always()
         run: |
-          if [ ${{ job.status }} == 'success' ]; then
-            echo "✅ Backend deployment successful!"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "Backend deployment successful"
           else
-            echo "❌ Backend deployment failed!"
+            echo "Backend deployment failed"
           fi
 
       - name: Cleanup
         if: always()
         run: |
           rm -f ~/.ssh/deploy_key.pem
-
+          rm -f backend-deploy.tar.gz
