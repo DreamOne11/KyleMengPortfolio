@@ -1,67 +1,114 @@
 # Kyle Meng Portfolio
 
-A modern, full-stack portfolio website showcasing my projects and skills.
+A full-stack portfolio website with a desktop OS-inspired interface, featuring interactive windows, 3D elements, and a photography showcase.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 ### Frontend
-- **React** with TypeScript
-- **Tailwind CSS** for styling
-- **Responsive Design** for all devices
+- **React 18** + TypeScript
+- **Tailwind CSS** with custom breakpoints
+- **Three.js** / React Three Fiber — 3D model rendering
+- **GSAP** — animations and transitions
+- **Axios** — API communication
+- **CRACO** — Create React App configuration overrides
 
 ### Backend
-- **Java Spring Boot**
-- **Maven** for dependency management
-- **PostgreSQL** database
+- **Fastify** (Node.js) + TypeScript
+- **Prisma ORM** — database access and migrations
+- **PostgreSQL** — persistent storage
+- **@sinclair/typebox** — runtime schema validation
 
 ### Deployment
-- **Docker** containerization
-- **Cloud deployment** ready
+- **AWS EC2** — both frontend and backend
+- **Nginx** — static file serving + reverse proxy (`/api` → Node.js)
+- **GitHub Actions** — CI/CD pipelines (separate workflows for frontend/backend)
+- **systemd** — backend process management
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-├── frontend/          # React frontend application
-├── backend/           # Spring Boot backend application  
-├── deployment/        # Deployment configuration files
-└── docs/             # Project documentation
+├── frontend/                  # React TypeScript application
+│   └── src/
+│       ├── components/
+│       │   ├── layout/        # DesktopContainer, TopBar, Screen, BottomDock
+│       │   ├── screens/       # AboutMe, MyWork, MyNote, Photography screens
+│       │   ├── ui/            # CardCarousel, ParticleBackground, LoadingScreen, etc.
+│       │   ├── windows/       # FileManager, EmailComposer, ProjectDetailWindow
+│       │   ├── icons/         # MacOS-style icon components
+│       │   └── models/        # Three.js 3D model components
+│       ├── services/          # API service layer (photographyApi.ts)
+│       ├── types/             # TypeScript type definitions
+│       ├── utils/             # responsive.ts, helper utilities
+│       └── data/              # Static data (filesystem simulation)
+│
+├── backend/                   # Fastify Node.js application
+│   └── src/
+│       ├── config/            # Environment configuration
+│       ├── plugins/           # Fastify plugins (database, cors, sensible)
+│       ├── routes/            # HTTP route handlers (photos, health)
+│       ├── services/          # Business logic (photoService.ts)
+│       └── types/             # API response type schemas
+│   └── prisma/
+│       ├── schema.prisma      # Database schema (PhotoCategory, Photo)
+│       └── migrations/        # SQL migration history
+│
+├── .github/workflows/
+│   ├── deploy-frontend.yml    # Build & deploy React app to EC2
+│   └── deploy-backend.yml     # Build, test & deploy Node.js app to EC2
+│
+└── deployment/                # Server configuration files
 ```
 
-## 🛠️ Development Setup
+## Development Setup
+
+### Prerequisites
+- Node.js 22+
+- PostgreSQL running locally
+
+### Backend
+```bash
+cd backend
+cp .env.example .env        # set DATABASE_URL, PORT, FRONTEND_URL
+npm install
+npx prisma generate
+npx prisma migrate deploy
+npm run build
+npm start                   # runs on http://localhost:8080
+```
 
 ### Frontend
 ```bash
 cd frontend
 npm install
-npm start
+npm start                   # runs on http://localhost:3000
 ```
 
-### Backend
-```bash
-cd backend
-mvn clean install
-mvn spring-boot:run
-```
+The dev frontend proxies `/api` requests to `http://localhost:8080` via the `REACT_APP_API_URL` environment variable.
 
-## ✨ Features
+## API Endpoints
 
-- **Modern Desktop-like Interface**: Intuitive user experience
-- **About Me Section**: Personal introduction and resume access
-- **Real-time Updates**: Live time and weather display
-- **Responsive Design**: Works on all screen sizes
-- **Resume Integration**: View and download functionality
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | Health check |
+| GET | `/api/photo-categories` | All photo categories with counts |
+| GET | `/api/photo-categories/:id` | Single category |
+| GET | `/api/photos` | All photos (optional `?page=&size=`) |
+| GET | `/api/photos/:id` | Single photo |
+| GET | `/api/photos/category/:categoryId` | Photos by category (optional `?page=&size=`) |
 
-## 🎨 Design Principles
+## Key Features
 
-- Clean, minimalist interface
-- Smooth animations and transitions
-- Professional color scheme
-- User-friendly navigation
+- **Desktop OS metaphor** — swipeable screens, draggable/resizable windows, dock navigation
+- **Photography showcase** — card carousel with 3D stack effect, folder-based gallery viewer
+- **3D interactive avatar** — Three.js model with performance-aware rendering
+- **Particle background** — GPU-optimized, adapts to device performance level
+- **Responsive scaling** — scales from 320px mobile to 1920px desktop using a single base design
+- **Onboarding tutorial** — first-visit walkthrough
 
-## 📧 Contact
+## Deployment
 
-Feel free to reach out for collaboration opportunities!
+Both services deploy automatically on push to `main` when their respective paths change (`frontend/**` or `backend/**`). The backend runs under systemd at `/opt/kyle-portfolio` and is proxied through Nginx.
 
 ---
 
-© 2024 Kyle Meng. All rights reserved. 
+© 2025 Kyle Meng. All rights reserved.
