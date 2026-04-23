@@ -29,25 +29,25 @@ const CATEGORIES = [
 
 const PHOTOS_PER_CATEGORY: Record<string, Array<{ title: string; filePath: string; thumbnailPath: string }>> = {
   portrait: [
-    { title: 'Portrait 1', filePath: '/photos/photography/portrait/DSC_4769-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_4769-full.webp' },
-    { title: 'Portrait 2', filePath: '/photos/photography/portrait/DSC_4770-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_4770-full.webp' },
-    { title: 'Portrait 3', filePath: '/photos/photography/portrait/DSC_4771-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_4771-full.webp' },
-    { title: 'Portrait 4', filePath: '/photos/photography/portrait/DSC_4772-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_4772-full.webp' },
-    { title: 'Portrait 5', filePath: '/photos/photography/portrait/DSC_4773-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_4773-full.webp' },
+    { title: 'Portrait Study 1', filePath: '/photos/photography/portrait/thumbnails/DSC_4769-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_4769-card.webp' },
+    { title: 'Portrait Study 2', filePath: '/photos/photography/portrait/thumbnails/DSC_6428-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/DSC_6428-card.webp' },
+    { title: 'Portrait Study 3', filePath: '/photos/photography/portrait/thumbnails/IMG_2781-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/IMG_2781-card.webp' },
+    { title: 'Portrait Study 4', filePath: '/photos/photography/portrait/thumbnails/IMG_2923-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/IMG_2923-card.webp' },
+    { title: 'Portrait Study 5', filePath: '/photos/photography/portrait/thumbnails/IMG_4382-full.webp', thumbnailPath: '/photos/photography/portrait/thumbnails/IMG_4382-card.webp' },
   ],
   landscape: [
-    { title: 'Landscape 1', filePath: '/photos/photography/landscape/DSC_5001-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_5001-full.webp' },
-    { title: 'Landscape 2', filePath: '/photos/photography/landscape/DSC_5002-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_5002-full.webp' },
-    { title: 'Landscape 3', filePath: '/photos/photography/landscape/DSC_5003-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_5003-full.webp' },
-    { title: 'Landscape 4', filePath: '/photos/photography/landscape/DSC_5004-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_5004-full.webp' },
-    { title: 'Landscape 5', filePath: '/photos/photography/landscape/DSC_5005-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_5005-full.webp' },
+    { title: 'Mountain Vista', filePath: '/photos/photography/landscape/thumbnails/DSC_1093-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_1093-card.webp' },
+    { title: 'Serene Waters', filePath: '/photos/photography/landscape/thumbnails/DSC_1174-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_1174-card.webp' },
+    { title: 'Natural Beauty', filePath: '/photos/photography/landscape/thumbnails/DSC_1180-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_1180-card.webp' },
+    { title: 'Wilderness Scene', filePath: '/photos/photography/landscape/thumbnails/DSC_1190-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_1190-card.webp' },
+    { title: 'Scenic Overlook', filePath: '/photos/photography/landscape/thumbnails/DSC_1195-full.webp', thumbnailPath: '/photos/photography/landscape/thumbnails/DSC_1195-card.webp' },
   ],
   humanist: [
-    { title: 'Humanist 1', filePath: '/photos/photography/humanist/DSC_6001-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_6001-full.webp' },
-    { title: 'Humanist 2', filePath: '/photos/photography/humanist/DSC_6002-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_6002-full.webp' },
-    { title: 'Humanist 3', filePath: '/photos/photography/humanist/DSC_6003-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_6003-full.webp' },
-    { title: 'Humanist 4', filePath: '/photos/photography/humanist/DSC_6004-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_6004-full.webp' },
-    { title: 'Humanist 5', filePath: '/photos/photography/humanist/DSC_6005-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_6005-full.webp' },
+    { title: 'Human Connection', filePath: '/photos/photography/humanist/thumbnails/DSC_3590-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_3590-card.webp' },
+    { title: 'Daily Life', filePath: '/photos/photography/humanist/thumbnails/DSC_3592-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_3592-card.webp' },
+    { title: 'Cultural Expression', filePath: '/photos/photography/humanist/thumbnails/DSC_3595-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_3595-card.webp' },
+    { title: 'Social Documentary', filePath: '/photos/photography/humanist/thumbnails/DSC_3597-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_3597-card.webp' },
+    { title: 'Life Stories', filePath: '/photos/photography/humanist/thumbnails/DSC_3642-full.webp', thumbnailPath: '/photos/photography/humanist/thumbnails/DSC_3642-card.webp' },
   ],
 };
 
