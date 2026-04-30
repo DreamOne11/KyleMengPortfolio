@@ -5,6 +5,10 @@ backend/node_modules/
 /.pnp
 .pnp.js
 
+# Local agent instructions
+CLAUDE.md
+AGENTS.md
+
 # Production builds
 frontend/build/
 backend/target/
