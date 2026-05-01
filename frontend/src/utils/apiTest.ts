@@ -41,7 +41,7 @@ export const testPhotographyApi = async () => {
 };
 
 // Auto-run test in development
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   // Only run in browser context, not during build
   if (typeof window !== 'undefined') {
     // Delay execution to allow other modules to load

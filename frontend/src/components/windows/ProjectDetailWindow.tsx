@@ -55,7 +55,7 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
   // 触摸事件相关引用
   const lastTapTimeRef = useRef<number>(0);
   const tapPositionRef = useRef<{x: number, y: number}>({x: 0, y: 0});
-  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 移动设备交互模式判断
   const isMobileDevice = responsive.isMobile;
@@ -544,4 +544,4 @@ const ProjectDetailWindow: React.FC<Props> = ({ project, onClose, onFocus, windo
   );
 };
 
-export default ProjectDetailWindow; 
+export default ProjectDetailWindow;

@@ -10,8 +10,8 @@ import {
 // API Base Configuration
 // 使用环境变量或默认值
 // 生产环境使用相对路径（通过 Nginx 反向代理）
-const API_BASE_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'production' 
+const API_BASE_URL = import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD
     ? '/api'  // 生产环境：通过 Nginx 代理访问后端
     : 'http://localhost:8080/api');    // 本地开发地址
 
