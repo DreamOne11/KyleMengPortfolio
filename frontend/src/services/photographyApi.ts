@@ -6,6 +6,11 @@ import {
   ApiError,
   PaginationParams
 } from '../types/photography';
+import {
+  localPhotoCategories,
+  localPhotos,
+  localPhotosByCategory
+} from '../data/localPhotographyFallback';
 
 // API Base Configuration
 // 使用环境变量或默认值
@@ -23,6 +28,31 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+const isLocalFallbackEnabled = import.meta.env.DEV;
+
+const normalizePhotoPath = (path?: string | null): string => {
+  if (!path) return '';
+  return path.replace(/^\/photos\/photography\//, '/images/photography/');
+};
+
+const normalizePhoto = (photo: PhotoResponse): PhotoResponse => ({
+  ...photo,
+  filePath: normalizePhotoPath(photo.filePath),
+  thumbnailPath: normalizePhotoPath(photo.thumbnailPath),
+});
+
+const normalizePhotos = (photos: PhotoResponse[]): PhotoResponse[] => photos.map(normalizePhoto);
+
+const hasRenderablePhotos = (photos: PhotoResponse[]): boolean =>
+  photos.some(photo => Boolean(photo.thumbnailPath || photo.filePath));
+
+const paginate = (photos: PhotoResponse[], params?: PaginationParams): PhotoResponse[] => {
+  if (!params || params.page === undefined || params.size === undefined) return photos;
+
+  const start = params.page * params.size;
+  return photos.slice(start, start + params.size);
+};
 
 // Request interceptor for adding auth tokens (if needed in future)
 apiClient.interceptors.request.use(
@@ -67,14 +97,38 @@ apiClient.interceptors.response.use(
 export class PhotographyApiService {
   // Get all photo categories with photo counts
   static async getPhotoCategories(): Promise<PhotoCategoryResponse[]> {
-    const response = await apiClient.get<PhotoCategoryResponse[]>('/photo-categories');
-    return response.data;
+    try {
+      const response = await apiClient.get<PhotoCategoryResponse[]>('/photo-categories');
+      const categories = response.data;
+
+      if (isLocalFallbackEnabled && categories.every(category => category.photoCount === 0)) {
+        return localPhotoCategories;
+      }
+
+      return categories;
+    } catch (error) {
+      if (isLocalFallbackEnabled) {
+        console.warn('Using local photography fallback categories:', error);
+        return localPhotoCategories;
+      }
+
+      throw error;
+    }
   }
 
   // Get specific photo category by ID
   static async getPhotoCategoryById(id: number): Promise<PhotoCategoryResponse> {
-    const response = await apiClient.get<PhotoCategoryResponse>(`/photo-categories/${id}`);
-    return response.data;
+    try {
+      const response = await apiClient.get<PhotoCategoryResponse>(`/photo-categories/${id}`);
+      return response.data;
+    } catch (error) {
+      const fallbackCategory = localPhotoCategories.find(category => category.id === id);
+      if (isLocalFallbackEnabled && fallbackCategory) {
+        return fallbackCategory;
+      }
+
+      throw error;
+    }
   }
 
   // Get photos by category ID with optional pagination
@@ -82,42 +136,81 @@ export class PhotographyApiService {
     categoryId: number,
     params?: PaginationParams
   ): Promise<PhotoResponse[]> {
-    const queryParams = params ? { page: params.page ?? 0, size: params.size ?? 20 } : undefined;
-    const response = await apiClient.get(`/photos/category/${categoryId}`, { params: queryParams });
-    const data = response.data;
-    return Array.isArray(data) ? data : (data.content ?? []);
+    try {
+      const queryParams = params ? { page: params.page ?? 0, size: params.size ?? 20 } : undefined;
+      const response = await apiClient.get(`/photos/category/${categoryId}`, { params: queryParams });
+      const data = response.data;
+      const photos = normalizePhotos(Array.isArray(data) ? data : (data.content ?? []));
+
+      if (isLocalFallbackEnabled && !hasRenderablePhotos(photos) && localPhotosByCategory[categoryId]) {
+        return paginate(localPhotosByCategory[categoryId], params);
+      }
+
+      return photos;
+    } catch (error) {
+      if (isLocalFallbackEnabled && localPhotosByCategory[categoryId]) {
+        console.warn(`Using local photography fallback photos for category ${categoryId}:`, error);
+        return paginate(localPhotosByCategory[categoryId], params);
+      }
+
+      throw error;
+    }
   }
 
   // Get specific photo by ID
   static async getPhotoById(id: number): Promise<PhotoResponse> {
-    const response = await apiClient.get<PhotoResponse>(`/photos/${id}`);
-    return response.data;
+    try {
+      const response = await apiClient.get<PhotoResponse>(`/photos/${id}`);
+      return normalizePhoto(response.data);
+    } catch (error) {
+      const fallbackPhoto = localPhotos.find(photo => photo.id === id);
+      if (isLocalFallbackEnabled && fallbackPhoto) {
+        return fallbackPhoto;
+      }
+
+      throw error;
+    }
   }
 
   // Get popular photos ordered by likes count
   static async getPopularPhotos(): Promise<PhotoResponse[]> {
     const response = await apiClient.get<PhotoResponse[]>('/photos/popular');
-    return response.data;
+    return normalizePhotos(response.data);
   }
 
   // Get top photos by likes count
   static async getTopPhotos(): Promise<PhotoResponse[]> {
     const response = await apiClient.get<PhotoResponse[]>('/photos/top');
-    return response.data;
+    return normalizePhotos(response.data);
   }
 
   // Get popular photos by category ordered by likes count
   static async getPopularPhotosByCategory(categoryId: number): Promise<PhotoResponse[]> {
     const response = await apiClient.get<PhotoResponse[]>(`/photos/category/${categoryId}/popular`);
-    return response.data;
+    return normalizePhotos(response.data);
   }
 
   // Get all photos with optional pagination
   static async getAllPhotos(params?: PaginationParams): Promise<PhotoResponse[]> {
-    const queryParams = params ? { page: params.page ?? 0, size: params.size ?? 20 } : undefined;
-    const response = await apiClient.get('/photos', { params: queryParams });
-    const data = response.data;
-    return Array.isArray(data) ? data : (data.content ?? []);
+    try {
+      const queryParams = params ? { page: params.page ?? 0, size: params.size ?? 20 } : undefined;
+      const response = await apiClient.get('/photos', { params: queryParams });
+      const data = response.data;
+      const photos = normalizePhotos(Array.isArray(data) ? data : (data.content ?? []));
+
+      if (isLocalFallbackEnabled && !hasRenderablePhotos(photos)) {
+        return paginate(localPhotos, params);
+      }
+
+      return photos;
+    } catch (error) {
+      if (isLocalFallbackEnabled) {
+        console.warn('Using local photography fallback photos:', error);
+        return paginate(localPhotos, params);
+      }
+
+      throw error;
+    }
   }
 
   // Health check endpoint to test API connection
