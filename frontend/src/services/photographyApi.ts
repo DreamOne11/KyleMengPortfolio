@@ -31,15 +31,17 @@ const apiClient = axios.create({
 
 const isLocalFallbackEnabled = import.meta.env.DEV;
 
-const normalizePhotoPath = (path?: string | null): string => {
+const normalizeLocalPhotoPath = (path?: string | null): string => {
   if (!path) return '';
+  if (!isLocalFallbackEnabled) return path;
+
   return path.replace(/^\/photos\/photography\//, '/images/photography/');
 };
 
 const normalizePhoto = (photo: PhotoResponse): PhotoResponse => ({
   ...photo,
-  filePath: normalizePhotoPath(photo.filePath),
-  thumbnailPath: normalizePhotoPath(photo.thumbnailPath),
+  filePath: normalizeLocalPhotoPath(photo.filePath),
+  thumbnailPath: normalizeLocalPhotoPath(photo.thumbnailPath),
 });
 
 const normalizePhotos = (photos: PhotoResponse[]): PhotoResponse[] => photos.map(normalizePhoto);
