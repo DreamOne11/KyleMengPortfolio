@@ -5,12 +5,12 @@ A full-stack portfolio website with a desktop OS-inspired interface, featuring i
 ## Tech Stack
 
 ### Frontend
-- **React 18** + TypeScript
+- **React 19** + TypeScript
+- **Vite** — frontend dev server and production build
 - **Tailwind CSS** with custom breakpoints
 - **Three.js** / React Three Fiber — 3D model rendering
 - **GSAP** — animations and transitions
 - **Axios** — API communication
-- **CRACO** — Create React App configuration overrides
 
 ### Backend
 - **Fastify** (Node.js) + TypeScript
@@ -83,7 +83,7 @@ npm install
 npm start                   # runs on http://localhost:3000
 ```
 
-The dev frontend proxies `/api` requests to `http://localhost:8080` via the `REACT_APP_API_URL` environment variable.
+The dev frontend proxies `/api` requests to `http://localhost:8080`. Set `VITE_API_URL` when you need to override the API base URL.
 
 ## API Endpoints
 

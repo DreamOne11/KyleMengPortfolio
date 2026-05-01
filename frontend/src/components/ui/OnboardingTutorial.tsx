@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useResponsive } from '../../utils/responsive';
 
 type Props = {
@@ -23,7 +23,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
   const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
   const observerRef = useRef<MutationObserver | null>(null);
 
-  const steps: Step[] = [
+  const steps: Step[] = useMemo(() => [
     {
       id: 0,
       title: 'Welcome to my Portfolio 👋',
@@ -53,7 +53,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       targetSelector: '.kyle-interactive',
       tooltipPosition: 'left',
     },
-  ];
+  ], [onTriggerContactFolder, responsive.isMobile]);
 
   const currentStepData = steps[currentStep];
 
@@ -64,7 +64,18 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
     const element = document.querySelector(currentStepData.targetSelector);
     if (element) {
       const rect = element.getBoundingClientRect();
-      setHighlightRect(rect);
+      setHighlightRect(prev => {
+        if (
+          prev &&
+          Math.round(prev.top) === Math.round(rect.top) &&
+          Math.round(prev.left) === Math.round(rect.left) &&
+          Math.round(prev.width) === Math.round(rect.width) &&
+          Math.round(prev.height) === Math.round(rect.height)
+        ) {
+          return prev;
+        }
+        return rect;
+      });
 
       // Calculate tooltip position
       const padding = 20;
@@ -147,10 +158,19 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
         }
       }
 
-      setTooltipPosition({ top, left });
+      setTooltipPosition(prev => {
+        if (
+          prev &&
+          Math.round(prev.top) === Math.round(top) &&
+          Math.round(prev.left) === Math.round(left)
+        ) {
+          return prev;
+        }
+        return { top, left };
+      });
     } else {
-      setHighlightRect(null);
-      setTooltipPosition(null);
+      setHighlightRect(prev => (prev === null ? prev : null));
+      setTooltipPosition(prev => (prev === null ? prev : null));
     }
   }, [currentStepData, currentStep]);
 
@@ -186,7 +206,7 @@ const OnboardingTutorial: React.FC<Props> = ({ onComplete, onTriggerContactFolde
       window.removeEventListener('scroll', updatePositions, true);
       clearInterval(retryInterval);
     };
-  }, [currentStep, highlightRect, updatePositions]);
+  }, [currentStep, updatePositions]);
 
   // Auto-trigger action for current step
   useEffect(() => {

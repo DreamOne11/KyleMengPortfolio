@@ -20,7 +20,7 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
   useEffect(() => {
     if (!responsive.isMobile) return;
 
-    let scrollTimer: NodeJS.Timeout;
+    let scrollTimer: ReturnType<typeof setTimeout>;
 
     const handleScroll = () => {
       setIsScrolling(true);
@@ -141,4 +141,4 @@ const BottomDock: React.FC<Props> = ({ currentScreen, onScreenChange, isHidden }
   );
 };
 
-export default BottomDock; 
+export default BottomDock;
