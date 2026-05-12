@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 
+export const DESKTOP_SCREEN_WIDTH = 1400;
+export const DESKTOP_SCREEN_HEIGHT = 900;
+
 // 设备类型检测
 export const isMobile = () => window.innerWidth <= 768;
 export const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024;
@@ -25,6 +28,21 @@ export const getResponsiveScale = () => {
   if (width <= 1024) return 0.9;
   if (width <= 1440) return 0.95;
   return Math.min(1, window.innerWidth / 1600);
+};
+
+// 固定桌面画布在浏览器视口中的占比，所有桌面布局只通过这一层缩放。
+export const getDesktopScreenScale = () => {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  if (width <= 768) return 1;
+
+  const targetWidthRatio = 0.78;
+  const verticalSafeArea = 48;
+  const scaleByWidth = (width * targetWidthRatio) / DESKTOP_SCREEN_WIDTH;
+  const scaleByHeight = Math.max(height - verticalSafeArea, 320) / DESKTOP_SCREEN_HEIGHT;
+
+  return Math.min(scaleByWidth, scaleByHeight);
 };
 
 // 响应式窗口大小计算

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
 // @ts-ignore
 import ForceGraph2D from 'react-force-graph-2d';
 
@@ -88,6 +88,7 @@ const transformSkillsData = (): GraphData => {
 const SkillsGraph: React.FC = () => {
   const graphRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const cleanupFrameRef = useRef<number | null>(null);
 
   const [graphData] = useState<GraphData>(() => {
     const data = transformSkillsData();
@@ -101,36 +102,141 @@ const SkillsGraph: React.FC = () => {
   const [highlightNodes, setHighlightNodes] = useState<Set<string>>(new Set());
   const [highlightLinks, setHighlightLinks] = useState<Set<string>>(new Set());
   const [dimensions, setDimensions] = useState({ width: 1000, height: 800 });
+  const [screenScale, setScreenScale] = useState(1);
 
   // 检测是否为移动设备
   const [isMobile, setIsMobile] = useState(() => {
     return window.innerWidth <= 768 || 'ontouchstart' in window;
   });
 
+  const getParentScreenScale = useCallback(() => {
+    const screen = containerRef.current?.closest('[data-testid="desktop-screen"]');
+    if (!screen) return 1;
+
+    const computedStyle = window.getComputedStyle(screen);
+    const cssScale = Number(computedStyle.getPropertyValue('--desktop-screen-scale'));
+    if (Number.isFinite(cssScale) && cssScale > 0) return cssScale;
+
+    const transform = computedStyle.transform;
+    if (!transform || transform === 'none') return 1;
+
+    const matrixMatch = transform.match(/^matrix\(([^,]+),/);
+    if (!matrixMatch) return 1;
+
+    const parsedScale = Number(matrixMatch[1]);
+    return Number.isFinite(parsedScale) && parsedScale > 0 ? parsedScale : 1;
+  }, []);
+
   // 计算容器尺寸和设备类型
-  useEffect(() => {
+  useLayoutEffect(() => {
+    let frameId: number | null = null;
+    let secondFrameId: number | null = null;
+
     const updateDimensions = () => {
       if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
+        // Use layout dimensions, not getBoundingClientRect(), because the whole
+        // desktop screen is scaled with a CSS transform. ForceGraph's pointer
+        // picking layer does not compensate for transformed ancestors.
+        const { clientWidth, clientHeight } = containerRef.current;
+        const width = clientWidth;
+        const height = clientHeight;
         const newWidth = width || 1000;
         const newHeight = height || 800;
-        console.log('SkillsGraph dimensions:', { width: newWidth, height: newHeight });
         setDimensions({ width: newWidth, height: newHeight });
+        setScreenScale(getParentScreenScale());
 
         // 更新移动设备检测
         setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
       }
     };
 
-    // 延迟测量以确保容器已渲染
-    const timer = setTimeout(updateDimensions, 100);
+    const scheduleUpdate = () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId);
+      }
+      if (secondFrameId !== null) {
+        cancelAnimationFrame(secondFrameId);
+      }
 
-    window.addEventListener('resize', updateDimensions);
+      frameId = requestAnimationFrame(() => {
+        updateDimensions();
+        secondFrameId = requestAnimationFrame(updateDimensions);
+      });
+    };
+
+    // 延迟测量以确保容器已渲染
+    const timer = setTimeout(scheduleUpdate, 100);
+
+    const observer = new ResizeObserver(updateDimensions);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    const screen = containerRef.current?.closest('[data-testid="desktop-screen"]');
+    const screenObserver = new MutationObserver(scheduleUpdate);
+    if (screen) {
+      screenObserver.observe(screen, {
+        attributes: true,
+        attributeFilter: ['style']
+      });
+    }
+
+    window.addEventListener('resize', scheduleUpdate);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', updateDimensions);
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId);
+      }
+      if (secondFrameId !== null) {
+        cancelAnimationFrame(secondFrameId);
+      }
+      observer.disconnect();
+      screenObserver.disconnect();
+      window.removeEventListener('resize', scheduleUpdate);
     };
-  }, []);
+  }, [getParentScreenScale]);
+
+  const graphDimensions = {
+    width: dimensions.width * screenScale,
+    height: dimensions.height * screenScale
+  };
+  const graphKey = `${Math.round(graphDimensions.width)}x${Math.round(graphDimensions.height)}-${screenScale.toFixed(4)}`;
+
+  useLayoutEffect(() => {
+    const cleanupLeakedCanvases = () => {
+      const host = containerRef.current;
+      if (!host) return;
+
+      const expectedWidth = Math.round(graphDimensions.width);
+      const expectedHeight = Math.round(graphDimensions.height);
+      const containers = Array.from(host.querySelectorAll<HTMLElement>('.force-graph-container'));
+      if (containers.length <= 1) return;
+
+      containers.forEach((container) => {
+        const canvas = container.querySelector('canvas');
+        const canvasWidth = Number(canvas?.getAttribute('width'));
+        const canvasHeight = Number(canvas?.getAttribute('height'));
+        const isCurrentCanvas =
+          Math.abs(canvasWidth - expectedWidth) <= 2 &&
+          Math.abs(canvasHeight - expectedHeight) <= 2;
+
+        if (!isCurrentCanvas) {
+          container.remove();
+        }
+      });
+    };
+
+    cleanupFrameRef.current = requestAnimationFrame(() => {
+      cleanupLeakedCanvases();
+      cleanupFrameRef.current = requestAnimationFrame(cleanupLeakedCanvases);
+    });
+
+    return () => {
+      if (cleanupFrameRef.current !== null) {
+        cancelAnimationFrame(cleanupFrameRef.current);
+      }
+    };
+  }, [graphDimensions.width, graphDimensions.height]);
 
   // 配置 D3 力模拟
   useEffect(() => {
@@ -187,8 +293,8 @@ const SkillsGraph: React.FC = () => {
           // 添加画布边界约束力 - 保持节点在可视区域内
           const boundaryForce = () => {
             // 限制在可视区域内，给予足够空间
-            const maxWidth = dimensions.width * 0.4; // 使用40%的宽度
-            const maxHeight = dimensions.height * 0.4; // 使用40%的高度
+            const maxWidth = graphDimensions.width * 0.4; // 使用40%的宽度
+            const maxHeight = graphDimensions.height * 0.4; // 使用40%的高度
             const strength = 0.2; // 适度约束力
 
             graphData.nodes.forEach((node: any) => {
@@ -222,7 +328,7 @@ const SkillsGraph: React.FC = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [graphData.nodes, dimensions.width, dimensions.height]);
+  }, [graphData.nodes, graphDimensions.width, graphDimensions.height]);
 
   // 处理节点悬停和高亮
   const updateNodeHighlight = useCallback((node: SkillNode | null) => {
@@ -292,7 +398,8 @@ const SkillsGraph: React.FC = () => {
 
     // 节点大小（hover 时稍微放大）
     const sizeMultiplier = isHovered ? 1.15 : 1;
-    const radius = nodeData.val * sizeMultiplier;
+    const drawScale = screenScale;
+    const radius = nodeData.val * sizeMultiplier * drawScale;
 
     // 确保 radius 是有效数值
     if (!isFinite(radius) || radius <= 0) {
@@ -327,23 +434,23 @@ const SkillsGraph: React.FC = () => {
     // globalScale <= 1: 完全隐藏，只在hover时显示
     const label = nodeData.name;
     let shouldShowLabel = false;
-    let fontSize = 11;
+    let fontSize = 11 * drawScale;
     let labelOpacity = opacity * 0.85;
 
     if (globalScale > 2) {
       // 正常显示标签
       shouldShowLabel = true;
-      fontSize = 11;
+      fontSize = 11 * drawScale;
       labelOpacity = opacity * 0.85;
     } else if (globalScale > 1) {
       // 缩放中：字体变小、颜色变浅
       shouldShowLabel = true;
-      fontSize = 9 + (globalScale - 1) * 2; // 9-11px
+      fontSize = (9 + (globalScale - 1) * 2) * drawScale; // 9-11px
       labelOpacity = opacity * 0.4 * globalScale; // 逐渐变浅
     } else {
       // 缩放到很小：只在hover时显示
       shouldShowLabel = isHovered;
-      fontSize = 11;
+      fontSize = 11 * drawScale;
       labelOpacity = opacity * 0.85;
     }
 
@@ -367,7 +474,7 @@ const SkillsGraph: React.FC = () => {
         ctx.fillText(label, node.x, labelY);
       }
     }
-  }, [highlightNodes, hoveredNode]);
+  }, [highlightNodes, hoveredNode, screenScale]);
 
   // 边渲染函数 - Obsidian 风格，统一浅黑色
   const paintLink = useCallback((link: any, ctx: CanvasRenderingContext2D) => {
@@ -384,7 +491,7 @@ const SkillsGraph: React.FC = () => {
 
     const isHighlighted = highlightLinks.size === 0 || highlightLinks.has(linkId);
     const opacity = isHighlighted ? 0.5 : 0.2;
-    const width = isHighlighted ? 1 : 0.7; // 边线更细
+    const width = (isHighlighted ? 1 : 0.7) * screenScale; // 边线更细
 
     // 统一使用浅黑色
     const edgeColor = '#9CA3AF';
@@ -395,43 +502,53 @@ const SkillsGraph: React.FC = () => {
     ctx.moveTo(link.source.x, link.source.y);
     ctx.lineTo(link.target.x, link.target.y);
     ctx.stroke();
-  }, [highlightLinks]);
+  }, [highlightLinks, screenScale]);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative min-h-[400px]">
-      <ForceGraph2D
-        ref={graphRef}
-        graphData={graphData}
-        width={dimensions.width}
-        height={dimensions.height}
-        nodeRelSize={1}
-        nodeVal={(node: any) => (node as SkillNode).val}
-        nodeLabel={() => ''} // 禁用默认的黑底白字标签
-        nodeCanvasObject={paintNode}
-        linkCanvasObject={paintLink}
-        onNodeHover={handleNodeHover}
-        onNodeDrag={handleNodeDrag}
-        onBackgroundClick={handleBackgroundClick}
-        enableZoomInteraction={true}
-        enablePanInteraction={true}
-        enableNodeDrag={true}
-        nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
-          // 移动端使用更大的触摸区域，提升节点拖拽识别
-          // 桌面端: 12px 半径
-          // 移动端: 20px 半径（约 40px 直径，适合手指触摸）
-          const touchRadius = isMobile ? 20 : 12;
-
-          ctx.fillStyle = color;
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, touchRadius, 0, 2 * Math.PI);
-          ctx.fill();
+    <div ref={containerRef} className="w-full h-full relative min-h-0 overflow-hidden">
+      <div
+        key={graphKey}
+        style={{
+          width: graphDimensions.width,
+          height: graphDimensions.height,
+          transform: `scale(${1 / screenScale})`,
+          transformOrigin: 'top left'
         }}
-        d3AlphaDecay={0.02}
-        d3VelocityDecay={0.3}
-        cooldownTime={3000}
-        warmupTicks={80}
-        backgroundColor="rgba(0,0,0,0)"
-      />
+      >
+        <ForceGraph2D
+          ref={graphRef}
+          graphData={graphData}
+          width={graphDimensions.width}
+          height={graphDimensions.height}
+          nodeRelSize={1}
+          nodeVal={(node: any) => (node as SkillNode).val}
+          nodeLabel={() => ''} // 禁用默认的黑底白字标签
+          nodeCanvasObject={paintNode}
+          linkCanvasObject={paintLink}
+          onNodeHover={handleNodeHover}
+          onNodeDrag={handleNodeDrag}
+          onBackgroundClick={handleBackgroundClick}
+          enableZoomInteraction={true}
+          enablePanInteraction={true}
+          enableNodeDrag={true}
+          nodePointerAreaPaint={(node: any, color: string, ctx: CanvasRenderingContext2D) => {
+            // 移动端使用更大的触摸区域，提升节点拖拽识别
+            // 桌面端: 12px 半径
+            // 移动端: 20px 半径（约 40px 直径，适合手指触摸）
+            const touchRadius = (isMobile ? 20 : 12) * screenScale;
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, touchRadius, 0, 2 * Math.PI);
+            ctx.fill();
+          }}
+          d3AlphaDecay={0.02}
+          d3VelocityDecay={0.3}
+          cooldownTime={3000}
+          warmupTicks={80}
+          backgroundColor="rgba(0,0,0,0)"
+        />
+      </div>
     </div>
   );
 };
