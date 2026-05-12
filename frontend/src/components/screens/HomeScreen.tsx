@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MacOSFolderIcon from '../icons/MacOSFolderIcon';
 import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
 import KyleInteractive from '../ui/KyleInteractive';
 import ProjectCard from '../ui/ProjectCard';
 import ProjectCarousel from '../ui/ProjectCarousel';
 import WidgetsSidebar from '../ui/WidgetsSidebar';
-import { useResponsive, getResponsiveScale } from '../../utils/responsive';
+import { useResponsive } from '../../utils/responsive';
 
 type HomeScreenProps = {
   onFolderDoubleClick: (folderId: string, e: React.MouseEvent, folderName: string) => void;
@@ -24,7 +24,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 }) => {
   const responsive = useResponsive();
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-  const [scale, setScale] = useState(getResponsiveScale());
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [isChatExpanded, setIsChatExpanded] = useState(false);
 
@@ -194,17 +193,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     }
   };
 
-
-  // 监听窗口大小变化，更新缩放比例
-  useEffect(() => {
-    const handleResize = () => {
-      setScale(getResponsiveScale());
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   // 移动端垂直布局
   if (responsive.isMobile) {
     return (
@@ -306,7 +294,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Projects Subtitle - 在文件夹和卡片之间 */}
-      <div className="absolute left-0 top-[22.5vh]">
+      <div className="absolute left-0 top-[203px]">
         <h4 className="text-left text-[#263148] uppercase font-sans drop-shadow-sm font-extrabold tracking-wide"
             style={{ fontSize: getSubtitleSize(), letterSpacing: '0.04em', textShadow: '0 2px 8px #b3c2d6' }}>
           Projects
@@ -319,7 +307,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* Widgets Sidebar - 右侧，与项目卡片对齐 */}
-      <div className="absolute top-[22.5vh] right-0 z-10">
+      <div className="absolute top-[203px] right-0 z-10">
         <WidgetsSidebar isChatExpanded={isChatExpanded} />
       </div>
 
@@ -336,8 +324,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           className="absolute origin-left cursor-pointer pointer-events-auto"
           style={{
             left: '1rem',
-            top: `calc(26vh + ${getCardTopOffset(id, topOffset)}px)`,
-            transform: `scale(${scale * (hoveredCard === id ? 1.02 : 1)})`,
+            top: `${234 + getCardTopOffset(id, topOffset)}px`,
+            transform: `scale(${hoveredCard === id ? 1.02 : 1})`,
             zIndex: getCardZIndex(id),
             transition: 'transform 0.3s ease-out, top 0.3s ease-out, z-index 0s'
           }}

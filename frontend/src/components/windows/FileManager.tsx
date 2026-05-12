@@ -129,39 +129,47 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
   const animationFrameRef = useRef<number | null>(null); // 新增：动画帧引用
   const lastMoveTime = useRef<number>(0); // 新增：记录上次移动时间
 
+  const getAnimationOffsetToSource = useCallback(() => {
+    if (!sourcePosition) {
+      return { x: 0, y: 0 };
+    }
+
+    const parentElement = windowRef.current?.parentElement;
+    if (parentElement) {
+      const parentRect = parentElement.getBoundingClientRect();
+      const scaleX = parentElement.clientWidth > 0 ? parentRect.width / parentElement.clientWidth : 1;
+      const scaleY = parentElement.clientHeight > 0 ? parentRect.height / parentElement.clientHeight : scaleX;
+      const safeScaleX = Number.isFinite(scaleX) && scaleX > 0 ? scaleX : 1;
+      const safeScaleY = Number.isFinite(scaleY) && scaleY > 0 ? scaleY : safeScaleX;
+
+      const sourceX = (sourcePosition.x - parentRect.left) / safeScaleX;
+      const sourceY = (sourcePosition.y - parentRect.top) / safeScaleY;
+      const currentWindowCenterX = parentElement.clientWidth / 2 + windowPosition.x;
+      const currentWindowCenterY = parentElement.clientHeight / 2 + windowPosition.y;
+
+      return {
+        x: sourceX - currentWindowCenterX,
+        y: sourceY - currentWindowCenterY
+      };
+    }
+
+    return {
+      x: sourcePosition.x - (window.innerWidth / 2 + windowPosition.x),
+      y: sourcePosition.y - (window.innerHeight / 2 + windowPosition.y)
+    };
+  }, [sourcePosition, windowPosition.x, windowPosition.y]);
+
   // 计算动画起始位置
   useEffect(() => {
     if (sourcePosition) {
-      if (useRelativePositioning) {
-        // 相对定位：相对于父容器计算偏移
-        const containerRect = windowRef.current?.parentElement?.getBoundingClientRect();
-        if (containerRect) {
-          const containerCenterX = containerRect.width / 2;
-          const containerCenterY = containerRect.height / 2;
-          const offsetX = (sourcePosition.x - containerRect.left) - containerCenterX;
-          const offsetY = (sourcePosition.y - containerRect.top) - containerCenterY;
-          console.log('Relative positioning - Animation start position:', { offsetX, offsetY, sourcePosition, containerRect });
-          setAnimationStartPosition({ x: offsetX, y: offsetY });
-        } else {
-          // 降级处理
-          setAnimationStartPosition({ x: 0, y: 0 });
-        }
-      } else {
-        // 固定定位：相对于整个视口计算偏移
-        const viewportCenterX = window.innerWidth / 2;
-        const viewportCenterY = window.innerHeight / 2;
-        const offsetX = sourcePosition.x - viewportCenterX;
-        const offsetY = sourcePosition.y - viewportCenterY;
-        console.log('Fixed positioning - Animation start position:', { offsetX, offsetY, sourcePosition });
-        setAnimationStartPosition({ x: offsetX, y: offsetY });
-      }
+      setAnimationStartPosition(getAnimationOffsetToSource());
       setIsPositionReady(true);
     } else {
       // 如果没有提供源位置，默认从屏幕中心开始
       setAnimationStartPosition({ x: 0, y: 0 });
       setIsPositionReady(true);
     }
-  }, [sourcePosition, useRelativePositioning]);
+  }, [sourcePosition, getAnimationOffsetToSource]);
 
   // 打开动画 - 组件挂载后立即开始动画
   useEffect(() => {
@@ -184,43 +192,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
     
     // 重新计算从当前窗口中心到源文件夹位置的偏移
     if (sourcePosition) {
-      if (useRelativePositioning) {
-        // 相对定位模式：需要考虑父容器的偏移
-        const containerRect = windowRef.current?.parentElement?.getBoundingClientRect();
-        if (containerRect) {
-          // 计算当前窗口的实际中心位置（屏幕坐标）
-          const currentWindowCenterX = containerRect.left + containerRect.width / 2 + windowPosition.x;
-          const currentWindowCenterY = containerRect.top + containerRect.height / 2 + windowPosition.y;
-          
-          // 计算从当前窗口中心到文件夹图标的偏移
-          const offsetX = sourcePosition.x - currentWindowCenterX;
-          const offsetY = sourcePosition.y - currentWindowCenterY;
-          
-          console.log('Relative close animation:', {
-            currentWindowCenter: { x: currentWindowCenterX, y: currentWindowCenterY },
-            sourcePosition,
-            offset: { x: offsetX, y: offsetY }
-          });
-          
-          setAnimationStartPosition({ x: offsetX, y: offsetY });
-        }
-      } else {
-        // 固定定位模式：计算从当前窗口中心到文件夹图标的偏移
-        const currentWindowCenterX = window.innerWidth / 2 + windowPosition.x;
-        const currentWindowCenterY = window.innerHeight / 2 + windowPosition.y;
-        
-        // 计算从当前窗口中心到文件夹图标的偏移
-        const offsetX = sourcePosition.x - currentWindowCenterX;
-        const offsetY = sourcePosition.y - currentWindowCenterY;
-        
-        console.log('Fixed close animation:', {
-          currentWindowCenter: { x: currentWindowCenterX, y: currentWindowCenterY },
-          sourcePosition,
-          offset: { x: offsetX, y: offsetY }
-        });
-        
-        setAnimationStartPosition({ x: offsetX, y: offsetY });
-      }
+      setAnimationStartPosition(getAnimationOffsetToSource());
     }
     
     setTimeout(() => {

@@ -190,8 +190,8 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
           </div>
           
           {/* Card Carousels Container */}
-          <div className="absolute top-24 left-4 right-4 bottom-12 overflow-hidden flex items-center justify-center">
-            <div className={`grid ${responsive.isDesktop ? 'grid-cols-3' : responsive.isTablet ? 'grid-cols-2' : 'grid-cols-1'} gap-6 justify-items-center items-center w-full`}>
+          <div className="absolute top-[150px] left-8 right-8 bottom-[110px] overflow-hidden flex items-center justify-center">
+            <div className={`grid ${responsive.isDesktop ? 'grid-cols-3' : responsive.isTablet ? 'grid-cols-2' : 'grid-cols-1'} gap-10 justify-items-center items-center w-full`}>
               {photoCategories.map((category) => (
                 <div key={category.id} className="flex flex-col items-center">
                   {/* Folder Button Above Carousel */}

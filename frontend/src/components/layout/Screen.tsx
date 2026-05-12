@@ -431,40 +431,43 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
           >
-            {/* 始终渲染所有屏幕，使用 CSS 控制显示/隐藏 */}
-            <div className={index === 0 ? 'w-full h-full' : 'hidden'}>
-              <HomeScreen
-                onFolderDoubleClick={handleFolderDoubleClick}
-                onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick}
-                onChatExpandedChange={onChatExpandedChange}
-                allProjects={allProjects}
-                onProjectDoubleClick={(projectId: string) => {
-                  // 从 allProjects 中查找完整的项目信息
-                  const project = allProjects.find(p => p.id === projectId);
-                  if (!project) return;
+            {index === 0 && (
+              <div className="w-full h-full">
+                <HomeScreen
+                  onFolderDoubleClick={handleFolderDoubleClick}
+                  onAllProjectsFolderDoubleClick={handleAllProjectsFolderDoubleClick}
+                  onChatExpandedChange={onChatExpandedChange}
+                  allProjects={allProjects}
+                  onProjectDoubleClick={(projectId: string) => {
+                    // 从 allProjects 中查找完整的项目信息
+                    const project = allProjects.find(p => p.id === projectId);
+                    if (!project) return;
 
-                  setProjectDetailWindows(prev => {
-                    // 若已存在同 id 的弹窗，则聚焦（提升 zIndex）
-                    const exist = prev.find(w => w.id === projectId);
-                    if (exist) {
-                      const maxZ = Math.max(...prev.map(w => w.zIndex));
-                      return prev.map(w => w.id === projectId ? {...w, zIndex: maxZ + 1} : w);
-                    }
-                    const maxZ = prev.length > 0 ? Math.max(...prev.map(w => w.zIndex)) : 2000;
-                    return [...prev, {id: projectId, project, zIndex: maxZ + 1, windowOffset: {x: prev.length * 40, y: prev.length * 40}}];
-                  });
-                }}
-              />
-            </div>
-            <div className={index === 1 ? 'w-full h-full' : 'hidden'}>
-              <PhotographyScreen
-                onPhotoCategoryFolderDoubleClick={handlePhotoCategoryFolderDoubleClick}
-                photoCategories={photographyData.categories}
-                categoryPhotos={photographyData.categoryPhotos}
-                allCategoryPhotos={photographyData.allCategoryPhotos}
-                isDataLoaded={photographyData.isLoaded}
-              />
-            </div>
+                    setProjectDetailWindows(prev => {
+                      // 若已存在同 id 的弹窗，则聚焦（提升 zIndex）
+                      const exist = prev.find(w => w.id === projectId);
+                      if (exist) {
+                        const maxZ = Math.max(...prev.map(w => w.zIndex));
+                        return prev.map(w => w.id === projectId ? {...w, zIndex: maxZ + 1} : w);
+                      }
+                      const maxZ = prev.length > 0 ? Math.max(...prev.map(w => w.zIndex)) : 2000;
+                      return [...prev, {id: projectId, project, zIndex: maxZ + 1, windowOffset: {x: prev.length * 40, y: prev.length * 40}}];
+                    });
+                  }}
+                />
+              </div>
+            )}
+            {index === 1 && (
+              <div className="w-full h-full">
+                <PhotographyScreen
+                  onPhotoCategoryFolderDoubleClick={handlePhotoCategoryFolderDoubleClick}
+                  photoCategories={photographyData.categories}
+                  categoryPhotos={photographyData.categoryPhotos}
+                  allCategoryPhotos={photographyData.allCategoryPhotos}
+                  isDataLoaded={photographyData.isLoaded}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

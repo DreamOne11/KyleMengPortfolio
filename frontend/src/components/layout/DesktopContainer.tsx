@@ -1,37 +1,67 @@
 import React, { useEffect, useState } from 'react';
-import { getResponsiveScale } from '../../utils/responsive';
+import {
+  DESKTOP_SCREEN_HEIGHT,
+  DESKTOP_SCREEN_WIDTH,
+  getDesktopScreenScale,
+  useResponsive
+} from '../../utils/responsive';
 
 type Props = {
   children: React.ReactNode;
 };
 
 const DesktopContainer: React.FC<Props> = ({ children }) => {
-  const [scale, setScale] = useState(getResponsiveScale());
+  const responsive = useResponsive();
+  const [scale, setScale] = useState(getDesktopScreenScale());
   
-  // 添加响应式监听以处理屏幕尺寸变化
   useEffect(() => {
     const handleResize = () => {
-      setScale(getResponsiveScale());
+      setScale(getDesktopScreenScale());
     };
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  if (responsive.isMobile) {
+    return (
+      <div className="min-h-screen w-full flex items-stretch justify-center overflow-hidden">
+        <div
+          data-testid="desktop-screen-mobile"
+          className="relative w-full h-[100svh] bg-white/10 border border-white/20 flex flex-col overflow-hidden shadow-2xl"
+          style={{ zIndex: 1 }}
+        >
+          {children}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
+    <div className="h-[100svh] w-full flex items-center justify-center overflow-hidden">
       <div 
-        className="relative bg-white/10 border border-white/20 flex flex-col overflow-hidden shadow-2xl"
+        data-testid="desktop-stage"
+        className="relative"
         style={{
-          width: 'min(95vw, 1400px)',
-          height: 'min(95vh, 900px)',
-          borderRadius: 'clamp(0.5rem, 1.5vw, 1.5rem)',
-          transform: `scale(${scale})`,
-          transformOrigin: 'center',
-          zIndex: 1
+          width: DESKTOP_SCREEN_WIDTH * scale,
+          height: DESKTOP_SCREEN_HEIGHT * scale,
+          zIndex: 1,
         }}
       >
-        {children}
+        <div
+          data-testid="desktop-screen"
+          className="absolute left-0 top-0 bg-white/10 border border-white/20 flex flex-col overflow-hidden shadow-2xl"
+          style={{
+            width: DESKTOP_SCREEN_WIDTH,
+            height: DESKTOP_SCREEN_HEIGHT,
+            borderRadius: 24,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+            '--desktop-screen-scale': scale,
+          } as React.CSSProperties}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
