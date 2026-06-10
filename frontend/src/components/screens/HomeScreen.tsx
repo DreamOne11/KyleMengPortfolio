@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MacOSFolderIcon from '../icons/MacOSFolderIcon';
-import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
+import KeyboardLogo from '../ui/keyboard-logo/KeyboardLogo';
 import KyleInteractive from '../ui/KyleInteractive';
 import ProjectCard from '../ui/ProjectCard';
 import ProjectCarousel from '../ui/ProjectCarousel';
@@ -222,10 +222,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                 onDoubleClick={(e) => handleFolderDoubleClick(folder.id, e)}
                 data-onboarding={folder.id === 'contact' ? 'contact-folder' : undefined}
               >
-                <div className={`w-14 h-14 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-2 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
+                <div className={`w-14 h-14 flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none rounded-lg hover:bg-white/10 mb-2 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
                   <MacOSFolderIcon color={folder.color} />
                 </div>
-                <h3 className={`font-semibold text-xs px-2 py-1 rounded ${selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'}`}>
+                <h3 className={`font-semibold text-xs px-2 py-1 rounded transition-colors duration-200 ${selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'}`}>
                   {folder.name}
                 </h3>
               </div>
@@ -247,9 +247,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             <WidgetsSidebar />
           </div>
 
-          {/* KeyboardLogoStacked - 底部 */}
+          {/* 键帽 Logo - 底部 */}
           <div className="flex justify-center flex-shrink-0 mt-8">
-            <KeyboardLogoStacked />
+            <KeyboardLogo />
           </div>
 
         </div>
@@ -283,10 +283,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             onDoubleClick={(e) => handleFolderDoubleClick(folder.id, e)}
             data-onboarding={folder.id === 'contact' ? 'contact-folder' : undefined}
           >
-            <div className={`w-12 h-12 md:w-16 md:h-16 flex items-center justify-center group-hover:scale-110 transition-all duration-200 rounded-lg hover:bg-white/10 mb-1 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
+            <div className={`w-12 h-12 md:w-16 md:h-16 flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none rounded-lg hover:bg-white/10 mb-1 ${selectedFolder === folder.id ? 'bg-white/10' : ''}`}>
               <MacOSFolderIcon color={folder.color} />
             </div>
-            <h3 className={`font-semibold text-xs px-2 py-1 rounded ${selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'}`}>
+            <h3 className={`font-semibold text-xs px-2 py-1 rounded transition-colors duration-200 ${selectedFolder === folder.id ? 'text-white bg-blue-500' : 'text-white'}`}>
               {folder.name}
             </h3>
           </div>
@@ -303,7 +303,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* 键帽 Logo - 居中显示 */}
       <div className="flex w-full h-full items-center justify-center pointer-events-none">
-        <KeyboardLogoStacked />
+        <KeyboardLogo />
       </div>
 
       {/* Widgets Sidebar - 右侧，与项目卡片对齐 */}
@@ -327,7 +327,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             top: `${234 + getCardTopOffset(id, topOffset)}px`,
             transform: `scale(${hoveredCard === id ? 1.02 : 1})`,
             zIndex: getCardZIndex(id),
-            transition: 'transform 0.3s ease-out, top 0.3s ease-out, z-index 0s'
+            filter: hoveredCard === id ? 'drop-shadow(0 8px 16px rgba(38, 49, 72, 0.18))' : 'none',
+            transition: 'transform 0.2s ease-out, top 0.3s ease-out, filter 0.2s ease-out, z-index 0s'
           }}
           onDoubleClick={() => handleCardDoubleClick(id)}
         >
