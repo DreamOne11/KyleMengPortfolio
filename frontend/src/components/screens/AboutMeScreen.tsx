@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MacOSFolderIcon from '../icons/MacOSFolderIcon';
-import KeyboardLogoStacked from '../ui/KeyboardLogoStacked';
+import KeyboardLogo from '../ui/keyboard-logo/KeyboardLogo';
 import KyleInteractive from '../ui/KyleInteractive';
 import { useResponsive } from '../../utils/responsive';
 
@@ -82,9 +82,9 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick, onCh
             ))}
           </div>
           
-          {/* KeyboardLogoStacked - 底部 */}
+          {/* 键帽 Logo - 底部 */}
           <div className="flex justify-center flex-shrink-0 mt-8">
-            <KeyboardLogoStacked />
+            <KeyboardLogo />
           </div>
           
         </div>
@@ -127,7 +127,7 @@ const AboutMeScreen: React.FC<AboutMeScreenProps> = ({ onFolderDoubleClick, onCh
       
       {/* 键帽 Logo - 居中显示 */}
       <div className="flex w-full h-full items-center justify-center pointer-events-none">
-        <KeyboardLogoStacked />
+        <KeyboardLogo />
       </div>
     </div>
   );
