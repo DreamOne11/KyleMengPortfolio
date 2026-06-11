@@ -7,6 +7,7 @@ interface PhotoThumbnailProps {
   onClick?: () => void;
   onDoubleClick?: () => void;
   showMetadata?: boolean;
+  isSelected?: boolean;
   className?: string;
 }
 
@@ -16,6 +17,7 @@ const PhotoThumbnail: React.FC<PhotoThumbnailProps> = ({
   onClick,
   onDoubleClick,
   showMetadata = false,
+  isSelected = false,
   className = ''
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -35,9 +37,17 @@ const PhotoThumbnail: React.FC<PhotoThumbnailProps> = ({
 
   return (
     <div
-      className={`relative bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow ${getSizeClasses()} ${className}`}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
+      className={`relative bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow ${
+        isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+      } ${getSizeClasses()} ${className}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onDoubleClick?.();
+      }}
     >
       {!imageError ? (
         <>

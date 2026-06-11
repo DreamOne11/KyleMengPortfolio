@@ -3,6 +3,7 @@ import FileManager from '../windows/FileManager';
 import EmailComposer from '../windows/EmailComposer';
 
 import ProjectDetailWindow from '../windows/ProjectDetailWindow';
+import QuickLookViewer from '../windows/QuickLookViewer';
 import { useResponsive } from '../../utils/responsive';
 
 // 导入拆分后的屏幕组件
@@ -129,6 +130,22 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
 
   // 在 Screen 组件顶部添加 projectDetailWindows 状态
   const [projectDetailWindows, setProjectDetailWindows] = useState<Array<{id: string, project: any, zIndex: number, windowOffset: {x: number, y: number}}>>([]);
+
+  // Quick Look 照片查看器状态（全局唯一，浮于所有窗口之上）
+  const [quickLook, setQuickLook] = useState<{ photos: PhotoResponse[]; index: number } | null>(null);
+
+  const handleOpenQuickLook = (photos: PhotoResponse[], index: number) => {
+    if (photos.length === 0) return;
+    setQuickLook({ photos, index: Math.min(Math.max(index, 0), photos.length - 1) });
+  };
+
+  // 最顶层窗口的 zIndex，用于限定空格键 Quick Look 只在该窗口生效
+  const allWindowZIndices = [
+    ...openFileManagers.map(fm => fm.zIndex),
+    ...openEmailComposers.map(ec => ec.zIndex),
+    ...projectDetailWindows.map(w => w.zIndex)
+  ];
+  const topWindowZIndex = allWindowZIndices.length > 0 ? Math.max(...allWindowZIndices) : -1;
 
   // 最大化状态计算和通知
   const isAnyFileManagerMaximized = openFileManagers.some(fm => fm.isMaximized);
@@ -461,6 +478,7 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
               <div className="w-full h-full">
                 <PhotographyScreen
                   onPhotoCategoryFolderDoubleClick={handlePhotoCategoryFolderDoubleClick}
+                  onPhotoOpen={handleOpenQuickLook}
                   photoCategories={photographyData.categories}
                   categoryPhotos={photographyData.categoryPhotos}
                   allCategoryPhotos={photographyData.allCategoryPhotos}
@@ -490,6 +508,9 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
           }}
           customFiles={fileManager.customFiles}
           photoCategoryId={fileManager.photoCategoryId}
+          onPhotoOpen={handleOpenQuickLook}
+          isTopWindow={fileManager.zIndex === topWindowZIndex}
+          isQuickLookOpen={quickLook !== null}
           onProjectDoubleClick={(project: any) => {
             setProjectDetailWindows(prev => {
               // 若已存在同 id 的弹窗，则聚焦（提升 zIndex）
@@ -530,6 +551,15 @@ const Screen: React.FC<Props> = ({ currentScreen, onScreenChange, onAnyFileManag
           zIndex={win.zIndex}
         />
       ))}
+
+      {/* Quick Look 照片查看器，浮于所有窗口之上 */}
+      {quickLook && (
+        <QuickLookViewer
+          photos={quickLook.photos}
+          initialIndex={quickLook.index}
+          onClose={() => setQuickLook(null)}
+        />
+      )}
     </div>
   );
 };

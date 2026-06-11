@@ -55,9 +55,12 @@ type Props = {
   onProjectDoubleClick?: (project: any) => void;
   isActive?: boolean; // 新增：是否处于活动状态
   photoCategoryId?: number; // Photography分类ID，用于获取照片
+  onPhotoOpen?: (photos: PhotoResponse[], index: number) => void; // 打开 Quick Look 查看器
+  isTopWindow?: boolean; // 是否为最顶层窗口（控制空格键 Quick Look 只作用于一个窗口）
+  isQuickLookOpen?: boolean; // Quick Look 已打开时挂起本窗口的键盘处理
 };
 
-const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange, customFiles, onProjectDoubleClick, isActive = false, photoCategoryId }) => {
+const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosition, useRelativePositioning, onFocus, windowOffset, zIndex, onOpenEmailComposer, onMaximizeChange, customFiles, onProjectDoubleClick, isActive = false, photoCategoryId, onPhotoOpen, isTopWindow = false, isQuickLookOpen = false }) => {
   const responsive = useResponsive();
   
   // 使用useEffect来监听folderName变化并更新文件列表
@@ -92,7 +95,29 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
   }, [photoCategoryId]);
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  
+  // 照片网格选中状态（桌面端单击选中，空格/双击打开 Quick Look）
+  const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
+
+  // 空格键打开选中照片的 Quick Look（仿 macOS Finder），仅最顶层窗口响应
+  useEffect(() => {
+    if (!photoCategoryId || responsive.isMobile) return;
+    if (!isTopWindow || isQuickLookOpen || selectedPhotoId === null) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (e.code !== 'Space') return;
+
+      e.preventDefault();
+      const index = photos.findIndex(p => p.id === selectedPhotoId);
+      if (index >= 0) onPhotoOpen?.(photos, index);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [photoCategoryId, responsive.isMobile, isTopWindow, isQuickLookOpen, selectedPhotoId, photos, onPhotoOpen]);
+
+
   // Window size and position state - 使用响应式窗口大小
   const defaultWindowSize = getResponsiveWindowSize(800, 600);
   const [windowSize, setWindowSize] = useState(defaultWindowSize);
@@ -781,7 +806,7 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
       <div className="flex-1 overflow-auto">
         {photoCategoryId && photos.length > 0 ? (
           // Photography files - use grid layout for photos
-          <div className="p-4">
+          <div className="p-4 min-h-full" onClick={() => setSelectedPhotoId(null)}>
             {photosLoading ? (
               <div className="flex items-center justify-center h-32">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -789,22 +814,26 @@ const FileManager: React.FC<Props> = ({ folderName, onClose, onBack, sourcePosit
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {photos.map((photo) => (
+                {photos.map((photo, photoIndex) => (
                   <PhotoThumbnail
                     key={photo.id}
                     photo={photo}
                     size="medium"
                     showMetadata={false}
+                    isSelected={!responsive.isMobile && selectedPhotoId === photo.id}
                     onClick={() => {
                       if (responsive.isMobile) {
-                        // Mobile: single click to view photo
-                        console.log('View photo:', photo.title);
+                        // 移动端：单击直接打开 Quick Look
+                        onPhotoOpen?.(photos, photoIndex);
+                      } else {
+                        // 桌面端：单击选中，空格或双击打开
+                        setSelectedPhotoId(photo.id);
                       }
                     }}
                     onDoubleClick={() => {
                       if (!responsive.isMobile) {
-                        // Desktop: double click to view photo
-                        console.log('View photo:', photo.title);
+                        setSelectedPhotoId(photo.id);
+                        onPhotoOpen?.(photos, photoIndex);
                       }
                     }}
                     className="w-full aspect-[4/3]"
