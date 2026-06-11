@@ -14,6 +14,7 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
   photos,
   categoryName,
   categoryColor,
+  onPhotoClick,
   className = ''
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -80,7 +81,7 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
     }
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isDragging) return;
 
     // 如果拖拽超过临界点，切换到下一张
@@ -89,9 +90,21 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
     } else {
       // 否则回弹
       setDragOffset(0);
+
+      // 几乎无位移视为轻点：打开当前照片的 Quick Look
+      const tapDelta = Math.abs(e.changedTouches[0].clientX - dragStartX.current);
+      if (tapDelta < 8 && photos.length > 0) {
+        onPhotoClick?.(photos[currentIndex]);
+      }
     }
 
     setIsDragging(false);
+  };
+
+  // 桌面端双击正面卡片打开 Quick Look
+  const handleDoubleClick = () => {
+    if (responsive.isMobile || photos.length === 0) return;
+    onPhotoClick?.(photos[currentIndex]);
   };
 
 
@@ -228,6 +241,7 @@ const CardCarousel: React.FC<CardCarouselProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

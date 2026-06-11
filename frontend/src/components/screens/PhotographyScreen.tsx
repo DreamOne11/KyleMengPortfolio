@@ -11,6 +11,7 @@ type PhotographyScreenProps = {
     photos: PhotoResponse[],
     e: React.MouseEvent
   ) => void;
+  onPhotoOpen?: (photos: PhotoResponse[], index: number) => void;
   photoCategories: PhotoCategoryResponse[];
   categoryPhotos: { [key: number]: PhotoResponse[] };
   allCategoryPhotos: { [key: number]: PhotoResponse[] };
@@ -19,12 +20,21 @@ type PhotographyScreenProps = {
 
 const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
   onPhotoCategoryFolderDoubleClick,
+  onPhotoOpen,
   photoCategories,
   categoryPhotos,
   allCategoryPhotos,
   isDataLoaded
 }) => {
   const responsive = useResponsive();
+
+  // 轮播卡片打开 Quick Look：定位到该分类完整照片列表中的对应位置
+  const handleCarouselPhotoOpen = (category: PhotoCategoryResponse, photo: PhotoResponse) => {
+    const fullList = allCategoryPhotos[category.id] || [];
+    const list = fullList.length > 0 ? fullList : (categoryPhotos[category.id] || []);
+    const index = Math.max(0, list.findIndex(p => p.id === photo.id));
+    onPhotoOpen?.(list, index);
+  };
   
   // 根据屏幕尺寸调整标题大小
   const getTitleSize = () => {
@@ -156,6 +166,7 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
                     photos={categoryPhotos[category.id] || []}
                     categoryName={category.displayName}
                     categoryColor={category.iconColor || '#3B82F6'}
+                    onPhotoClick={(photo) => handleCarouselPhotoOpen(category, photo)}
                     className="w-full"
                   />
                 </div>
@@ -212,6 +223,7 @@ const PhotographyScreen: React.FC<PhotographyScreenProps> = ({
                     photos={categoryPhotos[category.id] || []}
                     categoryName={category.displayName}
                     categoryColor={category.iconColor || '#3B82F6'}
+                    onPhotoClick={(photo) => handleCarouselPhotoOpen(category, photo)}
                     className="w-full"
                   />
                 </div>
